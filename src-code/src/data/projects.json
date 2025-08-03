@@ -1,0 +1,33 @@
+{
+  "projects": [
+    {
+      "id": "example-project-1",
+      "title": "Example Project 1",
+      "description": "A sample project to demonstrate the portfolio structure",
+      "longDescription": "This is a longer description that provides more details about the project, its goals, challenges, and solutions implemented.",
+      "technologies": ["React", "Next.js", "TypeScript", "Tailwind CSS"],
+      "githubUrl": "https://github.com/username/example-project-1",
+      "liveUrl": "https://example-project-1.vercel.app",
+      "imageUrl": "/images/projects/example-1.jpg",
+      "featured": true,
+      "category": "web-development",
+      "status": "completed",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-20T00:00:00.000Z"
+    },
+    {
+      "id": "example-project-2",
+      "title": "Example Project 2",
+      "description": "Another sample project showcasing different technologies",
+      "longDescription": "This project demonstrates different aspects of development including API integration, database management, and user authentication.",
+      "technologies": ["Node.js", "Express", "MongoDB", "React"],
+      "githubUrl": "https://github.com/username/example-project-2",
+      "imageUrl": "/images/projects/example-2.jpg",
+      "featured": false,
+      "category": "api",
+      "status": "in-progress",
+      "createdAt": "2024-02-01T00:00:00.000Z",
+      "updatedAt": "2024-02-15T00:00:00.000Z"
+    }
+  ]
+}

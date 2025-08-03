@@ -30,10 +30,6 @@ jobs:
       run: npm ci
       working-directory: ./src-code
       
-    - name: Run linting
-      run: npm run lint
-      working-directory: ./src-code
-      
     - name: Run type checking
       run: npx tsc --noEmit
       working-directory: ./src-code

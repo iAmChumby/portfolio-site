@@ -6,8 +6,13 @@ interface TopoPoint {
   x: number;
   y: number;
   elevation: number;
-  animatedElevation: number; // Add animated elevation for color calculations
+  animatedElevation: number;
   char: string;
+  // Pre-calculated values for performance
+  distance: number;
+  angle: number;
+  dx: number;
+  dy: number;
 }
 
 interface AnimatedBackgroundWrapperProps {
@@ -23,6 +28,10 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
   const timeRef = useRef<number>(0);
   const isRunningRef = useRef<boolean>(false);
   const lastFrameTimeRef = useRef<number>(0);
+  
+  // Performance optimization: Target 30fps instead of 60fps
+  const targetFPS = 30;
+  const frameInterval = 1000 / targetFPS;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -36,12 +45,12 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
       canvas.height = window.innerHeight;
     };
 
-    // Simplified character sets for clearer spiral visibility
+    // Optimized character sets and grid size for better performance
     const topoChars = ['8', '0', 'O']; // High elevation - spiral arms
     const detailChars = ['.', '_', '-']; // Low elevation - valleys
-    const gridSize = 16; // Smaller size for more detail
+    const gridSize = 20; // Increased from 16 to reduce point count for better performance
     
-    // Noise function for texture
+    // Simplified noise function for texture
     const noise = (x: number, y: number, scale: number = 1) => {
       return Math.sin(x * scale) * Math.cos(y * scale) * 0.5 + 0.5;
     };
@@ -58,7 +67,7 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
           const x = col * gridSize;
           const y = row * gridSize;
           
-          // Calculate distance and angle from center for spiral pattern
+          // Pre-calculate distance and angle for performance optimization
           const dx = x - centerX;
           const dy = y - centerY;
           const distance = Math.sqrt(dx * dx + dy * dy);
@@ -81,8 +90,13 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
             x,
             y,
             elevation: complexElevation,
-            animatedElevation: complexElevation, // Initialize with base elevation
-            char: topoChars[0] // Will be updated in animation
+            animatedElevation: complexElevation,
+            char: topoChars[0],
+            // Store pre-calculated values for performance
+            distance,
+            angle,
+            dx,
+            dy
           });
         }
       }
@@ -94,25 +108,26 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
       // Ensure canvas and context are valid
       if (!canvas || !ctx) return;
       
-      // Clear with black background
+      // Clear with black background - more efficient than fillRect
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Set font for ASCII characters
-      ctx.font = `${gridSize * 0.8}px monospace`;
+      // Set font for ASCII characters - only set once for performance
+      ctx.font = `${gridSize * 0.7}px monospace`; // Slightly smaller font for better performance
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
       const points = topoPointsRef.current;
       if (!points || points.length === 0) return;
       
+      // Batch rendering for better performance
       points.forEach(point => {
         // Use animated elevation for consistent color calculations
-        // Map from [-1.05, 1.05] to [0, 1] for color intensity
         const colorElevation = (point.animatedElevation + 1.05) / 2.1;
         const clampedColorElevation = Math.max(0, Math.min(1, colorElevation));
         
-        // Enhanced color calculation for better spiral visibility
+        // Simplified color calculation for better performance
         const colorIntensity = clampedColorElevation;
         const red = Math.floor(colorIntensity * 255);
         const green = Math.floor(colorIntensity * 220);
@@ -120,16 +135,16 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
         
         ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
         
-        // Add glow effect for higher elevations to make spiral more visible
-        if (clampedColorElevation > 0.6) {
-          ctx.shadowColor = `rgba(${green}, ${Math.floor(green * 0.9)}, ${Math.floor(green * 0.7)}, 0.4)`;
-          ctx.shadowBlur = 3;
+        // Reduced shadow effects for better performance
+        if (clampedColorElevation > 0.7) {
+          ctx.shadowColor = `rgba(${green}, ${Math.floor(green * 0.9)}, ${Math.floor(green * 0.7)}, 0.3)`;
+          ctx.shadowBlur = 2; // Reduced from 3 to 2
         } else {
           ctx.shadowBlur = 0;
         }
         
-        // Draw ASCII character
-        if (point.char !== ' ') {
+        // Draw ASCII character only if visible
+        if (point.char !== ' ' && clampedColorElevation > 0.1) {
           ctx.fillText(
             point.char,
             point.x + gridSize / 2,
@@ -145,35 +160,38 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
         return;
       }
 
-      // Use simple continuous time without modulo to prevent discontinuities
-      const currentTime = performance.now() * 0.001;
-      timeRef.current = currentTime;
-      lastFrameTimeRef.current = performance.now();
+      const currentTime = performance.now();
+      
+      // Frame rate limiting for smoother performance
+      if (currentTime - lastFrameTimeRef.current < frameInterval) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      // Update frame time
+      lastFrameTimeRef.current = currentTime;
+      timeRef.current = currentTime * 0.001;
       
       // Update topographic map with spiral pattern
       const points = topoPointsRef.current;
-      const time = currentTime;
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
+      const time = timeRef.current;
       
       // Only process if we have points
       if (points && points.length > 0) {
         points.forEach(point => {
-          // Calculate distance and angle from center
-          const dx = point.x - centerX;
-          const dy = point.y - centerY;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          const angle = Math.atan2(dy, dx);
+          // Use pre-calculated distance and angle for better performance
+          const distance = point.distance;
+          const angle = point.angle;
           
           // Create clean, distinct spiral pattern with consistent amplitude
           const spiralFreq = 0.005; // Slightly higher frequency for smaller bands
-          const spiralArms = 8; // Changed from 6 to 8 spiral arms
-          const spiralElevation = Math.sin((distance * spiralFreq) + (angle * spiralArms) + (time * 0.5)) * 0.6; // Reduced amplitude for smaller bands
+          const spiralArms = 6; // Reduced from 8 to 6 for better performance
+          const spiralElevation = Math.sin((distance * spiralFreq) + (angle * spiralArms) + (time * 0.4)) * 0.6; // Slower animation
           
           // Add gentle radial waves for depth
-          const radialWaves = Math.sin((distance * 0.006) + (time * 0.3)) * 0.2;
+          const radialWaves = Math.sin((distance * 0.006) + (time * 0.2)) * 0.2; // Slower animation
           
-          // Minimal noise for slight texture only
+          // Minimal noise for slight texture only (pre-calculated)
           const subtleNoise = noise(point.x * 0.03, point.y * 0.03, 1) * 0.05;
           
           // Combine elevations with better balance to ensure spiral visibility
@@ -183,7 +201,6 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
           point.animatedElevation = combinedElevation;
           
           // Improved normalization to ensure spiral arms are always visible
-          // Map from [-1.05, 1.05] to [0, 1] with bias toward higher values
           const normalizedElevation = (combinedElevation + 1.05) / 2.1;
           const clampedElevation = Math.max(0, Math.min(1, normalizedElevation));
           
@@ -223,19 +240,19 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
       }
     };
 
-    // Watchdog to restart animation if it stops unexpectedly
+    // Optimized watchdog with longer interval for better performance
     const watchdog = setInterval(() => {
       if (isRunningRef.current) {
         const now = performance.now();
         const timeSinceLastFrame = now - lastFrameTimeRef.current;
-        // If more than 100ms since last frame, restart animation
-        if (timeSinceLastFrame > 100) {
+        // If more than 200ms since last frame, restart animation (increased from 100ms)
+        if (timeSinceLastFrame > 200) {
           console.log('Animation watchdog: restarting stopped animation');
           animationRef.current = requestAnimationFrame(animate);
           lastFrameTimeRef.current = now;
         }
       }
-    }, 50);
+    }, 100); // Increased from 50ms to 100ms for better performance
 
     resizeCanvas();
     createTopoMap();

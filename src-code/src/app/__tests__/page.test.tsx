@@ -3,6 +3,10 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Home from '../page';
 
+// Mock the GitHub hooks
+jest.mock('@/lib/hooks/useGitHub');
+jest.mock('@/lib/hooks/useApi');
+
 // Mock the data files
 jest.mock('@/data/site-config.json', () => ({
   site: {
@@ -58,13 +62,13 @@ describe('Home Page', () => {
     expect(screen.getByText('Test bio description')).toBeInTheDocument();
     expect(screen.getByText('Test City, Test Country')).toBeInTheDocument();
     expect(screen.getByText('test@example.com')).toBeInTheDocument();
-    expect(screen.getByText('Available for work')).toBeInTheDocument();
+    expect(screen.getAllByText('Available for work')).toHaveLength(2);
   });
 
   it('renders featured projects section', () => {
     render(<Home />);
     
-    expect(screen.getByText('Featured Projects')).toBeInTheDocument();
+    expect(screen.getAllByText('Featured Projects')).toHaveLength(2);
     expect(screen.getByText('Test Project 1')).toBeInTheDocument();
     expect(screen.getByText('Test project description')).toBeInTheDocument();
     
@@ -75,9 +79,9 @@ describe('Home Page', () => {
   it('renders project technologies as tags', () => {
     render(<Home />);
     
-    expect(screen.getByText('React')).toBeInTheDocument();
-    expect(screen.getByText('TypeScript')).toBeInTheDocument();
-    expect(screen.getByText('Next.js')).toBeInTheDocument();
+    expect(screen.getAllByText('React')).toHaveLength(3); // SkillsShowcase, Technologies, and Projects
+    expect(screen.getAllByText('TypeScript')).toHaveLength(6); // Multiple components and contexts
+    expect(screen.getAllByText('Next.js')).toHaveLength(3); // SkillsShowcase, Technologies, and Projects
   });
 
   it('renders contact CTA section', () => {

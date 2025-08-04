@@ -2,33 +2,33 @@
 
 :root {
   /* Colors - Light Theme */
-  --color-primary: #3b82f6;
-  --color-primary-dark: #2563eb;
-  --color-primary-light: #60a5fa;
+  --color-primary: #000000;
+  --color-primary-dark: #000000;
+  --color-primary-light: #374151;
   
-  --color-secondary: #8b5cf6;
-  --color-secondary-dark: #7c3aed;
-  --color-secondary-light: #a78bfa;
+  --color-secondary: #ffffff;
+  --color-secondary-dark: #f9fafb;
+  --color-secondary-light: #ffffff;
   
-  --color-accent: #f59e0b;
-  --color-accent-dark: #d97706;
-  --color-accent-light: #fbbf24;
+  --color-accent: #22c55e;
+  --color-accent-dark: #16a34a;
+  --color-accent-light: #4ade80;
   
-  --color-text: #1f2937;
-  --color-text-light: #6b7280;
-  --color-text-muted: #9ca3af;
+  --color-text: #000000;
+  --color-text-light: #374151;
+  --color-text-muted: #6b7280;
   
-  --color-background: #ffffff;
-  --color-background-alt: #f9fafb;
+  --color-background: #d2d3d3;
+  --color-background-alt: #e5e7eb;
   --color-background-muted: #f3f4f6;
   
-  --color-border: #e5e7eb;
-  --color-border-light: #f3f4f6;
+  --color-border: #9ca3af;
+  --color-border-light: #d1d5db;
   
-  --color-success: #10b981;
+  --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-info: #22c55e;
   
   /* Typography */
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -111,16 +111,33 @@
 
 /* Dark Theme */
 [data-theme="dark"] {
-  --color-text: #f9fafb;
+  --color-text: #ffffff;
   --color-text-light: #d1d5db;
   --color-text-muted: #9ca3af;
   
-  --color-background: #111827;
-  --color-background-alt: #1f2937;
+  --color-background: #202125;
+  --color-background-alt: #2d3748;
   --color-background-muted: #374151;
   
-  --color-border: #374151;
-  --color-border-light: #4b5563;
+  --color-border: #4b5563;
+  --color-border-light: #6b7280;
+  
+  --color-primary: #ffffff;
+  --color-primary-dark: #d1d5db;
+  --color-primary-light: #ffffff;
+  
+  --color-secondary: #000000;
+  --color-secondary-dark: #111827;
+  --color-secondary-light: #1f2937;
+  
+  --color-accent: #22c55e;
+  --color-accent-dark: #16a34a;
+  --color-accent-light: #4ade80;
+  
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #22c55e;
 }
 
 /* High contrast mode */

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button, ThemeToggle } from '@/components/ui';
+import { Button } from '@/components/ui';
 
 interface NavigationItem {
   label: string;
@@ -64,43 +64,38 @@ const Header: React.FC<HeaderProps> = ({
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled
-          ? 'bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:bg-black/95 dark:border-gray-800'
+          ? 'bg-gray-800/95 backdrop-blur-sm shadow-sm border-b border-gray-600'
           : 'bg-transparent'
       )}
     >
-      <div className="container flex items-center justify-between h-32 px-32 max-w-none">
+      <div className="container flex items-center justify-between h-20 px-6">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 text-xl font-bold text-green-600 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="flex items-center space-x-2 text-xl font-bold text-black hover:text-gray-600 transition-colors"
           >
-            {logo && (
+            {logo ? (
               <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
+            ) : (
+              <span>{siteName}</span>
             )}
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-16">
-            {navigation.map((item, index) => (
+          <nav className="hidden md:flex items-center space-x-6">
+            {navigation.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 className={cn(
-                  'relative px-24 py-20 text-lg font-semibold transition-all duration-300 rounded-2xl border-4 min-w-[140px] flex items-center justify-center text-center',
-                  // Add explicit margins for extra spacing
-                  index > 0 ? 'ml-8' : '',
-                  // Persistent glow for all items with more button-like appearance
-                  'border-green-400/70 shadow-[0_0_16px_rgba(34,197,94,0.5)] bg-green-50/40 dark:bg-green-950/40',
-                  // Enhanced glow on hover with more pronounced button effect
-                  'hover:border-green-500 hover:shadow-[0_0_24px_rgba(34,197,94,0.7)] hover:text-green-400 hover:bg-green-50/60 dark:hover:bg-green-950/60 hover:scale-110 hover:-translate-y-2',
-                  // Emphasized glow on click/active with button press effect
-                  'active:border-green-600 active:shadow-[0_0_32px_rgba(34,197,94,0.9)] active:scale-105 active:translate-y-0',
-                  'focus:outline-none focus:ring-4 focus:ring-green-400/50 focus:ring-offset-4',
+                  'relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg border-2 border-transparent',
+                  'hover:border-[var(--color-accent)] hover:shadow-[0_0_10px_rgba(0,99,45,0.3)] hover:text-[var(--color-accent)]',
+                  'active:border-[var(--color-accent-hover)] active:shadow-[0_0_15px_rgba(0,99,45,0.5)]',
                   isActiveLink(item.href)
-                    ? 'border-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)] text-green-400 bg-green-50/50 dark:bg-green-950/50'
-                    : 'text-green-600 dark:text-gray-300'
+                    ? 'border-[var(--color-accent)] shadow-[0_0_8px_rgba(0,99,45,0.4)] text-[var(--color-accent)] bg-[var(--color-accent)]/5'
+                    : 'text-gray-700'
                 )}
               >
                 {item.label}
@@ -108,17 +103,17 @@ const Header: React.FC<HeaderProps> = ({
             ))}
           </nav>
 
-          {/* CTA Button and Theme Toggle */}
-          <div className="hidden md:flex items-center gap-40 ml-20">
-            <div className="relative">
-              <ThemeToggle />
-            </div>
+          {/* CTA Button */}
+          <div className="hidden md:flex items-center gap-6">
+            <Button variant="primary" size="sm">
+              Get In Touch
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={toggleMenu}
-            className="md:hidden p-2 rounded-md text-green-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="md:hidden p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
             aria-label="Toggle menu"
           >
             <svg
@@ -141,39 +136,32 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white/95 backdrop-blur-sm dark:bg-black/95 border-t border-gray-200 dark:border-gray-800">
-            <div className="flex flex-col space-y-8 px-12 py-16">
-              {navigation.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
-                  className={cn(
-                    'relative px-16 py-20 text-xl font-semibold transition-all duration-300 rounded-2xl border-4 min-w-[160px] flex items-center justify-center text-center',
-                    // Persistent glow for all items with more button-like appearance
-                    'border-green-400/70 shadow-[0_0_16px_rgba(34,197,94,0.5)] bg-green-50/40 dark:bg-green-950/40',
-                    // Enhanced glow on hover with more pronounced button effect
-                    'hover:border-green-500 hover:shadow-[0_0_24px_rgba(34,197,94,0.7)] hover:text-green-400 hover:bg-green-50/60 dark:hover:bg-green-950/60 hover:scale-110 hover:-translate-y-2',
-                    // Emphasized glow on click/active with button press effect
-                    'active:border-green-600 active:shadow-[0_0_32px_rgba(34,197,94,0.9)] active:scale-105 active:translate-y-0',
-                    'focus:outline-none focus:ring-4 focus:ring-green-400/50 focus:ring-offset-4',
-                    isActiveLink(item.href)
-                      ? 'text-green-400 border-green-400 shadow-[0_0_16px_rgba(34,197,94,0.6)]'
-                      : 'text-green-600 dark:text-gray-300 hover:text-green-400'
-                  )}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              
-              <div className="flex items-center justify-between mt-12 pt-12 border-t border-gray-200 dark:border-gray-700">
-                <div className="relative">
-                  <ThemeToggle />
+          <div className="md:hidden">
+            <div className="px-4 pt-4 pb-6 space-y-2 bg-gray-800 border-t border-gray-600 shadow-lg">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                    className={cn(
+                      'block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 border-2 border-transparent',
+                      'hover:border-[var(--color-accent)] hover:shadow-[0_0_8px_rgba(0,99,45,0.3)] hover:text-[var(--color-accent)]',
+                      'active:border-[var(--color-accent-hover)] active:shadow-[0_0_12px_rgba(0,99,45,0.5)]',
+                      isActiveLink(item.href)
+                        ? 'border-[var(--color-accent)] shadow-[0_0_6px_rgba(0,99,45,0.4)] text-[var(--color-accent)] bg-[var(--color-accent)]/5'
+                        : 'text-gray-300 hover:bg-gray-700'
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 mt-4 pt-4">
+                  <Button variant="primary" size="sm">
+                    Get In Touch
+                  </Button>
                 </div>
               </div>
-            </div>
           </div>
         )}
     </header>

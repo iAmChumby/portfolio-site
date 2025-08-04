@@ -28,29 +28,29 @@ const Technologies: React.FC = () => {
 
   return (
     <section className="py-20 bg-[var(--color-background)]">
-      <div className="container mx-auto px-6 max-w-4xl text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-green-600 dark:text-white mb-4">
+      <div className="container mx-auto px-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-green-600 mb-4 text-center">
           Technologies & Skills
         </h2>
-        <p className="text-lg text-green-600 dark:text-gray-300 mb-12">
-          Tools and technologies I work with
+        <p className="text-lg text-green-600 mb-12 text-center max-w-3xl mx-auto">
+          Here are the technologies and tools I work with regularly
         </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center">
-          {technologies.map((tech) => {
+        
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-items-center">
+          {technologies.map((tech, index) => {
             const IconComponent = tech.icon;
             return (
               <div
-                key={tech.name}
-                className="flex flex-col items-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-full max-w-[180px] min-h-[140px]"
+                key={index}
+                className="flex flex-col items-center p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors w-full max-w-[180px] min-h-[140px] border border-gray-600"
               >
-                <div className="text-primary mb-3">
-                  <IconComponent size={40} />
+                <div className="text-4xl mb-3">
+                  <IconComponent />
                 </div>
-                <h3 className="text-base font-semibold text-green-600 dark:text-white mb-2 text-center">
+                <h3 className="text-base font-semibold text-green-600 mb-2 text-center">
                   {tech.name}
                 </h3>
-                <p className="text-sm text-green-600 dark:text-gray-400 text-center">
+                <p className="text-sm text-green-600 text-center">
                   {tech.category}
                 </p>
               </div>

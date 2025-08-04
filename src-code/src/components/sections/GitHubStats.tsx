@@ -18,10 +18,10 @@ const GitHubStats: React.FC = () => {
   if (loading) {
     return (
       <div className="w-full">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-black dark:text-white mb-4">GitHub Statistics</h2>
-          <p className="text-green-600 dark:text-gray-400">Overview of my GitHub activity</p>
-        </div>
+        <div className="container mx-auto px-6">
+        <h2 className="text-3xl font-bold text-black mb-4">GitHub Statistics</h2>
+        <p className="text-green-600">Overview of my GitHub activity</p>
+      </div>
         <div className="flex justify-center py-12">
           <LoadingSpinner size="md" />
         </div>
@@ -32,10 +32,10 @@ const GitHubStats: React.FC = () => {
   if (error) {
     return (
       <div className="w-full">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-black dark:text-white mb-4">GitHub Statistics</h2>
-          <p className="text-green-600 dark:text-gray-400">Overview of my GitHub activity</p>
-        </div>
+        <div className="container mx-auto px-6">
+        <h2 className="text-3xl font-bold text-black mb-4">GitHub Statistics</h2>
+        <p className="text-green-600">Overview of my GitHub activity</p>
+      </div>
         <div className="max-w-md mx-auto">
           <ErrorMessage 
             message={error} 
@@ -92,12 +92,12 @@ const GitHubStats: React.FC = () => {
         {stats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
-            <div key={index} className="text-center p-6 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
-              <div className="text-black dark:text-white mb-3 flex justify-center">
+            <div key={index} className="text-center p-6 bg-gray-800 rounded-lg border border-gray-600">
+              <div className="text-black mb-3 flex justify-center">
                 <IconComponent size={32} />
               </div>
-              <div className="text-3xl font-bold text-black dark:text-white mb-2">{stat.value.toLocaleString()}</div>
-              <div className="text-sm text-green-600 dark:text-gray-400">{stat.label}</div>
+              <div className="text-3xl font-bold text-black mb-2">{stat.value.toLocaleString()}</div>
+              <div className="text-sm text-green-600">{stat.label}</div>
             </div>
           );
         })}
@@ -106,20 +106,20 @@ const GitHubStats: React.FC = () => {
       {/* Top Languages */}
       {topLanguages.length > 0 && (
         <div className="max-w-2xl mx-auto">
-          <h3 className="text-2xl font-bold text-black dark:text-white mb-6 text-center">Top Languages</h3>
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-800">
+          <h3 className="text-2xl font-bold text-black mb-6 text-center">Top Languages</h3>
+          <div className="bg-gray-800 rounded-lg p-6 border border-gray-600">
             <div className="space-y-4">
               {topLanguages.map((lang, index) => (
                 <div key={index} className="flex items-center justify-between">
-                  <span className="text-base font-medium text-black dark:text-white">{lang.language}</span>
+                  <span className="text-base font-medium text-black">{lang.language}</span>
                   <div className="flex items-center space-x-3">
-                    <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                    <div className="w-24 bg-gray-200 rounded-full h-3">
                       <div
-                        className="bg-black dark:bg-white h-3 rounded-full transition-all duration-300"
+                        className="bg-black h-3 rounded-full transition-all duration-300"
                         style={{ width: `${lang.percentage}%` }}
                       />
                     </div>
-                    <span className="text-sm text-green-600 dark:text-gray-400 w-10 text-right">
+                    <span className="text-sm text-green-600 w-10 text-right">
                       {lang.percentage.toFixed(0)}%
                     </span>
                   </div>
@@ -130,16 +130,16 @@ const GitHubStats: React.FC = () => {
         </div>
       )}
 
-      <div className="mt-12 text-center">
-        <a
-          href={`https://github.com/${username}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center px-6 py-3 bg-black dark:bg-white text-white dark:text-black font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-        >
-          View GitHub Profile →
-        </a>
-      </div>
+      <div className="text-center mt-8">
+          <a
+            href={`https://github.com/${githubUsername}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            View GitHub Profile
+          </a>
+        </div>
     </div>
   );
 };

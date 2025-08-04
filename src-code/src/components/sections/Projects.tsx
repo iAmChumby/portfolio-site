@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Card, CardHeader, CardBody } from '@/components/ui';
+import { Button } from '@/components/ui';
 import projectsData from '@/data/projects.json';
 
 const Projects: React.FC = () => {

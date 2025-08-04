@@ -9,7 +9,7 @@ const Hero: React.FC = () => {
     <section className="min-h-screen flex items-center justify-center bg-[var(--color-background)] pt-20">
       <div className="container mx-auto px-6 text-center">
         <h1 className="text-5xl md:text-7xl font-bold text-green-600 mb-6">
-          Hi, I'm {siteConfig.site.author.name}
+          Hi, I&apos;m {siteConfig.site.author.name}
         </h1>
         <h2 className="text-2xl md:text-3xl text-green-600 mb-8">
           {siteConfig.site.title}

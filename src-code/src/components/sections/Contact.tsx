@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-import { EmailIcon, BriefcaseIcon } from '../ui/icons';
-import { Button } from '@/components/ui';
 import siteConfig from '@/data/site-config.json';
 
 const Contact: React.FC = () => {
@@ -13,8 +11,8 @@ const Contact: React.FC = () => {
           Get In Touch
         </h2>
         <p className="text-xl text-green-600 mb-8 max-w-2xl mx-auto">
-          I'm always interested in new opportunities and collaborations. 
-          Feel free to reach out if you'd like to work together!
+          I&apos;m always interested in new opportunities and collaborations. 
+          Feel free to reach out if you&apos;d like to work together!
         </p>
         
         <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">

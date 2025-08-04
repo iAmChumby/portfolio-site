@@ -24,8 +24,6 @@ const Technologies: React.FC = () => {
     { name: 'AWS', icon: CloudIcon, category: 'Cloud' },
   ];
 
-  const categories = ['Frontend', 'Framework', 'Language', 'Backend', 'Database', 'DevOps', 'Cloud'];
-
   return (
     <section className="py-20 bg-[var(--color-background)]">
       <div className="container mx-auto px-6">

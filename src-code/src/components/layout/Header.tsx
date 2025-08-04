@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui';
 
 interface NavigationItem {
   label: string;
@@ -21,8 +20,9 @@ interface HeaderProps {
 
 const defaultNavigation: NavigationItem[] = [
   { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
   { label: 'Projects', href: '/projects' },
-  { label: 'GitHub', href: '/github' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -62,106 +62,194 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out',
         isScrolled
-          ? 'bg-gray-800/95 backdrop-blur-sm shadow-sm border-b border-gray-600'
+          ? 'bg-gray-900/90 backdrop-blur-md shadow-2xl border-b border-gray-700/50'
           : 'bg-transparent'
       )}
     >
-      <div className="container flex items-center justify-between h-20 px-6">
-          {/* Logo */}
+      <div className="container flex items-center justify-between h-24 px-6 max-w-7xl mx-auto">
+          {/* Logo with enhanced hover effect */}
           <Link
             href="/"
-            className="flex items-center space-x-2 text-xl font-bold text-black hover:text-gray-600 transition-colors"
+            className="group flex items-center space-x-3 text-2xl font-bold transition-all duration-300 hover:scale-105"
           >
             {logo ? (
-              <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
+              <div className="relative">
+                <Image 
+                  src={logo} 
+                  alt={siteName} 
+                  width={40} 
+                  height={40} 
+                  className="h-10 w-auto transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]" 
+                />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+              </div>
             ) : (
-              <span>{siteName}</span>
+              <span className="bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 bg-clip-text text-transparent group-hover:from-green-300 group-hover:via-emerald-400 group-hover:to-green-500 transition-all duration-300">
+                {siteName}
+              </span>
             )}
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navigation.map((item) => (
+          {/* Desktop Navigation with enhanced spacing and effects */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            {navigation.map((item, index) => (
               <Link
                 key={item.href}
                 href={item.href}
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 className={cn(
-                  'relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg border-2 border-transparent',
-                  'hover:border-[var(--color-accent)] hover:shadow-[0_0_10px_rgba(0,99,45,0.3)] hover:text-[var(--color-accent)]',
-                  'active:border-[var(--color-accent-hover)] active:shadow-[0_0_15px_rgba(0,99,45,0.5)]',
+                  'group relative px-4 py-3 text-sm font-semibold tracking-wide uppercase transition-all duration-500 ease-out',
+                  'before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-green-400/10 before:via-emerald-500/10 before:to-green-600/10',
+                  'before:opacity-0 before:scale-95 before:transition-all before:duration-300',
+                  'hover:before:opacity-100 hover:before:scale-100',
+                  'after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-green-400 after:via-emerald-500 after:to-green-600',
+                  'after:transition-all after:duration-300 after:ease-out after:-translate-x-1/2',
+                  'hover:after:w-full hover:scale-105 hover:text-green-400',
+                  'active:scale-95 active:transition-transform active:duration-150',
                   isActiveLink(item.href)
-                    ? 'border-[var(--color-accent)] shadow-[0_0_8px_rgba(0,99,45,0.4)] text-[var(--color-accent)] bg-[var(--color-accent)]/5'
-                    : 'text-gray-700'
+                    ? 'text-green-400 after:w-full shadow-[0_0_20px_rgba(34,197,94,0.3)]'
+                    : 'text-gray-300 hover:text-green-400'
                 )}
+                style={{
+                  animationDelay: `${index * 100}ms`
+                }}
               >
-                {item.label}
+                <span className="relative z-10 flex items-center space-x-2">
+                  <span>{item.label}</span>
+                  {/* Animated dot indicator */}
+                  <span className={cn(
+                    'w-1.5 h-1.5 rounded-full transition-all duration-300',
+                    isActiveLink(item.href) 
+                      ? 'bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.8)]' 
+                      : 'bg-transparent group-hover:bg-green-400/60'
+                  )}></span>
+                </span>
+                
+                {/* Constellation-like particles on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                  <div className="absolute top-1 left-2 w-1 h-1 bg-green-400/60 rounded-full animate-pulse"></div>
+                  <div className="absolute top-3 right-3 w-0.5 h-0.5 bg-emerald-400/80 rounded-full animate-pulse" style={{animationDelay: '200ms'}}></div>
+                  <div className="absolute bottom-2 left-4 w-0.5 h-0.5 bg-green-300/70 rounded-full animate-pulse" style={{animationDelay: '400ms'}}></div>
+                </div>
               </Link>
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:flex items-center gap-6">
-            <Button variant="primary" size="sm">
-              Get In Touch
-            </Button>
+          {/* Enhanced CTA Button */}
+          <div className="hidden lg:flex items-center">
+            <Link
+              href="/contact"
+              className="group relative px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(34,197,94,0.4)] active:scale-95"
+            >
+              <span className="relative z-10 flex items-center space-x-2">
+                <span>Get In Touch</span>
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
+              
+              {/* Animated background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+            </Link>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Enhanced Mobile Menu Button */}
           <button
             onClick={toggleMenu}
-            className="md:hidden p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
+            className="lg:hidden relative p-3 rounded-xl text-gray-300 hover:text-green-400 hover:bg-gray-800/50 transition-all duration-300 hover:scale-110 active:scale-95"
             aria-label="Toggle menu"
           >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {isMenuOpen ? (
-                <path d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            <div className="relative w-6 h-6">
+              <span className={cn(
+                'absolute left-0 top-1 w-6 h-0.5 bg-current transition-all duration-300 ease-out',
+                isMenuOpen ? 'rotate-45 translate-y-2' : 'rotate-0 translate-y-0'
+              )}></span>
+              <span className={cn(
+                'absolute left-0 top-3 w-6 h-0.5 bg-current transition-all duration-300 ease-out',
+                isMenuOpen ? 'opacity-0' : 'opacity-100'
+              )}></span>
+              <span className={cn(
+                'absolute left-0 top-5 w-6 h-0.5 bg-current transition-all duration-300 ease-out',
+                isMenuOpen ? '-rotate-45 -translate-y-2' : 'rotate-0 translate-y-0'
+              )}></span>
+            </div>
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Enhanced Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-4 pt-4 pb-6 space-y-2 bg-gray-800 border-t border-gray-600 shadow-lg">
-                {navigation.map((item) => (
+          <div className="lg:hidden">
+            <div className="absolute top-full left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50 shadow-2xl">
+              <div className="px-6 py-6 space-y-1 max-w-7xl mx-auto">
+                {navigation.map((item, index) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
                     className={cn(
-                      'block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 border-2 border-transparent',
-                      'hover:border-[var(--color-accent)] hover:shadow-[0_0_8px_rgba(0,99,45,0.3)] hover:text-[var(--color-accent)]',
-                      'active:border-[var(--color-accent-hover)] active:shadow-[0_0_12px_rgba(0,99,45,0.5)]',
+                      'group block px-4 py-3 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-300',
+                      'hover:bg-gradient-to-r hover:from-green-400/10 hover:via-emerald-500/10 hover:to-green-600/10',
+                      'hover:scale-105 hover:shadow-[0_0_20px_rgba(34,197,94,0.2)]',
+                      'active:scale-95 active:transition-transform active:duration-150',
                       isActiveLink(item.href)
-                        ? 'border-[var(--color-accent)] shadow-[0_0_6px_rgba(0,99,45,0.4)] text-[var(--color-accent)] bg-[var(--color-accent)]/5'
-                        : 'text-gray-300 hover:bg-gray-700'
+                        ? 'bg-gradient-to-r from-green-400/20 via-emerald-500/20 to-green-600/20 text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)]'
+                        : 'text-gray-300 hover:text-green-400'
                     )}
+                    style={{
+                      animationDelay: `${index * 50}ms`
+                    }}
                   >
-                    {item.label}
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center space-x-3">
+                        <span>{item.label}</span>
+                        <span className={cn(
+                          'w-1.5 h-1.5 rounded-full transition-all duration-300',
+                          isActiveLink(item.href) 
+                            ? 'bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.8)]' 
+                            : 'bg-transparent group-hover:bg-green-400/60'
+                        )}></span>
+                      </span>
+                      <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                    
+                    {/* Mobile constellation particles */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                      <div className="absolute top-2 left-3 w-0.5 h-0.5 bg-green-400/60 rounded-full animate-pulse"></div>
+                      <div className="absolute top-4 right-4 w-1 h-1 bg-emerald-400/80 rounded-full animate-pulse" style={{animationDelay: '150ms'}}></div>
+                      <div className="absolute bottom-3 left-6 w-0.5 h-0.5 bg-green-300/70 rounded-full animate-pulse" style={{animationDelay: '300ms'}}></div>
+                    </div>
                   </Link>
                 ))}
-                <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 mt-4 pt-4">
-                  <Button variant="primary" size="sm">
-                    Get In Touch
-                  </Button>
+                
+                {/* Mobile CTA Button */}
+                <div className="pt-6 border-t border-gray-700/50 mt-6">
+                  <Link
+                    href="/contact"
+                    className="group flex items-center justify-center w-full px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(34,197,94,0.4)] active:scale-95"
+                  >
+                    <span className="relative z-10 flex items-center space-x-2">
+                      <span>Get In Touch</span>
+                      <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </span>
+                    
+                    {/* Mobile button effects */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                  </Link>
                 </div>
               </div>
+            </div>
           </div>
         )}
     </header>

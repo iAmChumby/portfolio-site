@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui';
 import siteConfig from '@/data/site-config.json';
 
 const About: React.FC = () => {
@@ -42,9 +41,12 @@ const About: React.FC = () => {
           </div>
         </div>
         <div className="text-center mt-8">
-          <Button variant="outline">
+          <a
+            href="/about"
+            className="inline-flex items-center px-6 py-3 border border-green-600 text-green-600 font-medium rounded-lg hover:bg-green-600 hover:text-white transition-colors"
+          >
             Learn More About Me
-          </Button>
+          </a>
         </div>
       </div>
     </section>

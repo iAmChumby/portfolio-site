@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, CardHeader, CardBody, LoadingSpinner, ErrorMessage } from '../ui';
+import { LoadingSpinner, ErrorMessage } from '../ui';
 import { useGitHubUser, useGitHubRepositories, useGitHubLanguages } from '../../lib/hooks';
 import { FolderIcon, UsersIcon, UserIcon, StarIcon } from '../ui/icons';
 import siteConfig from '@/data/site-config.json';
@@ -132,7 +132,7 @@ const GitHubStats: React.FC = () => {
 
       <div className="text-center mt-8">
           <a
-            href={`https://github.com/${githubUsername}`}
+            href={`https://github.com/${username}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"

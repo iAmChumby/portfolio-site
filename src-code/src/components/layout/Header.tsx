@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({
           : 'bg-transparent'
       )}
     >
-      <div className="container flex items-center justify-between h-24 px-6 max-w-7xl mx-auto">
+      <div className="container flex items-center justify-between h-24 px-8 max-w-7xl mx-auto">
           {/* Logo with enhanced hover effect */}
           <Link
             href="/"
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({
           </Link>
 
           {/* Desktop Navigation with enhanced spacing and effects */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-12">
             {navigation.map((item, index) => (
               <Link
                 key={item.href}
@@ -101,7 +101,7 @@ const Header: React.FC<HeaderProps> = ({
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 className={cn(
-                  'group relative px-4 py-3 text-sm font-semibold tracking-wide uppercase transition-all duration-500 ease-out',
+                  'group relative px-6 py-3 text-sm font-semibold tracking-wide uppercase transition-all duration-500 ease-out',
                   'before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-green-400/10 before:via-emerald-500/10 before:to-green-600/10',
                   'before:opacity-0 before:scale-95 before:transition-all before:duration-300',
                   'hover:before:opacity-100 hover:before:scale-100',

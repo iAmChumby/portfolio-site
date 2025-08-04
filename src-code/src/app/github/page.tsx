@@ -1,4 +1,4 @@
-import { GitHubStats } from '@/components/sections/GitHubStats'
+import GitHubStats from '@/components/sections/GitHubStats'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {

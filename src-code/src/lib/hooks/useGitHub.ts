@@ -278,7 +278,17 @@ export const useGitHubDashboard = (username: string) => {
 // Utility hook for repository statistics
 export const useRepositoryStats = (owner: string, repo: string) => {
   const [state, setState] = useState<{
-    data: any | null;
+    data: {
+      stars: number;
+      forks: number;
+      issues: number;
+      watchers: number;
+      language: string | null;
+      topics: string[];
+      created: string;
+      updated: string;
+      pushed: string | null;
+    } | null;
     loading: boolean;
     error: string | null;
   }>({

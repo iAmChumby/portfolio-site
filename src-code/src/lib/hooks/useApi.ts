@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { apiClient } from '../api/client';
-import { ApiResponse, ProjectData, SkillData, PersonalData } from '../api/types';
+import { apiClient } from '@/lib/api/client';
+import { ProjectData, SkillData, PersonalData } from '@/lib/api/types';
 
 interface UseApiState<T> {
   data: T | null;
@@ -16,7 +16,7 @@ export const useApi = <T>(
   endpoint: string,
   options?: {
     immediate?: boolean;
-    dependencies?: any[];
+    dependencies?: unknown[];
   }
 ): UseApiState<T> => {
   const [state, setState] = useState<{
@@ -33,7 +33,7 @@ export const useApi = <T>(
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await apiClient.get<ApiResponse<T>>(endpoint);
+      const response = await apiClient.get<T>(endpoint);
       setState({ 
         data: response.data, 
         loading: false, 
@@ -121,70 +121,64 @@ export const useSkills = (): UseApiState<SkillData[]> => {
       // Mock skills data for now
       const mockSkills: SkillData[] = [
         {
-          id: '1',
           name: 'JavaScript',
-          category: 'Programming Languages',
-          level: 'Expert',
+          category: 'language',
+          proficiency: 5,
           yearsOfExperience: 5,
-          projects: ['portfolio-site', 'react-dashboard'],
-          description: 'Modern JavaScript ES6+ development',
-          icon: 'javascript',
-          color: '#F7DF1E'
+          lastUsed: '2024-01-01',
+          projectCount: 10,
+          linesOfCode: 50000,
+          repositories: ['portfolio-site', 'react-dashboard']
         },
         {
-          id: '2',
           name: 'TypeScript',
-          category: 'Programming Languages',
-          level: 'Advanced',
+          category: 'language',
+          proficiency: 4,
           yearsOfExperience: 3,
-          projects: ['portfolio-site', 'api-server'],
-          description: 'Type-safe JavaScript development',
-          icon: 'typescript',
-          color: '#3178C6'
+          lastUsed: '2024-01-01',
+          projectCount: 8,
+          linesOfCode: 30000,
+          repositories: ['portfolio-site', 'api-server']
         },
         {
-          id: '3',
           name: 'React',
-          category: 'Frontend Frameworks',
-          level: 'Expert',
+          category: 'framework',
+          proficiency: 5,
           yearsOfExperience: 4,
-          projects: ['portfolio-site', 'react-dashboard'],
-          description: 'Modern React with hooks and context',
-          icon: 'react',
-          color: '#61DAFB'
+          lastUsed: '2024-01-01',
+          projectCount: 12,
+          linesOfCode: 40000,
+          repositories: ['portfolio-site', 'react-dashboard']
         },
         {
-          id: '4',
           name: 'Next.js',
-          category: 'Frontend Frameworks',
-          level: 'Advanced',
+          category: 'framework',
+          proficiency: 4,
           yearsOfExperience: 2,
-          projects: ['portfolio-site'],
-          description: 'Full-stack React framework',
-          icon: 'nextjs',
-          color: '#000000'
+          lastUsed: '2024-01-01',
+          projectCount: 5,
+          linesOfCode: 20000,
+          repositories: ['portfolio-site']
         },
         {
-          id: '5',
           name: 'Node.js',
-          category: 'Backend Technologies',
-          level: 'Advanced',
+          category: 'framework',
+          proficiency: 4,
           yearsOfExperience: 4,
-          projects: ['api-server', 'webhook-handler'],
-          description: 'Server-side JavaScript runtime',
-          icon: 'nodejs',
-          color: '#339933'
+          lastUsed: '2024-01-01',
+          projectCount: 8,
+          linesOfCode: 25000,
+          repositories: ['api-server', 'webhook-handler']
         },
         {
-          id: '6',
           name: 'Python',
-          category: 'Programming Languages',
-          level: 'Intermediate',
+          category: 'language',
+          proficiency: 3,
           yearsOfExperience: 2,
-          projects: ['data-analysis', 'automation-scripts'],
-          description: 'Data analysis and automation',
-          icon: 'python',
-          color: '#3776AB'
+          lastUsed: '2023-12-01',
+          projectCount: 4,
+          linesOfCode: 15000,
+          repositories: ['data-analysis', 'automation-scripts']
         }
       ];
 
@@ -232,7 +226,6 @@ export const usePersonalData = (): UseApiState<PersonalData> => {
       const config = await response.json();
       
       const personalData: PersonalData = {
-        id: '1',
         name: config.name,
         title: config.title,
         bio: config.bio,
@@ -243,14 +236,14 @@ export const usePersonalData = (): UseApiState<PersonalData> => {
         avatar: config.avatar,
         resume: config.resume,
         social: config.social,
-        story: config.story || 'Passionate developer with a love for creating innovative solutions.',
-        interests: config.interests || ['Web Development', 'Open Source', 'Technology'],
-        education: config.education || [],
+        story: {
+          introduction: config.story?.introduction || 'Passionate developer with a love for creating innovative solutions.',
+          journey: config.story?.journey || ['Started coding', 'Learned web development', 'Built amazing projects'],
+          currentFocus: config.story?.currentFocus || 'Building modern web applications',
+          goals: config.story?.goals || ['Master new technologies', 'Contribute to open source', 'Build impactful products']
+        },
         experience: config.experience || [],
-        achievements: config.achievements || [],
-        testimonials: config.testimonials || [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        education: config.education || []
       };
 
       setState({ data: personalData, loading: false, error: null });
@@ -274,7 +267,7 @@ export const usePersonalData = (): UseApiState<PersonalData> => {
 };
 
 // Hook for posting data
-export const usePostData = <T, R = any>() => {
+export const usePostData = <T, R = unknown>() => {
   const [state, setState] = useState<{
     loading: boolean;
     error: string | null;
@@ -289,7 +282,7 @@ export const usePostData = <T, R = any>() => {
     setState({ loading: true, error: null, success: false });
 
     try {
-      const response = await apiClient.post<ApiResponse<R>>(endpoint, data);
+      const response = await apiClient.post<R>(endpoint, data);
       setState({ loading: false, error: null, success: true });
       return response.data;
     } catch (error) {
@@ -309,7 +302,7 @@ export const usePostData = <T, R = any>() => {
 };
 
 // Hook for updating data
-export const useUpdateData = <T, R = any>() => {
+export const useUpdateData = <T, R = unknown>() => {
   const [state, setState] = useState<{
     loading: boolean;
     error: string | null;
@@ -324,7 +317,7 @@ export const useUpdateData = <T, R = any>() => {
     setState({ loading: true, error: null, success: false });
 
     try {
-      const response = await apiClient.put<ApiResponse<R>>(endpoint, data);
+      const response = await apiClient.put<R>(endpoint, data);
       setState({ loading: false, error: null, success: true });
       return response.data;
     } catch (error) {

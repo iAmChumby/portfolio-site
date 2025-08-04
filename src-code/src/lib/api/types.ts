@@ -70,6 +70,27 @@ export interface GitHubCommit {
   };
 }
 
+export interface GitHubActivityPayload {
+  commits?: Array<{
+    sha: string;
+    message: string;
+    author: {
+      name: string;
+      email: string;
+    };
+  }>;
+  ref?: string;
+  ref_type?: string;
+  master_branch?: string;
+  description?: string;
+  pusher_type?: string;
+  size?: number;
+  distinct_size?: number;
+  head?: string;
+  before?: string;
+  [key: string]: unknown;
+}
+
 export interface GitHubActivity {
   id: string;
   type: 'PushEvent' | 'CreateEvent' | 'WatchEvent' | 'ForkEvent' | 'IssuesEvent' | 'PullRequestEvent';
@@ -81,7 +102,7 @@ export interface GitHubActivity {
     name: string;
     url: string;
   };
-  payload: any;
+  payload: GitHubActivityPayload;
   public: boolean;
   created_at: string;
 }
@@ -179,7 +200,7 @@ export interface ApiError {
   message: string;
   code: string;
   status: number;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 export interface PaginatedResponse<T> {

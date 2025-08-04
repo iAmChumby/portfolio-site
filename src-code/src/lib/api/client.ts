@@ -94,38 +94,43 @@ class ApiClient {
     }
   }
 
-  private shouldRetry(error: any): boolean {
+  private shouldRetry(error: unknown): boolean {
     // Retry on network errors, timeouts, and 5xx server errors
     if (error instanceof Error && error.message.includes('timeout')) return true;
     if (this.isApiError(error) && error.status >= 500) return true;
     return false;
   }
 
-  private isApiError(error: any): error is ApiError {
-    return error && typeof error.status === 'number' && typeof error.message === 'string';
+  private isApiError(error: unknown): error is ApiError {
+    return !!(error && 
+             typeof error === 'object' && 
+             'status' in error && 
+             'message' in error && 
+             typeof (error as ApiError).status === 'number' && 
+             typeof (error as ApiError).message === 'string');
   }
 
   // HTTP Methods
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
-    const url = params ? `${endpoint}?${new URLSearchParams(params).toString()}` : endpoint;
+  async get<T>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<ApiResponse<T>> {
+    const url = params ? `${endpoint}?${new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])).toString()}` : endpoint;
     return this.makeRequest<T>(url, { method: 'GET' });
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async patch<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async patch<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
@@ -156,9 +161,12 @@ export const apiClient = new ApiClient();
 export { ApiClient };
 
 // Utility function for handling API errors in components
-export const handleApiError = (error: any): string => {
-  if (error && typeof error.message === 'string') {
-    return error.message;
+export const handleApiError = (error: unknown): string => {
+  if (error && 
+      typeof error === 'object' && 
+      'message' in error && 
+      typeof (error as ApiError).message === 'string') {
+    return (error as ApiError).message;
   }
   return 'An unexpected error occurred. Please try again.';
 };

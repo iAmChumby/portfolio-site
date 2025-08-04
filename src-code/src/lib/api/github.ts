@@ -112,7 +112,7 @@ class GitHubApi {
   }
 
   // Get user's contribution activity (requires authentication)
-  async getUserContributions(username: string): Promise<any> {
+  async getUserContributions(username: string): Promise<GitHubActivity[]> {
     // Note: This endpoint requires GraphQL API for detailed contribution data
     // For now, we'll use the events API as a proxy
     return this.getUserActivity(username, 1, 100);
@@ -198,12 +198,19 @@ class GitHubApi {
   }
 
   // Utility: Get repository statistics
-  async getRepositoryStats(owner: string, repo: string) {
+  async getRepositoryStats(owner: string, repo: string): Promise<{
+    stars: number;
+    forks: number;
+    issues: number;
+    watchers: number;
+    language: string | null;
+    topics: string[];
+    created: string;
+    updated: string;
+    pushed: string | null;
+  } | null> {
     try {
-      const [repoData, commits] = await Promise.all([
-        this.getRepository(owner, repo),
-        this.getRepositoryCommits(owner, repo, 1, 1) // Just get the count
-      ]);
+      const repoData = await this.getRepository(owner, repo);
 
       return {
         stars: repoData.stargazers_count,

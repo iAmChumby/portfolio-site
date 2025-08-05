@@ -34,11 +34,20 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
   const frameInterval = 1000 / targetFPS;
 
   useEffect(() => {
+    console.log('AnimatedBackground: useEffect triggered');
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.log('AnimatedBackground: Canvas ref not found');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log('AnimatedBackground: Canvas context not available');
+      return;
+    }
+    
+    console.log('AnimatedBackground: Canvas and context initialized');
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -256,6 +265,7 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
 
     resizeCanvas();
     createTopoMap();
+    console.log('AnimatedBackground: Starting animation with', topoPointsRef.current.length, 'points');
     startAnimation();
 
     const handleResize = () => {
@@ -277,14 +287,15 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
       ref={canvasRef}
       className={`fixed inset-0 w-full h-full ${className}`}
       style={{ 
-        zIndex: -10,
+        zIndex: -10,  // Changed from -1 to -10 to ensure it's behind content
         pointerEvents: 'none',
         opacity: 1.0,
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100vw',
-        height: '100vh'
+        height: '100vh',
+        backgroundColor: '#000000'  // Added explicit background color
       }}
     />
   );

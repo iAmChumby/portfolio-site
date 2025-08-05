@@ -97,10 +97,10 @@
   --z-toast: 1080;
   
   /* Transitions */
-  // Optimized transition timings for better performance
-  --transition-fast: 120ms ease-in-out; // Reduced from 150ms
-  --transition-base: 200ms ease-in-out; // Reduced from 250ms
-  --transition-slow: 300ms ease-in-out; // Reduced from 350ms
+  /* Optimized transition timings for better performance */
+  --transition-fast: 120ms ease-in-out; /* Reduced from 150ms */
+  --transition-base: 200ms ease-in-out; /* Reduced from 250ms */
+  --transition-slow: 300ms ease-in-out; /* Reduced from 350ms */
   
   /* Breakpoints (for reference in JS) */
   --breakpoint-sm: 640px;

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
-import { AnimatedBackground } from "@/components/ui";
+import AnimatedBackground from "@/components/ui/AnimatedBackground";
 import siteConfig from "@/data/site-config.json";
 
 const geistSans = Geist({
@@ -52,21 +52,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" style={{ background: 'transparent', color: '#ffffff' }}>
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ background: 'transparent', color: '#ffffff', minHeight: '100vh' }}
       >
         <AnimatedBackground />
-        <div style={{ position: 'relative', zIndex: 10, background: 'rgba(42, 42, 42, 0.8)' }}>
-          <Header 
-            navigation={siteConfig.site.navigation}
-            siteName={siteConfig.site.name}
-          />
-          <main className="min-h-screen" style={{ background: 'transparent' }}>
-            {children}
-          </main>
-        </div>
+        <Header 
+          navigation={siteConfig.site.navigation}
+          siteName={siteConfig.site.name}
+        />
+        <main className="min-h-screen pt-16">
+          {children}
+        </main>
       </body>
     </html>
   );

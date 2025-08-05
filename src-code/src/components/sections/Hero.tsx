@@ -6,7 +6,7 @@ import siteConfig from '@/data/site-config.json';
 
 const Hero: React.FC = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center bg-[var(--color-background)] pt-20">
+    <section className="min-h-screen flex items-center justify-center bg-transparent pt-20">
       <div className="container mx-auto px-6 text-center">
         <h1 className="text-5xl md:text-7xl font-bold text-green-600 mb-6">
           Hi, I&apos;m {siteConfig.site.author.name}

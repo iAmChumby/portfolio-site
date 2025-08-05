@@ -1,77 +1,97 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui';
-import projectsData from '@/data/projects.json';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { ArrowTopRightOnSquareIcon, CodeBracketIcon } from '@heroicons/react/24/outline';
 
-const Projects: React.FC = () => {
-  const featuredProjects = projectsData.projects.filter(project => project.featured);
+const projects = [
+  {
+    title: 'E-Commerce Platform',
+    description: 'A full-stack e-commerce solution built with Next.js, Stripe, and PostgreSQL. Features include user authentication, payment processing, and admin dashboard.',
+    image: '/api/placeholder/400/250',
+    technologies: ['Next.js', 'TypeScript', 'Stripe', 'PostgreSQL'],
+    liveUrl: '#',
+    githubUrl: '#'
+  },
+  {
+    title: 'Task Management App',
+    description: 'A collaborative task management application with real-time updates, drag-and-drop functionality, and team collaboration features.',
+    image: '/api/placeholder/400/250',
+    technologies: ['React', 'Node.js', 'Socket.io', 'MongoDB'],
+    liveUrl: '#',
+    githubUrl: '#'
+  },
+  {
+    title: 'Weather Dashboard',
+    description: 'A responsive weather dashboard that displays current conditions and forecasts using multiple weather APIs with beautiful data visualizations.',
+    image: '/api/placeholder/400/250',
+    technologies: ['Vue.js', 'Chart.js', 'Weather API', 'Tailwind'],
+    liveUrl: '#',
+    githubUrl: '#'
+  }
+];
 
+export default function Projects() {
   return (
-    <section className="py-20 bg-[var(--color-background)]">
+    <section id="projects" className="py-20 bg-muted/30">
       <div className="container mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-green-600 mb-4 text-center">
-          Featured Projects
-        </h2>
-        <p className="text-lg text-green-600 text-center mb-12 max-w-3xl mx-auto">
-          Here are some of my recent projects that showcase my skills and experience
-        </p>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProjects.map((project, index) => (
-            <div key={index} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-gray-700">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-green-600 mb-2">
-                  {project.title}
-                </h3>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.technologies.map((tech, techIndex) => (
-                    <span
-                      key={techIndex}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                    >
-                      {tech}
-                    </span>
-                  ))}
+        <div className="max-w-6xl mx-auto">
+          <h2 className="heading-2 !text-center mb-4">Featured Projects</h2>
+          <p className="text-large !text-center mb-16 max-w-2xl mx-auto">
+            Here are some of my recent projects that showcase my skills and experience
+          </p>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {projects.map((project) => (
+              <Card key={project.title} className="overflow-hidden hover:shadow-xl transition-shadow">
+                <div className="aspect-video bg-gradient-to-br from-accent/20 to-secondary/20 flex items-center justify-center">
+                  <span className="text-4xl font-bold text-accent/50">{project.title.charAt(0)}</span>
                 </div>
-                <p className="text-green-600 mb-4">
-                  {project.description}
-                </p>
-                <div className="flex gap-4">
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                
+                <div className="p-6">
+                  <h3 className="heading-3 mb-3">{project.title}</h3>
+                  <p className="text-base mb-4">{project.description}</p>
+                  
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {project.technologies.map((tech) => (
+                      <span 
+                        key={tech}
+                        className="px-3 py-1 bg-accent/10 text-accent text-xs rounded-full"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <Button 
+                      variant="primary" 
+                      size="sm"
+                      icon={<ArrowTopRightOnSquareIcon className="w-4 h-4" />}
                     >
                       Live Demo
-                    </a>
-                  )}
-                  {project.githubUrl && (
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      icon={<CodeBracketIcon className="w-4 h-4" />}
                     >
-                      GitHub
-                    </a>
-                  )}
+                      Code
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="text-center">
-          <Button variant="primary" size="lg">
-            View All Projects
-          </Button>
+              </Card>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <Button variant="outline" size="lg">
+              View All Projects
+            </Button>
+          </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default Projects;
+}

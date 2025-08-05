@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from './Button';
+import { Button } from './Button';
 
 interface ErrorMessageProps {
   message: string;
@@ -16,12 +16,12 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 }) => {
   if (variant === 'minimal') {
     return (
-      <div className={`text-red-600 text-sm ${className}`}>
+      <div className={`text-destructive text-small ${className}`}>
         {message}
         {onRetry && (
           <button
             onClick={onRetry}
-            className="ml-2 text-blue-600 hover:text-blue-800 underline"
+            className="ml-2 text-accent hover:text-accent/80 underline"
           >
             Retry
           </button>
@@ -31,11 +31,11 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
   }
 
   return (
-    <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
+    <div className={`bg-destructive/10 border border-destructive/20 rounded-lg p-4 ${className}`}>
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <svg
-            className="h-5 w-5 text-red-400"
+            className="h-5 w-5 text-destructive"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -48,10 +48,10 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
           </svg>
         </div>
         <div className="ml-3 flex-1">
-          <h3 className="text-sm font-medium text-red-800">
+          <h3 className="text-small font-medium text-destructive">
             Something went wrong
           </h3>
-          <div className="mt-2 text-sm text-green-600">
+          <div className="mt-2 text-small text-destructive/80">
             {message}
           </div>
           {onRetry && (
@@ -60,7 +60,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
                 onClick={onRetry}
                 variant="outline"
                 size="sm"
-                className="border-red-300 text-red-700 hover:bg-red-50"
+                className="border-destructive/30 text-destructive hover:bg-destructive/10"
               >
                 Try again
               </Button>

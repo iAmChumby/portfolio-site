@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import AnimatedBackground from "@/components/ui/AnimatedBackground";
+import Footer from "@/components/layout/Footer";
 import siteConfig from "@/data/site-config.json";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -54,16 +58,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${poppins.variable} font-inter antialiased`}
       >
         <AnimatedBackground />
         <Header 
           navigation={siteConfig.site.navigation}
           siteName={siteConfig.site.name}
         />
-        <main className="min-h-screen pt-16">
+        <main className="flex-1 pt-16 sm:pt-20 md:pt-24">
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );

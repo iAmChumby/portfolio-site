@@ -1,6 +1,6 @@
 {
   "site": {
-    "name": "Luke Edwards Portfolio",
+    "name": "Luke Edwards' Portfolio",
     "title": "Full Stack Developer & Designer",
     "description": "Passionate full-stack developer creating innovative web solutions with modern technologies.",
     "url": "https://lukeedwards.me",
@@ -40,18 +40,17 @@
         "external": false
       },
       {
-        "label": "Blog",
-        "href": "/blog",
+        "label": "Contact",
+        "href": "/contact",
         "external": false
       },
       {
-        "label": "Contact",
-        "href": "/contact",
+        "label": "Live Feed",
+        "href": "/github",
         "external": false
       }
     ],
     "features": {
-      "darkMode": true,
       "analytics": true,
       "blog": true,
       "contact": true,
@@ -60,8 +59,8 @@
     }
   },
   "seo": {
-    "defaultTitle": "Your Portfolio - Full Stack Developer",
-    "titleTemplate": "%s | Your Portfolio",
+    "defaultTitle": "Luke Edwards - Full Stack Developer",
+    "titleTemplate": "%s | Luke Edwards",
     "defaultDescription": "Passionate full-stack developer creating innovative web solutions with modern technologies.",
     "keywords": [
       "full-stack developer",

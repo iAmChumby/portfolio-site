@@ -261,7 +261,7 @@ export const useGitHubDashboard = (username: string) => {
       activity.refetch(),
       languages.refetch(),
     ]);
-  }, [user.refetch, repositories.refetch, featured.refetch, activity.refetch, languages.refetch]);
+  }, [user, repositories, featured, activity, languages]);
 
   return {
     user: user.data,

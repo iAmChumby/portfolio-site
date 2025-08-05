@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button } from '../ui';
+import { Button } from '@/components/ui';
 
 interface NavigationItem {
   label: string;
@@ -26,74 +25,45 @@ const defaultNavigation: NavigationItem[] = [
   { label: 'Contact', href: '/contact' },
 ];
 
-const Header: React.FC<HeaderProps> = ({
-  navigation = defaultNavigation,
-  logo,
-  siteName = 'Portfolio',
-}) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+export default function Header({ navigation, siteName }: HeaderProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const isActiveLink = (href: string) => {
-    if (href === '/') {
-      return pathname === '/';
-    }
-    return pathname.startsWith(href);
-  };
+  const navItems = navigation || defaultNavigation;
 
   return (
-    <header
-      className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled
-          ? 'bg-black/90 backdrop-blur-md shadow-lg border-b border-green-500/20'
-          : 'bg-black/90 backdrop-blur-md'
-      )}
+    <header 
+      className="fixed top-0 left-0 right-0 z-50 w-full bg-background/90 backdrop-blur-sm border-b border-border"
+      style={{
+        display: 'block',
+        visibility: 'visible',
+        opacity: 1,
+        minHeight: '80px',
+      }}
     >
-      <div className="container flex items-center justify-between h-24">
+      <div className="container mx-auto flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 text-xl font-bold text-white hover:text-green-400 transition-colors"
+            className="flex items-center space-x-2 text-xl font-bold text-emerald-500 hover:text-accent transition-colors"
           >
-            {logo ? (
-              <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
-            ) : (
-              <span>{siteName}</span>
-            )}
+            <span>{siteName || 'Portfolio'}</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-16">
-            {navigation.map((item) => (
+          <nav className="hidden md:flex items-center space-x-6">
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 className={cn(
-                  'relative px-3 py-3 text-base font-medium transition-all duration-300 rounded-lg',
-                  isActiveLink(item.href)
-                    ? 'text-green-400 bg-green-500/20 shadow-md'
-                    : 'text-gray-200 hover:text-green-400 hover:bg-green-500/10'
+                  'navbar-link relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg border-2 border-transparent',
+                  'hover:border-accent hover:text-accent',
+                  pathname === item.href
+                    ? 'border-accent text-accent bg-accent/10'
+                    : 'text-white hover:text-accent'
                 )}
               >
                 {item.label}
@@ -101,11 +71,8 @@ const Header: React.FC<HeaderProps> = ({
             ))}
           </nav>
 
-          {/* CTA Button and Theme Toggle */}
+          {/* CTA Button */}
           <div className="hidden md:flex items-center gap-6">
-            <div className="relative">
-              {/* Theme toggle removed temporarily */}
-            </div>
             <Button variant="primary" size="sm">
               Get In Touch
             </Button>
@@ -113,8 +80,8 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Mobile Menu Button */}
           <button
-            onClick={toggleMenu}
-            className="md:hidden p-2 rounded-md text-gray-200 hover:text-green-400 hover:bg-green-500/10 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="mobile-menu-btn md:hidden p-2 rounded-md text-white hover:text-accent hover:bg-muted transition-colors"
             aria-label="Toggle menu"
           >
             <svg
@@ -126,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              {isMenuOpen ? (
+              {isMobileMenuOpen ? (
                 <path d="M6 18L18 6M6 6l12 12" />
               ) : (
                 <path d="M4 6h16M4 12h16M4 18h16" />
@@ -136,29 +103,27 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
+        {isMobileMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-6 pb-8 space-y-2 bg-black/90 backdrop-blur-md border-t border-green-500/20 shadow-lg">
-                {navigation.map((item) => (
+            <div className="px-4 pt-4 pb-6 space-y-2 bg-background/95 border-t border-border shadow-lg">
+                {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
                     className={cn(
-                      'block px-4 py-4 rounded-lg text-lg font-medium transition-all duration-300',
-                      isActiveLink(item.href)
-                        ? 'text-green-400 bg-green-500/20 shadow-md'
-                        : 'text-gray-200 hover:text-green-400 hover:bg-green-500/10'
+                      'navbar-link block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 border-2 border-transparent',
+                      'hover:border-accent hover:text-accent',
+                      pathname === item.href
+                        ? 'border-accent text-accent bg-accent/10'
+                        : 'text-white hover:text-accent hover:bg-muted'
                     )}
                   >
                     {item.label}
                   </Link>
                 ))}
-                <div className="px-4 py-4 flex items-center justify-between border-t border-green-500/20 mt-6 pt-6">
-                  <div className="relative">
-                    {/* Theme toggle removed temporarily */}
-                  </div>
+                <div className="px-4 py-3 flex items-center justify-center border-t border-border mt-4 pt-4">
                   <Button variant="primary" size="sm">
                     Get In Touch
                   </Button>
@@ -168,6 +133,4 @@ const Header: React.FC<HeaderProps> = ({
         )}
     </header>
   );
-};
-
-export default Header;
+}

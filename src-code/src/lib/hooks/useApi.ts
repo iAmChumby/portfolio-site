@@ -52,7 +52,7 @@ export const useApi = <T>(
     if (options?.immediate !== false) {
       fetchData();
     }
-  }, [fetchData, ...(options?.dependencies || [])]);
+  }, [fetchData, options?.immediate, options?.dependencies]);
 
   return {
     ...state,

@@ -20,7 +20,7 @@ const GitHubStats: React.FC = () => {
       <div className="w-full">
         <div className="container mx-auto px-6">
         <h2 className="text-3xl font-bold text-black mb-4">GitHub Statistics</h2>
-        <p className="text-green-600">Overview of my GitHub activity</p>
+        <p className="text-accent">Overview of my GitHub activity</p>
       </div>
         <div className="flex justify-center py-12">
           <LoadingSpinner size="md" />
@@ -34,7 +34,7 @@ const GitHubStats: React.FC = () => {
       <div className="w-full">
         <div className="container mx-auto px-6">
         <h2 className="text-3xl font-bold text-black mb-4">GitHub Statistics</h2>
-        <p className="text-green-600">Overview of my GitHub activity</p>
+        <p className="text-accent">Overview of my GitHub activity</p>
       </div>
         <div className="max-w-md mx-auto">
           <ErrorMessage 
@@ -92,12 +92,12 @@ const GitHubStats: React.FC = () => {
         {stats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
-            <div key={index} className="text-center p-6 bg-gray-800 rounded-lg border border-gray-600">
+            <div key={index} className="text-center p-6 bg-card rounded-lg border border-border">
               <div className="text-black mb-3 flex justify-center">
                 <IconComponent size={32} />
               </div>
               <div className="text-3xl font-bold text-black mb-2">{stat.value.toLocaleString()}</div>
-              <div className="text-sm text-green-600">{stat.label}</div>
+              <div className="text-sm text-accent">{stat.label}</div>
             </div>
           );
         })}
@@ -107,19 +107,19 @@ const GitHubStats: React.FC = () => {
       {topLanguages.length > 0 && (
         <div className="max-w-2xl mx-auto">
           <h3 className="text-2xl font-bold text-black mb-6 text-center">Top Languages</h3>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-600">
+          <div className="bg-card rounded-lg p-6 border border-border">
             <div className="space-y-4">
               {topLanguages.map((lang, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-base font-medium text-black">{lang.language}</span>
                   <div className="flex items-center space-x-3">
-                    <div className="w-24 bg-gray-200 rounded-full h-3">
+                    <div className="w-24 bg-muted rounded-full h-3">
                       <div
                         className="bg-black h-3 rounded-full transition-all duration-300"
                         style={{ width: `${lang.percentage}%` }}
                       />
                     </div>
-                    <span className="text-sm text-green-600 w-10 text-right">
+                    <span className="text-sm text-accent w-10 text-right">
                       {lang.percentage.toFixed(0)}%
                     </span>
                   </div>
@@ -135,7 +135,7 @@ const GitHubStats: React.FC = () => {
             href={`https://github.com/${username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-background text-foreground font-medium rounded-lg hover:bg-muted transition-colors"
           >
             View GitHub Profile
           </a>

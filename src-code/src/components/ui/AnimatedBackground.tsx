@@ -34,20 +34,15 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
   const frameInterval = 1000 / targetFPS;
 
   useEffect(() => {
-    console.log('AnimatedBackground: useEffect triggered');
     const canvas = canvasRef.current;
     if (!canvas) {
-      console.log('AnimatedBackground: Canvas ref not found');
       return;
     }
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      console.log('AnimatedBackground: Canvas context not available');
       return;
     }
-    
-    console.log('AnimatedBackground: Canvas and context initialized');
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -117,9 +112,9 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
       // Ensure canvas and context are valid
       if (!canvas || !ctx) return;
       
-      // Clear with black background - more efficient than fillRect
+      // Clear with dark background for the new theme
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = '#0a0a0a'; // Dark background
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Set font for ASCII characters - only set once for performance
@@ -136,17 +131,17 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
         const colorElevation = (point.animatedElevation + 1.05) / 2.1;
         const clampedColorElevation = Math.max(0, Math.min(1, colorElevation));
         
-        // Simplified color calculation for better performance
+        // Dark green color scheme for the new theme
         const colorIntensity = clampedColorElevation;
-        const red = Math.floor(colorIntensity * 255);
-        const green = Math.floor(colorIntensity * 220);
-        const blue = Math.floor(colorIntensity * 180);
+        const red = Math.floor(colorIntensity * 40); // Very low red for dark green
+        const green = Math.floor(colorIntensity * 180); // Primary green component
+        const blue = Math.floor(colorIntensity * 60); // Low blue for dark green
         
         ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
         
-        // Reduced shadow effects for better performance
+        // Green shadow effects for better performance
         if (clampedColorElevation > 0.7) {
-          ctx.shadowColor = `rgba(${green}, ${Math.floor(green * 0.9)}, ${Math.floor(green * 0.7)}, 0.3)`;
+          ctx.shadowColor = `rgba(${Math.floor(green * 0.7)}, ${green}, ${Math.floor(green * 0.5)}, 0.3)`;
           ctx.shadowBlur = 2; // Reduced from 3 to 2
         } else {
           ctx.shadowBlur = 0;
@@ -280,14 +275,14 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
       stopAnimation();
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [frameInterval]);
 
   return (
     <canvas
       ref={canvasRef}
       className={`fixed inset-0 w-full h-full ${className}`}
       style={{ 
-        zIndex: -10,  // Changed from -1 to -10 to ensure it's behind content
+        zIndex: -5,  // Changed from -10 to -5 to be above background elements but below content
         pointerEvents: 'none',
         opacity: 1.0,
         position: 'fixed',
@@ -295,7 +290,7 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
         left: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: '#000000'  // Added explicit background color
+        backgroundColor: '#0a0a0a'  // Updated background color to match theme
       }}
     />
   );

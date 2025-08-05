@@ -34,21 +34,21 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     },
     ref
   ) => {
-    const baseClasses = 'card';
+    const baseClasses = 'rounded-lg bg-white';
     
     const variantClasses = {
-      default: '',
-      elevated: 'card-elevated',
-      flat: 'card-flat',
-      outline: 'card-outline',
+      default: 'shadow-sm border border-border',
+      elevated: 'shadow-lg border border-border',
+      flat: 'shadow-none border-0',
+      outline: 'border-2 border-accent',
     };
 
     const classes = cn(
       baseClasses,
       variantClasses[variant],
       {
-        'card-interactive': interactive,
-        'card-loading': loading,
+        'hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer': interactive,
+        'animate-pulse': loading,
       },
       className
     );
@@ -64,7 +64,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div className={cn('card-header', className)} ref={ref} {...props}>
+      <div className={cn('px-6 py-4 border-b border-border', className)} ref={ref} {...props}>
         {children}
       </div>
     );
@@ -74,7 +74,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
 const CardBody = React.forwardRef<HTMLDivElement, CardBodyProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div className={cn('card-body', className)} ref={ref} {...props}>
+      <div className={cn('px-6 py-4', className)} ref={ref} {...props}>
         {children}
       </div>
     );
@@ -84,7 +84,7 @@ const CardBody = React.forwardRef<HTMLDivElement, CardBodyProps>(
 const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div className={cn('card-footer', className)} ref={ref} {...props}>
+      <div className={cn('px-6 py-4 border-t border-border bg-muted/20 rounded-b-lg', className)} ref={ref} {...props}>
         {children}
       </div>
     );

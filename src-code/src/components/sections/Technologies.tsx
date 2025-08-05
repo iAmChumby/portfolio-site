@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 import { 
   ReactIcon, 
   CloudIcon, 
@@ -25,35 +26,33 @@ const Technologies: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-[var(--color-background)]">
-      <div className="container mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-green-600 mb-4 text-center">
-          Technologies & Skills
-        </h2>
-        <p className="text-lg text-green-600 mb-12 text-center max-w-3xl mx-auto">
-          Here are the technologies and tools I work with regularly
-        </p>
-        
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-items-center">
-          {technologies.map((tech, index) => {
-            const IconComponent = tech.icon;
-            return (
-              <div
-                key={index}
-                className="flex flex-col items-center p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors w-full max-w-[180px] min-h-[140px] border border-gray-600"
-              >
-                <div className="text-4xl mb-3">
-                  <IconComponent />
+    <section className="py-20 lg:py-32 px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-6xl">
+        <div className="space-y-16">
+          <div className="text-center space-y-6">
+            <h2 className="heading-2 !text-center mb-4">
+              Technologies & Skills
+            </h2>
+            <div className="max-w-4xl mx-auto">
+              <p className="text-large !text-center">
+                Here are the technologies and tools I work with regularly:
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8">
+            {technologies.map((tech, index) => (
+              <ScrollReveal key={tech.name} delay={index * 100} direction="up">
+                <div className="group bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl p-6 text-center hover:shadow-lg hover:shadow-[var(--color-accent)]/20 hover:scale-105 hover:border-[var(--color-accent)] transition-all duration-300">
+                  <div className="flex justify-center mb-4">
+                    <tech.icon className="w-12 h-12 text-[var(--color-accent)] group-hover:scale-110 transition-transform duration-300" />
+                  </div>
+                  <h3 className="font-semibold text-[var(--color-text)] mb-2">{tech.name}</h3>
+                  <p className="text-sm text-[var(--color-text-secondary)]">{tech.category}</p>
                 </div>
-                <h3 className="text-base font-semibold text-green-600 mb-2 text-center">
-                  {tech.name}
-                </h3>
-                <p className="text-sm text-green-600 text-center">
-                  {tech.category}
-                </p>
-              </div>
-            );
-          })}
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>

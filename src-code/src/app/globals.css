@@ -505,6 +505,35 @@ html {
   color: rgba(144, 238, 144, 1); /* Light green text for Firefox */
 }
 
+/* Project card animations */
+.project-card-enter {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  animation: projectCardEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes projectCardEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.project-card-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.project-card-exit-active {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+}
+
 /* Input styling */
 input, textarea, select {
   background-color: hsl(var(--input));

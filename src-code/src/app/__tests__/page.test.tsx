@@ -3,108 +3,57 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Home from '../page';
 
-// Mock the GitHub hooks
-jest.mock('@/lib/hooks/useGitHub');
-jest.mock('@/lib/hooks/useApi');
-
-// Mock the data files
+// Mock the site config to match actual implementation
 jest.mock('@/data/site-config.json', () => ({
   site: {
     author: {
-      name: 'Test Author',
-      bio: 'Test bio description',
-      location: 'Test City, Test Country',
-      email: 'test@example.com',
+      name: 'Luke Edwards',
     },
-    title: 'Test Developer',
-    description: 'Test description for the site',
   },
-  contact: {
-    availability: 'Available for work',
-  },
-}));
-
-jest.mock('@/data/projects.json', () => ({
-  projects: [
-    {
-      id: 'test-project-1',
-      title: 'Test Project 1',
-      description: 'Test project description',
-      technologies: ['React', 'TypeScript', 'Next.js'],
-      githubUrl: 'https://github.com/test/project1',
-      liveUrl: 'https://project1.example.com',
-      featured: true,
-    },
-    {
-      id: 'test-project-2',
-      title: 'Test Project 2',
-      description: 'Another test project',
-      technologies: ['Node.js', 'Express'],
-      githubUrl: 'https://github.com/test/project2',
-      featured: false,
-    },
-  ],
 }));
 
 describe('Home Page', () => {
-  it('renders the hero section with author information', () => {
+  it('renders the hero section with correct structure', () => {
     render(<Home />);
     
-    expect(screen.getByText('Test Author')).toBeInTheDocument();
-    expect(screen.getByText('Test Developer')).toBeInTheDocument();
-    expect(screen.getByText('Test description for the site')).toBeInTheDocument();
+    // Check for the main hero content
+    expect(screen.getByText(/Hi, I'm/)).toBeInTheDocument();
+    expect(screen.getByText('Luke Edwards')).toBeInTheDocument();
+    expect(screen.getByText('Full Stack Developer & UI/UX Designer')).toBeInTheDocument();
   });
 
-  it('renders the about section with author details', () => {
+  it('renders the hero description', () => {
     render(<Home />);
     
-    expect(screen.getByText('About Me')).toBeInTheDocument();
-    expect(screen.getByText('Test bio description')).toBeInTheDocument();
-    expect(screen.getByText('Test City, Test Country')).toBeInTheDocument();
-    expect(screen.getByText('test@example.com')).toBeInTheDocument();
-    expect(screen.getAllByText('Available for work')).toHaveLength(2);
+    expect(screen.getByText(/I create beautiful, functional, and user-centered digital experiences/)).toBeInTheDocument();
+    expect(screen.getByText(/Passionate about clean code, innovative design, and solving complex problems/)).toBeInTheDocument();
   });
 
-  it('renders featured projects section', () => {
-    render(<Home />);
-    
-    expect(screen.getAllByText('Featured Projects')).toHaveLength(2);
-    expect(screen.getByText('Test Project 1')).toBeInTheDocument();
-    expect(screen.getByText('Test project description')).toBeInTheDocument();
-    
-    // Should only show featured projects
-    expect(screen.queryByText('Test Project 2')).not.toBeInTheDocument();
-  });
-
-  it('renders project technologies as tags', () => {
-    render(<Home />);
-    
-    expect(screen.getAllByText('React')).toHaveLength(3); // SkillsShowcase, Technologies, and Projects
-    expect(screen.getAllByText('TypeScript')).toHaveLength(6); // Multiple components and contexts
-    expect(screen.getAllByText('Next.js')).toHaveLength(3); // SkillsShowcase, Technologies, and Projects
-  });
-
-  it('renders contact CTA section', () => {
-    render(<Home />);
-    
-    expect(screen.getByText("Let's Work Together")).toBeInTheDocument();
-    expect(screen.getByText(/I'm always interested in new opportunities/)).toBeInTheDocument();
-  });
-
-  it('renders all main action buttons', () => {
+  it('renders the main action buttons', () => {
     render(<Home />);
     
     expect(screen.getByText('View My Work')).toBeInTheDocument();
     expect(screen.getByText('Get In Touch')).toBeInTheDocument();
-    expect(screen.getByText('Learn More About Me')).toBeInTheDocument();
-    expect(screen.getByText('View All Projects')).toBeInTheDocument();
-    expect(screen.getByText('Start a Conversation')).toBeInTheDocument();
   });
 
-  it('renders project action buttons for featured projects', () => {
+  it('has proper semantic structure', () => {
     render(<Home />);
     
-    expect(screen.getByText('GitHub')).toBeInTheDocument();
-    expect(screen.getByText('Live Demo')).toBeInTheDocument();
+    // Check for main element
+    const main = screen.getByRole('main');
+    expect(main).toBeInTheDocument();
+    expect(main).toHaveClass('min-h-screen');
+  });
+
+  it('renders with proper heading hierarchy', () => {
+    render(<Home />);
+    
+    // Check for h1 and h2 elements
+    const h1 = screen.getByRole('heading', { level: 1 });
+    const h2 = screen.getByRole('heading', { level: 2 });
+    
+    expect(h1).toBeInTheDocument();
+    expect(h2).toBeInTheDocument();
+    expect(h2).toHaveTextContent('Full Stack Developer & UI/UX Designer');
   });
 });

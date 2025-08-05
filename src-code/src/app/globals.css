@@ -237,7 +237,6 @@ html {
 /* Glass morphism effect - Dark theme */
 .glass {
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -487,7 +486,6 @@ html {
 
 .dark-card {
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -496,10 +494,15 @@ html {
   transition: background 0.3s ease;
 }
 
-/* Selection styling */
+/* Selection styling - Light green */
 ::selection {
-  background: hsl(var(--accent) / 0.3);
-  color: hsl(var(--foreground));
+  background: rgba(144, 238, 144, 0.3); /* Light green background */
+  color: rgba(144, 238, 144, 1); /* Light green text */
+}
+
+::-moz-selection {
+  background: rgba(144, 238, 144, 0.3); /* Light green background for Firefox */
+  color: rgba(144, 238, 144, 1); /* Light green text for Firefox */
 }
 
 /* Input styling */

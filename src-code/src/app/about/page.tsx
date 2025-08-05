@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen pt-20 relative overflow-hidden bg-gradient-to-br from-background via-background to-muted">
+    <main className="min-h-screen pt-20 relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      <div className="absolute top-20 left-20 w-72 h-72 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+     <div className="absolute inset-0 z-0 pointer-events-none"></div>
+      <div className="absolute top-10 left-10 md:top-20 md:left-20 w-48 h-48 md:w-72 md:h-72 bg-accent/10 rounded-full blur-sm animate-pulse -z-20"></div>
+      <div className="absolute bottom-10 right-10 md:bottom-20 md:right-20 w-64 h-64 md:w-96 md:h-96 bg-secondary/10 rounded-full blur-sm animate-pulse delay-1000 -z-20"></div>
       
       <div className="relative z-10">
         <About />

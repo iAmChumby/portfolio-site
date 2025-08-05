@@ -33,7 +33,7 @@ export default function Header({ navigation, siteName }: HeaderProps) {
 
   return (
     <header 
-      className="fixed top-0 left-0 right-0 z-50 w-full bg-background/90 backdrop-blur-sm border-b border-border"
+      className="fixed top-0 left-0 right-0 z-50 w-full bg-background/90 border-b border-border"
       style={{
         display: 'block',
         visibility: 'visible',
@@ -73,9 +73,11 @@ export default function Header({ navigation, siteName }: HeaderProps) {
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-6">
-            <Button variant="primary" size="sm">
-              Get In Touch
-            </Button>
+            <Link href="/contact">
+              <Button variant="primary" size="sm">
+                Get In Touch
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -124,9 +126,11 @@ export default function Header({ navigation, siteName }: HeaderProps) {
                   </Link>
                 ))}
                 <div className="px-4 py-3 flex items-center justify-center border-t border-border mt-4 pt-4">
-                  <Button variant="primary" size="sm">
-                    Get In Touch
-                  </Button>
+                  <Link href="/contact">
+                    <Button variant="primary" size="sm">
+                      Get In Touch
+                    </Button>
+                  </Link>
                 </div>
               </div>
           </div>

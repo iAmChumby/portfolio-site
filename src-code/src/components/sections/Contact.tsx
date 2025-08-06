@@ -35,7 +35,7 @@ export default function Contact() {
         setStatusMessage('');
       }, 3000);
       
-    } catch (error) {
+    } catch {
       setFormStatus('error');
       setStatusMessage('Sorry, there was an error sending your message. Please try again.');
       

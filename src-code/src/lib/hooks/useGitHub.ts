@@ -5,6 +5,7 @@ import {
   GitHubRepository, 
   GitHubUser, 
   GitHubActivity,
+  GitHubWorkflowRun,
   GetRepositoriesParams 
 } from '../api/types';
 import { githubApi, processLanguageStats, getActivitySummary } from '../api/github';
@@ -221,6 +222,48 @@ export const useGitHubLanguages = (username: string) => {
   };
 };
 
+// Hook for fetching user workflow runs
+export const useGitHubWorkflowRuns = (
+  username: string,
+  limit = 10
+): UseGitHubState<GitHubWorkflowRun[]> => {
+  const [state, setState] = useState<{
+    data: GitHubWorkflowRun[] | null;
+    loading: boolean;
+    error: string | null;
+  }>({
+    data: null,
+    loading: true,
+    error: null,
+  });
+
+  const fetchWorkflowRuns = useCallback(async () => {
+    if (!username) return;
+
+    setState(prev => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const workflowRuns = await githubApi.getUserWorkflowRuns(username, limit);
+      setState({ data: workflowRuns, loading: false, error: null });
+    } catch (error) {
+      setState({ 
+        data: null, 
+        loading: false, 
+        error: error instanceof Error ? error.message : 'Failed to fetch workflow runs' 
+      });
+    }
+  }, [username, limit]);
+
+  useEffect(() => {
+    fetchWorkflowRuns();
+  }, [fetchWorkflowRuns]);
+
+  return {
+    ...state,
+    refetch: fetchWorkflowRuns,
+  };
+};
+
 // Hook for activity summary
 export const useGitHubActivitySummary = (username: string) => {
   const { data: activity, loading, error, refetch } = useGitHubActivity(username, 100);
@@ -246,12 +289,13 @@ export const useGitHubDashboard = (username: string) => {
   const featured = useFeaturedRepositories(username, 6);
   const activity = useGitHubActivity(username, 50);
   const languages = useGitHubLanguages(username);
+  const workflowRuns = useGitHubWorkflowRuns(username, 10);
 
   const loading = user.loading || repositories.loading || featured.loading || 
-                  activity.loading || languages.loading;
+                  activity.loading || languages.loading || workflowRuns.loading;
   
   const error = user.error || repositories.error || featured.error || 
-                activity.error || languages.error;
+                activity.error || languages.error || workflowRuns.error;
 
   const refetchAll = useCallback(async () => {
     await Promise.all([
@@ -260,8 +304,9 @@ export const useGitHubDashboard = (username: string) => {
       featured.refetch(),
       activity.refetch(),
       languages.refetch(),
+      workflowRuns.refetch(),
     ]);
-  }, [user, repositories, featured, activity, languages]);
+  }, [user, repositories, featured, activity, languages, workflowRuns]);
 
   return {
     user: user.data,
@@ -269,6 +314,7 @@ export const useGitHubDashboard = (username: string) => {
     featured: featured.data,
     activity: activity.data,
     languages: languages.data,
+    workflowRuns: workflowRuns.data,
     loading,
     error,
     refetch: refetchAll,

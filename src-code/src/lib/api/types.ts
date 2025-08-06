@@ -196,6 +196,127 @@ export interface PersonalData {
   }>;
 }
 
+export interface GitHubWorkflowRun {
+  id: number;
+  name: string;
+  head_branch: string;
+  head_sha: string;
+  path: string;
+  display_title: string;
+  run_number: number;
+  event: string;
+  status: 'queued' | 'in_progress' | 'completed';
+  conclusion: 'success' | 'failure' | 'neutral' | 'cancelled' | 'skipped' | 'timed_out' | 'action_required' | null;
+  workflow_id: number;
+  check_suite_id: number;
+  check_suite_node_id: string;
+  url: string;
+  html_url: string;
+  pull_requests: Array<{
+    url: string;
+    id: number;
+    number: number;
+    head: {
+      ref: string;
+      sha: string;
+      repo: {
+        id: number;
+        name: string;
+        url: string;
+      };
+    };
+    base: {
+      ref: string;
+      sha: string;
+      repo: {
+        id: number;
+        name: string;
+        url: string;
+      };
+    };
+  }>;
+  created_at: string;
+  updated_at: string;
+  actor: {
+    login: string;
+    id: number;
+    avatar_url: string;
+    html_url: string;
+  };
+  run_attempt: number;
+  referenced_workflows: Array<{
+    path: string;
+    sha: string;
+    ref?: string;
+  }>;
+  run_started_at: string;
+  triggering_actor: {
+    login: string;
+    id: number;
+    avatar_url: string;
+    html_url: string;
+  };
+  jobs_url: string;
+  logs_url: string;
+  check_suite_url: string;
+  artifacts_url: string;
+  cancel_url: string;
+  rerun_url: string;
+  previous_attempt_url: string | null;
+  workflow_url: string;
+  head_commit: {
+    id: string;
+    tree_id: string;
+    message: string;
+    timestamp: string;
+    author: {
+      name: string;
+      email: string;
+    };
+    committer: {
+      name: string;
+      email: string;
+    };
+  };
+  repository: {
+    id: number;
+    name: string;
+    full_name: string;
+    owner: {
+      login: string;
+      id: number;
+      avatar_url: string;
+      html_url: string;
+    };
+    private: boolean;
+    html_url: string;
+    description: string | null;
+    fork: boolean;
+    url: string;
+  };
+  head_repository: {
+    id: number;
+    name: string;
+    full_name: string;
+    owner: {
+      login: string;
+      id: number;
+      avatar_url: string;
+      html_url: string;
+    };
+    private: boolean;
+    html_url: string;
+    description: string | null;
+    fork: boolean;
+    url: string;
+  };
+}
+
+export interface GitHubWorkflowRunsResponse {
+  total_count: number;
+  workflow_runs: GitHubWorkflowRun[];
+}
+
 export interface ApiError {
   message: string;
   code: string;

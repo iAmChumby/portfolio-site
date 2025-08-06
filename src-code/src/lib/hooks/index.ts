@@ -19,6 +19,7 @@ export {
   useGitHubActivitySummary,
   useGitHubDashboard,
   useRepositoryStats,
+  useGitHubWorkflowRuns,
 } from './useGitHub';
 
 // Re-export types for convenience

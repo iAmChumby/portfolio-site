@@ -47,7 +47,7 @@ export default function About() {
               
               <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10">
                 <div className="flex flex-wrap gap-3 justify-center">
-                  {['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'AWS'].map((skill) => (
+                  {['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'PostgreSQL', 'Docker', 'Java', 'Electron', 'C', 'Sprint Boot', 'Angular'].map((skill) => (
                     <span 
                       key={skill}
                       className={`

@@ -4,6 +4,8 @@ import {
   GitHubLanguages, 
   GitHubActivity,
   GitHubCommit,
+  GitHubWorkflowRun,
+  GitHubWorkflowRunsResponse,
   GetRepositoriesParams 
 } from './types';
 
@@ -195,6 +197,69 @@ class GitHubApi {
       console.error('Failed to get featured repositories:', error);
       return [];
     }
+  }
+
+  // Get user's workflow runs across all repositories
+  async getUserWorkflowRuns(
+    username: string,
+    perPage = 30
+  ): Promise<GitHubWorkflowRun[]> {
+    try {
+      // First, get user's repositories
+      const repositories = await this.getUserRepositories(username, {
+        type: 'owner',
+        sort: 'updated',
+        limit: 100
+      });
+
+      const allWorkflowRuns: GitHubWorkflowRun[] = [];
+
+      // Process repositories in batches to avoid rate limiting
+      const batchSize = 5;
+      for (let i = 0; i < repositories.length; i += batchSize) {
+        const batch = repositories.slice(i, i + batchSize);
+        
+        const workflowPromises = batch.map(async (repo) => {
+          try {
+            // Fetch workflow runs from all branches (no branch parameter = all branches)
+            const response = await this.makeRequest<GitHubWorkflowRunsResponse>(
+              `/repos/${username}/${repo.name}/actions/runs?per_page=10&page=1`
+            );
+            return response.workflow_runs;
+          } catch {
+            // Silently handle repos without workflows or access issues
+            return [];
+          }
+        });
+
+        const batchResults = await Promise.all(workflowPromises);
+        batchResults.forEach(runs => allWorkflowRuns.push(...runs));
+
+        // Add delay between batches to respect rate limits
+        if (i + batchSize < repositories.length) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+      }
+
+      // Sort by created date (most recent first) and limit results
+      return allWorkflowRuns
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, perPage);
+    } catch (error) {
+      console.error('Failed to get user workflow runs:', error);
+      return [];
+    }
+  }
+
+  // Get workflow runs for a specific repository
+  async getRepositoryWorkflowRuns(
+    owner: string,
+    repo: string,
+    page = 1,
+    perPage = 30
+  ): Promise<GitHubWorkflowRunsResponse> {
+    const endpoint = `/repos/${owner}/${repo}/actions/runs?page=${page}&per_page=${Math.min(perPage, 100)}`;
+    return this.makeRequest<GitHubWorkflowRunsResponse>(endpoint);
   }
 
   // Utility: Get repository statistics

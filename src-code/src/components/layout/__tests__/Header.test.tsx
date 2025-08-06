@@ -46,13 +46,12 @@ describe('Header', () => {
   it('renders with default props', () => {
     render(<Header />);
     
-    expect(screen.getByText('Portfolio')).toBeInTheDocument();
+    expect(screen.getByText('Luke Edwards\' Portfolio')).toBeInTheDocument();
     expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText('Projects')).toBeInTheDocument();
-    expect(screen.getByText('Blog')).toBeInTheDocument();
+    expect(screen.getByText('GitHub')).toBeInTheDocument();
     expect(screen.getByText('Contact')).toBeInTheDocument();
-    expect(screen.getByText('Get In Touch')).toBeInTheDocument();
+    expect(screen.getByText('Let\'s work together')).toBeInTheDocument();
   });
 
   it('renders with custom navigation', () => {
@@ -72,7 +71,7 @@ describe('Header', () => {
     render(<Header siteName="My Custom Site" />);
     
     expect(screen.getByText('My Custom Site')).toBeInTheDocument();
-    expect(screen.queryByText('Portfolio')).not.toBeInTheDocument();
+    expect(screen.queryByText('Luke Edwards\' Portfolio')).not.toBeInTheDocument();
   });
 
   it('toggles mobile menu', () => {
@@ -109,9 +108,8 @@ describe('Header', () => {
     render(<Header />);
 
     expect(screen.getByText('Home').closest('a')).toHaveAttribute('href', '/');
-    expect(screen.getByText('About').closest('a')).toHaveAttribute('href', '/about');
     expect(screen.getByText('Projects').closest('a')).toHaveAttribute('href', '/projects');
-    expect(screen.getByText('Blog').closest('a')).toHaveAttribute('href', '/blog');
+    expect(screen.getByText('GitHub').closest('a')).toHaveAttribute('href', '/github');
     expect(screen.getByText('Contact').closest('a')).toHaveAttribute('href', '/contact');
   });
 });

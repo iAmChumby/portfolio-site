@@ -11,25 +11,28 @@ describe('Button', () => {
   });
 
   it('renders with different variants', () => {
-    render(<Button variant="secondary">Secondary</Button>);
+    const { rerender } = render(<Button variant="secondary">Secondary</Button>);
     expect(screen.getByRole('button')).toHaveClass('btn-secondary');
-    render(<Button variant="outline">Outline</Button>);
+    
+    rerender(<Button variant="outline">Outline</Button>);
     expect(screen.getByRole('button')).toHaveClass('btn-outline');
-    render(<Button variant="ghost">Ghost</Button>);
+    
+    rerender(<Button variant="ghost">Ghost</Button>);
     expect(screen.getByRole('button')).toHaveClass('btn-ghost');
   });
 
   it('renders with different sizes', () => {
-    render(<Button size="sm">Small</Button>);
+    const { rerender } = render(<Button size="sm">Small</Button>);
     expect(screen.getByRole('button')).toHaveClass('btn-sm');
-    render(<Button size="lg">Large</Button>);
+    
+    rerender(<Button size="lg">Large</Button>);
     expect(screen.getByRole('button')).toHaveClass('btn-lg');
   });
 
   it('renders loading state', () => {
     render(<Button loading>Loading</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveClass('btn-loading');
+    expect(button).toHaveClass('opacity-50', 'cursor-not-allowed');
     expect(button).toBeDisabled();
   });
 

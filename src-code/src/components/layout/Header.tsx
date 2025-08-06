@@ -29,7 +29,7 @@ const defaultNavigation: NavigationItem[] = [
 const Header: React.FC<HeaderProps> = ({
   navigation = defaultNavigation,
   logo,
-  siteName = 'Portfolio',
+  siteName = 'Luke Edwards\' Portfolio',
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -77,7 +77,7 @@ const Header: React.FC<HeaderProps> = ({
             {logo ? (
               <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
             ) : (
-              <span>Luke Edwards&apos; Portfolio</span>
+              <span>{siteName}</span>
             )}
           </Link>
 

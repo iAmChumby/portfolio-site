@@ -6,9 +6,11 @@ const router = express.Router()
 // Health check endpoint
 router.get('/health', (req, res) => {
   res.json({
-    status: 'ok',
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    version: '1.0.0'
   })
 })
 
@@ -16,18 +18,23 @@ router.get('/health', (req, res) => {
 router.get('/user', async (req, res) => {
   try {
     const user = await database.getUser()
-    const lastUpdated = await database.getLastUpdated()
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User data not found'
+      })
+    }
     
     res.json({
-      data: user,
-      lastUpdated,
-      cached: true
+      success: true,
+      data: user
     })
   } catch (error) {
-    console.error('Error fetching user data:', error)
+    console.error('Error fetching user:', error)
     res.status(500).json({
-      error: 'Failed to fetch user data',
-      message: error.message
+      success: false,
+      error: 'Internal server error'
     })
   }
 })
@@ -36,18 +43,17 @@ router.get('/user', async (req, res) => {
 router.get('/repositories', async (req, res) => {
   try {
     const repositories = await database.getRepositories()
-    const lastUpdated = await database.getLastUpdated()
     
     res.json({
+      success: true,
       data: repositories,
-      lastUpdated,
-      cached: true
+      count: repositories.length
     })
   } catch (error) {
     console.error('Error fetching repositories:', error)
     res.status(500).json({
-      error: 'Failed to fetch repositories',
-      message: error.message
+      success: false,
+      error: 'Internal server error'
     })
   }
 })
@@ -68,18 +74,15 @@ router.get('/repositories/featured', async (req, res) => {
       })
       .slice(0, limit)
     
-    const lastUpdated = await database.getLastUpdated()
-    
     res.json({
-      data: featured,
-      lastUpdated,
-      cached: true
+      success: true,
+      data: featured
     })
   } catch (error) {
     console.error('Error fetching featured repositories:', error)
     res.status(500).json({
-      error: 'Failed to fetch featured repositories',
-      message: error.message
+      success: false,
+      error: 'Internal server error'
     })
   }
 })
@@ -88,26 +91,16 @@ router.get('/repositories/featured', async (req, res) => {
 router.get('/languages', async (req, res) => {
   try {
     const languages = await database.getLanguages()
-    const lastUpdated = await database.getLastUpdated()
-    
-    // Convert to array and sort by percentage
-    const languageArray = Object.entries(languages)
-      .map(([name, data]) => ({
-        name,
-        ...data
-      }))
-      .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage))
     
     res.json({
-      data: languageArray,
-      lastUpdated,
-      cached: true
+      success: true,
+      data: languages
     })
   } catch (error) {
     console.error('Error fetching languages:', error)
     res.status(500).json({
-      error: 'Failed to fetch languages',
-      message: error.message
+      success: false,
+      error: 'Internal server error'
     })
   }
 })
@@ -116,18 +109,20 @@ router.get('/languages', async (req, res) => {
 router.get('/activity', async (req, res) => {
   try {
     const activity = await database.getActivity()
-    const lastUpdated = await database.getLastUpdated()
+    const limit = parseInt(req.query.limit) || activity.length
+    
+    const limitedActivity = activity.slice(0, limit)
     
     res.json({
-      data: activity,
-      lastUpdated,
-      cached: true
+      success: true,
+      data: limitedActivity,
+      count: limitedActivity.length
     })
   } catch (error) {
     console.error('Error fetching activity:', error)
     res.status(500).json({
-      error: 'Failed to fetch activity',
-      message: error.message
+      success: false,
+      error: 'Internal server error'
     })
   }
 })
@@ -136,18 +131,17 @@ router.get('/activity', async (req, res) => {
 router.get('/workflows', async (req, res) => {
   try {
     const workflows = await database.getWorkflows()
-    const lastUpdated = await database.getLastUpdated()
     
     res.json({
+      success: true,
       data: workflows,
-      lastUpdated,
-      cached: true
+      count: workflows.length
     })
   } catch (error) {
     console.error('Error fetching workflows:', error)
     res.status(500).json({
-      error: 'Failed to fetch workflows',
-      message: error.message
+      success: false,
+      error: 'Internal server error'
     })
   }
 })
@@ -156,18 +150,16 @@ router.get('/workflows', async (req, res) => {
 router.get('/stats', async (req, res) => {
   try {
     const stats = await database.getStats()
-    const lastUpdated = await database.getLastUpdated()
     
     res.json({
-      data: stats,
-      lastUpdated,
-      cached: true
+      success: true,
+      data: stats
     })
   } catch (error) {
     console.error('Error fetching stats:', error)
     res.status(500).json({
-      error: 'Failed to fetch stats',
-      message: error.message
+      success: false,
+      error: 'Internal server error'
     })
   }
 })
@@ -178,14 +170,14 @@ router.get('/all', async (req, res) => {
     const allData = await database.getAllData()
     
     res.json({
-      data: allData,
-      cached: true
+      success: true,
+      data: allData
     })
   } catch (error) {
     console.error('Error fetching all data:', error)
     res.status(500).json({
-      error: 'Failed to fetch all data',
-      message: error.message
+      success: false,
+      error: 'Internal server error'
     })
   }
 })

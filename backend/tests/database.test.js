@@ -1,10 +1,9 @@
 import { jest } from '@jest/globals'
 import fs from 'fs/promises'
 import path from 'path'
-import Database from '../src/config/database.js'
+import database from '../src/config/database.js'
 
 describe('Database', () => {
-  let database
   const testDbPath = './data/test-database.json'
 
   beforeEach(async () => {
@@ -15,7 +14,9 @@ describe('Database', () => {
       // File doesn't exist, that's fine
     }
     
-    database = new Database(testDbPath)
+    // Reset the database instance
+    database.isInitialized = false
+    database.db = null
   })
 
   afterEach(async () => {
@@ -48,15 +49,15 @@ describe('Database', () => {
       database.db.data.user = { name: 'Test User' }
       await database.db.write()
       
-      // Initialize again
-      const newDatabase = new Database(testDbPath)
-      await newDatabase.initialize()
+      // Reset and initialize again
+      database.isInitialized = false
+      await database.initialize()
       
-      expect(newDatabase.db.data.user.name).toBe('Test User')
+      expect(database.db.data.user.name).toBe('Test User')
     })
   })
 
-  describe('updateUser', () => {
+  describe('setUser', () => {
     beforeEach(async () => {
       await database.initialize()
     })
@@ -69,14 +70,15 @@ describe('Database', () => {
         public_repos: 10
       }
 
-      await database.updateUser(userData)
+      await database.setUser(userData)
       
-      expect(database.db.data.user).toEqual(userData)
-      expect(database.db.data.lastUpdated.user).toBeDefined()
+      const user = await database.getUser()
+      expect(user).toEqual(userData)
+      expect(database.db.data.lastUpdated).toBeDefined()
     })
   })
 
-  describe('updateRepositories', () => {
+  describe('setRepositories', () => {
     beforeEach(async () => {
       await database.initialize()
     })
@@ -87,14 +89,15 @@ describe('Database', () => {
         { id: 2, name: 'repo2', stargazers_count: 10 }
       ]
 
-      await database.updateRepositories(reposData)
+      await database.setRepositories(reposData)
       
-      expect(database.db.data.repositories).toEqual(reposData)
-      expect(database.db.data.lastUpdated.repositories).toBeDefined()
+      const repositories = await database.getRepositories()
+      expect(repositories).toEqual(reposData)
+      expect(database.db.data.lastUpdated).toBeDefined()
     })
   })
 
-  describe('updateLanguages', () => {
+  describe('setLanguages', () => {
     beforeEach(async () => {
       await database.initialize()
     })
@@ -106,14 +109,15 @@ describe('Database', () => {
         TypeScript: 600
       }
 
-      await database.updateLanguages(languagesData)
+      await database.setLanguages(languagesData)
       
-      expect(database.db.data.languages).toEqual(languagesData)
-      expect(database.db.data.lastUpdated.languages).toBeDefined()
+      const languages = await database.getLanguages()
+      expect(languages).toEqual(languagesData)
+      expect(database.db.data.lastUpdated).toBeDefined()
     })
   })
 
-  describe('updateActivity', () => {
+  describe('setActivity', () => {
     beforeEach(async () => {
       await database.initialize()
     })
@@ -124,14 +128,15 @@ describe('Database', () => {
         { id: '2', type: 'CreateEvent', created_at: '2023-01-02T00:00:00Z' }
       ]
 
-      await database.updateActivity(activityData)
+      await database.setActivity(activityData)
       
-      expect(database.db.data.activity).toEqual(activityData)
-      expect(database.db.data.lastUpdated.activity).toBeDefined()
+      const activity = await database.getActivity()
+      expect(activity).toEqual(activityData)
+      expect(database.db.data.lastUpdated).toBeDefined()
     })
   })
 
-  describe('updateWorkflows', () => {
+  describe('setWorkflows', () => {
     beforeEach(async () => {
       await database.initialize()
     })
@@ -142,14 +147,15 @@ describe('Database', () => {
         { id: 2, name: 'Deploy', status: 'in_progress', conclusion: null }
       ]
 
-      await database.updateWorkflows(workflowsData)
+      await database.setWorkflows(workflowsData)
       
-      expect(database.db.data.workflows).toEqual(workflowsData)
-      expect(database.db.data.lastUpdated.workflows).toBeDefined()
+      const workflows = await database.getWorkflows()
+      expect(workflows).toEqual(workflowsData)
+      expect(database.db.data.lastUpdated).toBeDefined()
     })
   })
 
-  describe('updateStats', () => {
+  describe('setStats', () => {
     beforeEach(async () => {
       await database.initialize()
     })
@@ -159,19 +165,36 @@ describe('Database', () => {
         totalRepos: 15,
         totalStars: 100,
         totalForks: 25,
-        totalCommits: 500
+        totalCommits: 500,
+        followers: 0,
+        following: 0
       }
 
-      await database.updateStats(statsData)
+      await database.setStats(statsData)
       
-      expect(database.db.data.stats).toEqual(statsData)
-      expect(database.db.data.lastUpdated.stats).toBeDefined()
+      const stats = await database.getStats()
+      expect(stats).toEqual(statsData)
+      expect(database.db.data.lastUpdated).toBeDefined()
     })
   })
 
   describe('getter methods', () => {
     beforeEach(async () => {
       await database.initialize()
+      
+      // Clear all data first
+      database.db.data.user = null
+      database.db.data.repositories = []
+      database.db.data.languages = {}
+      database.db.data.activity = []
+      database.db.data.workflows = []
+      database.db.data.stats = {
+        totalStars: 0,
+        totalForks: 0,
+        totalRepos: 0,
+        followers: 0,
+        following: 0
+      }
       
       // Set up test data
       database.db.data.user = { name: 'Test User' }
@@ -180,34 +203,42 @@ describe('Database', () => {
       database.db.data.activity = [{ type: 'PushEvent' }]
       database.db.data.workflows = [{ name: 'CI' }]
       database.db.data.stats = { totalRepos: 1 }
+      
+      await database.db.write()
     })
 
-    test('getUser should return user data', () => {
-      expect(database.getUser()).toEqual({ name: 'Test User' })
+    test('getUser should return user data', async () => {
+      const user = await database.getUser()
+      expect(user).toEqual({ name: 'Test User' })
     })
 
-    test('getRepositories should return repositories data', () => {
-      expect(database.getRepositories()).toEqual([{ name: 'repo1' }])
+    test('getRepositories should return repositories data', async () => {
+      const repositories = await database.getRepositories()
+      expect(repositories).toEqual([{ name: 'repo1' }])
     })
 
-    test('getLanguages should return languages data', () => {
-      expect(database.getLanguages()).toEqual({ JavaScript: 1000 })
+    test('getLanguages should return languages data', async () => {
+      const languages = await database.getLanguages()
+      expect(languages).toEqual({ JavaScript: 1000 })
     })
 
-    test('getActivity should return activity data', () => {
-      expect(database.getActivity()).toEqual([{ type: 'PushEvent' }])
+    test('getActivity should return activity data', async () => {
+      const activity = await database.getActivity()
+      expect(activity).toEqual([{ type: 'PushEvent' }])
     })
 
-    test('getWorkflows should return workflows data', () => {
-      expect(database.getWorkflows()).toEqual([{ name: 'CI' }])
+    test('getWorkflows should return workflows data', async () => {
+      const workflows = await database.getWorkflows()
+      expect(workflows).toEqual([{ name: 'CI' }])
     })
 
-    test('getStats should return stats data', () => {
-      expect(database.getStats()).toEqual({ totalRepos: 1 })
+    test('getStats should return stats data', async () => {
+      const stats = await database.getStats()
+      expect(stats).toEqual({ totalRepos: 1 })
     })
 
-    test('getAllData should return all data', () => {
-      const allData = database.getAllData()
+    test('getAllData should return all data', async () => {
+      const allData = await database.getAllData()
       
       expect(allData).toHaveProperty('user')
       expect(allData).toHaveProperty('repositories')

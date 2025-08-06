@@ -1,7 +1,6 @@
 import { jest } from '@jest/globals'
 import request from 'supertest'
 import express from 'express'
-import apiRoutes from '../src/routes/api.js'
 
 // Mock the database
 const mockDatabase = {
@@ -14,10 +13,13 @@ const mockDatabase = {
   getAllData: jest.fn()
 }
 
-// Mock the database module
+// Mock the database module BEFORE importing the routes
 jest.unstable_mockModule('../src/config/database.js', () => ({
   default: mockDatabase
 }))
+
+// Import the routes AFTER setting up the mock
+const { default: apiRoutes } = await import('../src/routes/api.js')
 
 describe('API Routes', () => {
   let app

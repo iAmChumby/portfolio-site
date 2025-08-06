@@ -58,7 +58,7 @@ export default function Contact() {
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <div className="relative inline-block bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg p-8">
+            <div className="relative inline-block bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8">
               <h2 className="heading-2 !text-center mb-4 !text-white">Get In Touch</h2>
               <p className="text-large !text-center max-w-2xl mx-auto !text-white">
                 I&apos;m always open to discussing new opportunities and interesting projects
@@ -68,7 +68,7 @@ export default function Contact() {
           
           <div className="grid md:grid-cols-2 gap-12">
             <div className="space-y-8">
-              <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+              <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-6">
                 <h3 className="heading-3 mb-6 !text-white">Let&apos;s Connect</h3>
                 <p className="text-base mb-6 !text-white/80">
                   Whether you have a project in mind, want to collaborate, or just want to say hello, 
@@ -80,7 +80,7 @@ export default function Contact() {
                 </div>
               </div>
               
-              <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg p-6 space-y-6">
+              <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-6 space-y-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center border border-accent/30">
                     <EnvelopeIcon className="w-6 h-6 text-accent" />
@@ -123,7 +123,7 @@ export default function Contact() {
               </div>
             </div>
             
-            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg p-8">
+            <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium mb-2 text-white">
@@ -210,7 +210,7 @@ export default function Contact() {
           </div>
           
           {/* Connect Online Section - Full Width */}
-          <div className="mt-12 bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+          <div className="mt-12 bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-6">
             <h3 className="heading-3 mb-6 !text-white">Connect Online</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <a

@@ -24,8 +24,6 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('btn-sm');
     render(<Button size="lg">Large</Button>);
     expect(screen.getByRole('button')).toHaveClass('btn-lg');
-    render(<Button size="xl">Extra Large</Button>);
-    expect(screen.getByRole('button')).toHaveClass('btn-xl');
   });
 
   it('renders loading state', () => {

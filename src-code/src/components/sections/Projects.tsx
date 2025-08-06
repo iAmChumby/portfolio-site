@@ -76,7 +76,7 @@ export default function Projects() {
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="relative inline-block bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg p-8">
+            <div className="relative inline-block bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8">
               <h2 className="heading-2 !text-center mb-4 !text-white">Featured Projects</h2>
               <p className="text-large !text-center max-w-2xl mx-auto !text-white">
                 Here are some of my recent projects that showcase my skills and experience
@@ -92,7 +92,7 @@ export default function Projects() {
               return (
                 <div 
                   key={project.id}
-                  className={`group bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:bg-black/30 hover:border-accent/50 hover:scale-105 transition-all duration-300 ${
+                  className={`group bg-black/30 backdrop-blur-md border border-white/20 rounded-lg overflow-hidden hover:bg-black/40 hover:border-accent/50 hover:scale-105 transition-all duration-300 ${
                     isNewProject ? 'project-card-enter' : ''
                   }`}
                   style={{

@@ -41,7 +41,7 @@ const Technologies: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="relative inline-block">
-              <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg p-8 mb-4">
+              <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8 mb-4">
                 <h2 className="heading-2 !text-center mb-4 !text-white">Technologies & Skills</h2>
                 <p className="text-large !text-center max-w-2xl mx-auto !text-white">
                   Here are the technologies and tools I work with regularly
@@ -53,7 +53,7 @@ const Technologies: React.FC = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
             {technologies.map((tech, index) => (
               <ScrollReveal key={tech.name} delay={index * 100} direction="up">
-                <div className="group bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg p-6 text-center hover:bg-black/30 hover:border-accent/50 hover:scale-105 transition-all duration-300">
+                <div className="group bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-6 text-center hover:bg-black/40 hover:border-accent/50 hover:scale-105 transition-all duration-300">
                   <div className="flex justify-center mb-4">
                     <tech.icon className="w-12 h-12 text-accent group-hover:scale-110 group-hover:text-white transition-all duration-300" />
                   </div>

@@ -31,7 +31,7 @@
 ## 📝 Typography System
 
 ### **Font Stack**
-```scss
+```css
 // Primary Font (Headings)
 $font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 

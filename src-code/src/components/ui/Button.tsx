@@ -7,6 +7,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
+  iconOnly?: boolean;
+  fullWidth?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -17,6 +19,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     loading = false, 
     icon, 
     iconPosition = 'left',
+    iconOnly = false,
+    fullWidth = false,
     children, 
     disabled,
     ...props 
@@ -43,7 +47,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           sizes[size],
           {
             'opacity-50 cursor-not-allowed': disabled || loading,
-            'flex items-center gap-2': icon,
+            'flex items-center gap-2': icon && !iconOnly,
+            'btn-icon': icon && !iconOnly,
+            'btn-icon-only': iconOnly,
+            'w-full': fullWidth,
           },
           className
         )}
@@ -56,7 +63,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           <>
             {icon && iconPosition === 'left' && icon}
-            {children}
+            {!iconOnly && children}
             {icon && iconPosition === 'right' && icon}
           </>
         )}

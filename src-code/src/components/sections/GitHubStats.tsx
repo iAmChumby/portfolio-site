@@ -87,26 +87,26 @@ const GitHubStats: React.FC = () => {
     <div className="relative">
       {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/10 to-black/20 rounded-2xl" />
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10" />
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-md rounded-2xl border border-white/20" />
       
       <div className="relative p-4 md:p-6">
         <div className="space-y-4">
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+            <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20">
               <div className="text-lg md:text-xl font-bold text-white">{user?.public_repos || 0}</div>
               <div className="text-xs text-gray-400">Repositories</div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-                <div className="text-lg md:text-xl font-bold text-white">{user?.followers || 0}</div>
-                <div className="text-xs text-gray-400">Followers</div>
-              </div>
-              <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-                <div className="text-lg md:text-xl font-bold text-white">{user?.following || 0}</div>
-                <div className="text-xs text-gray-400">Following</div>
-              </div>
-              <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+            <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20">
+              <div className="text-lg md:text-xl font-bold text-white">{user?.followers || 0}</div>
+              <div className="text-xs text-gray-400">Followers</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20">
+              <div className="text-lg md:text-xl font-bold text-white">{user?.following || 0}</div>
+              <div className="text-xs text-gray-400">Following</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20">
               <div className="text-lg md:text-xl font-bold text-white">
                 {repositories?.reduce((sum, repo) => sum + repo.stargazers_count, 0) || 0}
               </div>
@@ -115,7 +115,7 @@ const GitHubStats: React.FC = () => {
           </div>
 
           {/* Top Languages */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20">
             <h3 className="text-lg font-semibold text-white mb-3">Top 5 Languages</h3>
             {languagesLoading ? (
               <div className="space-y-2">
@@ -155,7 +155,7 @@ const GitHubStats: React.FC = () => {
           </div>
 
           {/* Recent Workflow Runs */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+          <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 border border-white/20">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-lg font-semibold text-white">Recent Workflows</h3>
               <button

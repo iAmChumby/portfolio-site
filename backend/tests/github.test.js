@@ -1,15 +1,22 @@
 import { jest } from '@jest/globals'
 import GitHubService from '../src/services/github.js'
 
-// Mock environment variables
-process.env.GITHUB_TOKEN = 'test-token'
-process.env.GITHUB_USERNAME = 'testuser'
-
 describe('GitHubService', () => {
   let githubService
   let mockClient
+  let originalEnv
 
   beforeEach(() => {
+    // Save original environment variables
+    originalEnv = {
+      GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+      GITHUB_USERNAME: process.env.GITHUB_USERNAME
+    }
+    
+    // Set test environment variables
+    process.env.GITHUB_TOKEN = 'test-token'
+    process.env.GITHUB_USERNAME = 'testuser'
+    
     githubService = new GitHubService()
     
     // Mock the client directly
@@ -19,23 +26,51 @@ describe('GitHubService', () => {
     githubService.client = mockClient
   })
 
+  afterEach(() => {
+    // Restore original environment variables
+    if (originalEnv.GITHUB_TOKEN !== undefined) {
+      process.env.GITHUB_TOKEN = originalEnv.GITHUB_TOKEN
+    } else {
+      delete process.env.GITHUB_TOKEN
+    }
+    
+    if (originalEnv.GITHUB_USERNAME !== undefined) {
+      process.env.GITHUB_USERNAME = originalEnv.GITHUB_USERNAME
+    } else {
+      delete process.env.GITHUB_USERNAME
+    }
+  })
+
   describe('constructor', () => {
     test('should initialize with token and username from environment', () => {
       expect(githubService.token).toBe('test-token')
       expect(githubService.username).toBe('testuser')
       expect(githubService.baseURL).toBe('https://api.github.com')
+      expect(githubService.isConfigured).toBe(true)
     })
 
-    test('should throw error if token is missing', () => {
+    test('should not be configured if token is missing', () => {
       delete process.env.GITHUB_TOKEN
-      expect(() => new GitHubService()).toThrow('GITHUB_TOKEN and GITHUB_USERNAME environment variables are required')
-      process.env.GITHUB_TOKEN = 'test-token'
+      const service = new GitHubService()
+      expect(service.isConfigured).toBe(false)
     })
 
-    test('should throw error if username is missing', () => {
+    test('should not be configured if username is missing', () => {
       delete process.env.GITHUB_USERNAME
-      expect(() => new GitHubService()).toThrow('GITHUB_TOKEN and GITHUB_USERNAME environment variables are required')
-      process.env.GITHUB_USERNAME = 'testuser'
+      const service = new GitHubService()
+      expect(service.isConfigured).toBe(false)
+    })
+
+    test('should not be configured if token is placeholder', () => {
+      process.env.GITHUB_TOKEN = 'your_github_token_here'
+      const service = new GitHubService()
+      expect(service.isConfigured).toBe(false)
+    })
+
+    test('should not be configured if username is placeholder', () => {
+      process.env.GITHUB_USERNAME = 'your_github_username'
+      const service = new GitHubService()
+      expect(service.isConfigured).toBe(false)
     })
   })
 
@@ -133,13 +168,10 @@ describe('GitHubService', () => {
       const mockLang1 = { JavaScript: 1000, Python: 500 }
       const mockLang2 = { JavaScript: 800, TypeScript: 600 }
 
-      mockClient.get
-        .mockResolvedValueOnce({
-          data: mockLang1
-        })
-        .mockResolvedValueOnce({
-          data: mockLang2
-        })
+      // Mock the fetchRepositoryLanguages method directly
+      githubService.fetchRepositoryLanguages = jest.fn()
+        .mockResolvedValueOnce(mockLang1)
+        .mockResolvedValueOnce(mockLang2)
 
       const result = await githubService.aggregateLanguages(mockRepos)
       
@@ -162,13 +194,37 @@ describe('GitHubService', () => {
     test('should handle repositories with no languages', async () => {
       const mockRepos = [{ name: 'repo1', fork: false }]
 
-      mockClient.get.mockResolvedValueOnce({
-        data: {}
-      })
+      // Mock the fetchRepositoryLanguages method directly
+      githubService.fetchRepositoryLanguages = jest.fn()
+        .mockResolvedValueOnce({})
 
       const result = await githubService.aggregateLanguages(mockRepos)
       
       expect(result).toEqual({})
+    })
+
+    test('should skip forked repositories', async () => {
+      const mockRepos = [
+        { name: 'repo1', fork: false },
+        { name: 'repo2', fork: true }
+      ]
+
+      const mockLang1 = { JavaScript: 1000 }
+
+      // Mock the fetchRepositoryLanguages method directly
+      githubService.fetchRepositoryLanguages = jest.fn()
+        .mockResolvedValueOnce(mockLang1)
+
+      const result = await githubService.aggregateLanguages(mockRepos)
+      
+      expect(githubService.fetchRepositoryLanguages).toHaveBeenCalledTimes(1)
+      expect(githubService.fetchRepositoryLanguages).toHaveBeenCalledWith('repo1')
+      expect(result).toEqual({
+        JavaScript: {
+          bytes: 1000,
+          percentage: '100.00'
+        }
+      })
     })
   })
 

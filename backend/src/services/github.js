@@ -5,11 +5,16 @@ class GitHubService {
     this.token = process.env.GITHUB_TOKEN
     this.username = process.env.GITHUB_USERNAME
     this.baseURL = 'https://api.github.com'
+    this.isConfigured = false
     
-    if (!this.token || !this.username) {
-      throw new Error('GITHUB_TOKEN and GITHUB_USERNAME environment variables are required')
+    if (!this.token || !this.username || this.token === 'your_github_token_here' || this.username === 'your_github_username') {
+      console.warn('⚠️  GitHub credentials not configured. GitHub API features will be disabled.')
+      console.warn('   Set GITHUB_TOKEN and GITHUB_USERNAME environment variables to enable GitHub integration.')
+      this.isConfigured = false
+      return
     }
 
+    this.isConfigured = true
     this.client = axios.create({
       baseURL: this.baseURL,
       headers: {
@@ -21,7 +26,14 @@ class GitHubService {
     })
   }
 
+  _checkConfiguration() {
+    if (!this.isConfigured) {
+      throw new Error('GitHub service is not configured. Please set GITHUB_TOKEN and GITHUB_USERNAME environment variables.')
+    }
+  }
+
   async fetchUser() {
+    this._checkConfiguration()
     try {
       const response = await this.client.get(`/users/${this.username}`)
       return response.data
@@ -32,6 +44,7 @@ class GitHubService {
   }
 
   async fetchRepositories(page = 1, perPage = 100) {
+    this._checkConfiguration()
     try {
       const response = await this.client.get(`/users/${this.username}/repos`, {
         params: {
@@ -49,6 +62,7 @@ class GitHubService {
   }
 
   async fetchAllRepositories() {
+    this._checkConfiguration()
     try {
       let allRepos = []
       let page = 1
@@ -69,6 +83,7 @@ class GitHubService {
   }
 
   async fetchRepositoryLanguages(repoName) {
+    this._checkConfiguration()
     try {
       const response = await this.client.get(`/repos/${this.username}/${repoName}/languages`)
       return response.data
@@ -79,6 +94,7 @@ class GitHubService {
   }
 
   async fetchUserEvents(page = 1, perPage = 30) {
+    this._checkConfiguration()
     try {
       const response = await this.client.get(`/users/${this.username}/events`, {
         params: {
@@ -94,6 +110,7 @@ class GitHubService {
   }
 
   async fetchWorkflowRuns(repoName, page = 1, perPage = 10) {
+    this._checkConfiguration()
     try {
       const response = await this.client.get(`/repos/${this.username}/${repoName}/actions/runs`, {
         params: {

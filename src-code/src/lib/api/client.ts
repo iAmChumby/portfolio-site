@@ -9,7 +9,7 @@ interface ApiClientConfig {
 }
 
 const defaultConfig: ApiClientConfig = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
   timeout: 10000,
   retries: 3,
   retryDelay: 1000,

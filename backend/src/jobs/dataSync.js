@@ -6,21 +6,109 @@ class DataSyncJob {
   constructor() {
     this.githubService = null
     this.isRunning = false
+    this.isGitHubConfigured = false
   }
 
   async initialize() {
     try {
       this.githubService = new GitHubService()
-      console.log('✅ DataSync job initialized')
+      this.isGitHubConfigured = this.githubService.isConfigured
+      
+      if (this.isGitHubConfigured) {
+        console.log('DataSync job initialized with GitHub integration')
+      } else {
+        console.log('DataSync job initialized without GitHub integration (credentials not configured)')
+        await this.initializeMockData()
+      }
     } catch (error) {
-      console.error('❌ Failed to initialize DataSync job:', error)
-      throw error
+      console.error('Failed to initialize DataSync job:', error)
+      this.isGitHubConfigured = false
+      await this.initializeMockData()
     }
+  }
+
+  async initializeMockData() {
+    console.log('Initializing with mock data for development...')
+    
+    const mockUser = {
+      login: 'developer',
+      name: 'Portfolio Developer',
+      bio: 'Full-stack developer passionate about creating amazing web experiences',
+      location: 'Remote',
+      followers: 42,
+      following: 24,
+      public_repos: 15,
+      avatar_url: 'https://github.com/identicons/developer.png',
+      html_url: 'https://github.com/developer'
+    }
+
+    const mockRepositories = [
+      {
+        name: 'portfolio-site',
+        description: 'Personal portfolio website built with modern web technologies',
+        stargazers_count: 12,
+        forks_count: 3,
+        language: 'JavaScript',
+        updated_at: new Date().toISOString(),
+        html_url: 'https://github.com/developer/portfolio-site',
+        fork: false
+      },
+      {
+        name: 'react-dashboard',
+        description: 'Modern React dashboard with real-time analytics',
+        stargazers_count: 8,
+        forks_count: 2,
+        language: 'TypeScript',
+        updated_at: new Date(Date.now() - 86400000).toISOString(),
+        html_url: 'https://github.com/developer/react-dashboard',
+        fork: false
+      }
+    ]
+
+    const mockLanguages = {
+      JavaScript: { bytes: 45000, percentage: '60.00' },
+      TypeScript: { bytes: 20000, percentage: '26.67' },
+      CSS: { bytes: 8000, percentage: '10.67' },
+      HTML: { bytes: 2000, percentage: '2.67' }
+    }
+
+    const mockActivity = [
+      {
+        id: '1',
+        type: 'PushEvent',
+        repo: { name: 'developer/portfolio-site' },
+        created_at: new Date().toISOString(),
+        payload: { commits: [{ message: 'Update portfolio design' }] }
+      }
+    ]
+
+    const mockStats = {
+      totalStars: 20,
+      totalForks: 5,
+      totalRepos: 2,
+      followers: 42,
+      following: 24
+    }
+
+    // Save mock data to database
+    await database.setUser(mockUser)
+    await database.setRepositories(mockRepositories)
+    await database.setLanguages(mockLanguages)
+    await database.setActivity(mockActivity)
+    await database.setStats(mockStats)
+    await database.setWorkflows([])
+
+    console.log('✅ Mock data initialized successfully')
   }
 
   async syncAllData() {
     if (this.isRunning) {
       console.log('⏳ Data sync already in progress, skipping...')
+      return
+    }
+
+    if (!this.isGitHubConfigured) {
+      console.log('⚠️  GitHub not configured, skipping data sync')
       return
     }
 
@@ -156,6 +244,11 @@ class DataSyncJob {
   }
 
   startScheduledSync() {
+    if (!this.isGitHubConfigured) {
+      console.log('⚠️  GitHub not configured, scheduled sync disabled')
+      return
+    }
+
     // Run every 6 hours
     cron.schedule('0 */6 * * *', async () => {
       console.log('⏰ Scheduled data sync triggered')
@@ -180,6 +273,11 @@ class DataSyncJob {
   }
 
   async performInitialSync() {
+    if (!this.isGitHubConfigured) {
+      console.log('⚠️  GitHub not configured, skipping initial sync (using mock data)')
+      return
+    }
+    
     console.log('🚀 Performing initial data sync...')
     await this.syncAllData()
   }

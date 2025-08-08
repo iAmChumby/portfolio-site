@@ -49,10 +49,10 @@ class Database {
       }
 
       this.isInitialized = true
-      console.log('✅ Database initialized successfully')
+      console.log('Database initialized successfully')
       return this.db
     } catch (error) {
-      console.error('❌ Database initialization failed:', error)
+      console.error('Database initialization failed:', error)
       throw error
     }
   }

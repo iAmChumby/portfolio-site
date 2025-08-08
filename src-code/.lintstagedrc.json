@@ -7,7 +7,7 @@
   "*.{json,md,yml,yaml}": [
     "prettier --write"
   ],
-  "*.{css,scss}": [
+  "*.css": [
     "prettier --write"
   ]
 }

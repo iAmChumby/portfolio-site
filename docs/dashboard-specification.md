@@ -186,8 +186,140 @@ The Portfolio Dashboard provides comprehensive, privacy-respecting analytics and
 - **Frontend**: Next.js 14+ with TypeScript and CSS Modules
 - **Backend**: Node.js API with LowDB for metrics storage
 - **Real-time Updates**: WebSocket integration for live data
-- **Authentication**: Secure admin-only access with MFA
+- **Authentication**: Secure admin-only access with SMS-based MFA
 - **Visualization**: Chart.js or D3.js for data visualization
+
+### SMS-Based Authentication System
+
+#### Overview
+The dashboard implements a secure SMS-based authentication system that provides dynamic access through temporary URLs, eliminating the need for static login credentials or hidden dashboard links.
+
+#### Architecture Components
+
+**SMS Service Integration**
+- **Provider**: Twilio SMS API
+- **Webhook Handler**: Processes incoming SMS messages
+- **Token Generator**: Creates cryptographically secure access tokens
+- **Response Service**: Sends SMS replies with access URLs
+- **Phone Whitelist**: Authorized phone number validation
+
+**Security Features**
+- **Dynamic URLs**: Each access request generates a unique URL
+- **Time-Limited Tokens**: 15-minute expiration for security
+- **Phone Number Verification**: Only whitelisted numbers can request access
+- **Rate Limiting**: Prevents SMS spam and abuse attempts
+- **Audit Logging**: All access attempts logged for security monitoring
+- **IP Restrictions**: Optional IP-based access controls
+
+#### User Experience Flow
+
+1. **Access Request**: User sends SMS to designated Twilio number
+2. **Validation**: System validates sender's phone number against whitelist
+3. **Token Generation**: Creates secure, time-limited access token
+4. **SMS Response**: Sends back temporary dashboard URL via SMS
+5. **Dashboard Access**: User clicks URL to access dashboard
+6. **Automatic Expiry**: URL becomes invalid after 15 minutes
+
+#### Technical Implementation
+
+**Database Schema (LowDB)**
+```json
+{
+  "sms_tokens": [
+    {
+      "id": "uuid",
+      "token": "cryptographic_hash",
+      "phone_number": "hashed_phone",
+      "created_at": "timestamp",
+      "expires_at": "timestamp",
+      "used": false,
+      "ip_address": "optional_ip"
+    }
+  ],
+  "authorized_phones": [
+    {
+      "phone_hash": "hashed_phone_number",
+      "label": "admin_phone",
+      "active": true,
+      "created_at": "timestamp"
+    }
+  ]
+}
+```
+
+**Environment Variables**
+```env
+# Twilio Configuration
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_PHONE_NUMBER=your_twilio_number
+TWILIO_WEBHOOK_URL=https://yourdomain.com/api/sms/webhook
+
+# SMS Authentication
+AUTHORIZED_PHONE_NUMBERS=+1234567890,+0987654321
+SMS_TOKEN_EXPIRY_MINUTES=15
+SMS_RATE_LIMIT_PER_HOUR=5
+```
+
+**API Endpoints**
+- `POST /api/sms/webhook` - Twilio webhook for incoming SMS
+- `GET /api/admin/dashboard/:token` - Token-based dashboard access
+- `POST /api/admin/sms/validate` - Token validation
+- `DELETE /api/admin/sms/revoke/:token` - Manual token revocation
+
+#### Security Considerations
+
+**Token Security**
+- Cryptographically secure random token generation
+- SHA-256 hashing for phone number storage
+- No plaintext phone numbers in database
+- Automatic cleanup of expired tokens
+
+**Rate Limiting & Abuse Prevention**
+- Maximum 5 SMS requests per phone number per hour
+- Exponential backoff for repeated failed attempts
+- Automatic blocking of suspicious patterns
+- Webhook signature verification from Twilio
+
+**Privacy & Compliance**
+- Phone numbers hashed before storage
+- SMS content never logged
+- GDPR-compliant data handling
+- Automatic data purging after retention period
+
+#### Cost Analysis
+
+**Twilio SMS Pricing (US)**
+- Incoming SMS: $0.0075 per message
+- Outgoing SMS: $0.0075 per message
+- Monthly cost for personal use: ~$1-5
+- Webhook hosting: Included in existing infrastructure
+
+#### Benefits Over Traditional Authentication
+
+1. **Enhanced Security**: No static passwords or hidden URLs
+2. **Dynamic Access**: Each session uses unique credentials
+3. **Mobile-First**: Works on any device with SMS capability
+4. **No App Required**: Uses standard SMS functionality
+5. **Audit Trail**: Complete access logging
+6. **Time-Limited**: Automatic session expiry
+7. **Cost-Effective**: Minimal operational costs
+8. **User-Friendly**: Simple SMS-based workflow
+
+#### Future Enhancements
+
+**Planned Features**
+- Multi-language SMS responses
+- Custom SMS templates
+- Integration with monitoring alerts
+- Backup authentication methods
+- Advanced analytics on access patterns
+
+**Optional Integrations**
+- WhatsApp Business API support
+- Voice call fallback option
+- Integration with security monitoring tools
+- Automated threat detection and response
 
 ### Data Collection Methods
 - **Server-side Analytics**: Privacy-friendly server-side tracking

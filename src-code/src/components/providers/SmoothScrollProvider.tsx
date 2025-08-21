@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useRef } from 'react'
 import Lenis from 'lenis'
+import type { LenisInstance } from '@/types/lenis'
 
 interface SmoothScrollProviderProps {
   children: ReactNode
@@ -58,21 +59,21 @@ export default function SmoothScrollProvider({
       lenisRef.current?.destroy()
       lenisRef.current = null
     }
-  }, [])
+  }, [options])
 
   // Expose Lenis instance for external control
   useEffect(() => {
     if (lenisRef.current) {
       // Make Lenis instance globally accessible for page transitions
-      ;(window as any).lenis = lenisRef.current
+      window.lenis = lenisRef.current as LenisInstance
     }
 
     return () => {
-      if ((window as any).lenis) {
-        delete (window as any).lenis
+      if (window.lenis) {
+        delete window.lenis
       }
     }
-  }, [lenisRef.current])
+  }, [])
 
   return <>{children}</>
 }

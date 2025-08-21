@@ -112,11 +112,9 @@ export function LoadingSpinner({
 // Progressive loading wrapper
 export function ProgressiveLoader({ 
   children, 
-  fallback, 
   delay = 200 
 }: { 
   children: ReactNode
-  fallback: ReactNode
   delay?: number 
 }) {
   return (

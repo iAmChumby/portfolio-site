@@ -24,12 +24,12 @@ const defaultData = {
 }
 
 class Database {
-  constructor() {
+  constructor () {
     this.db = null
     this.isInitialized = false
   }
 
-  async initialize() {
+  async initialize () {
     if (this.isInitialized) {
       return this.db
     }
@@ -57,7 +57,7 @@ class Database {
     }
   }
 
-  async getDb() {
+  async getDb () {
     if (!this.isInitialized) {
       await this.initialize()
     }
@@ -65,13 +65,13 @@ class Database {
   }
 
   // User data methods
-  async getUser() {
+  async getUser () {
     const db = await this.getDb()
     await db.read()
     return db.data.user
   }
 
-  async setUser(userData) {
+  async setUser (userData) {
     const db = await this.getDb()
     await db.read()
     db.data.user = userData
@@ -81,13 +81,13 @@ class Database {
   }
 
   // Repository methods
-  async getRepositories() {
+  async getRepositories () {
     const db = await this.getDb()
     await db.read()
     return db.data.repositories
   }
 
-  async setRepositories(repositories) {
+  async setRepositories (repositories) {
     const db = await this.getDb()
     await db.read()
     db.data.repositories = repositories
@@ -97,13 +97,13 @@ class Database {
   }
 
   // Languages methods
-  async getLanguages() {
+  async getLanguages () {
     const db = await this.getDb()
     await db.read()
     return db.data.languages
   }
 
-  async setLanguages(languages) {
+  async setLanguages (languages) {
     const db = await this.getDb()
     await db.read()
     db.data.languages = languages
@@ -113,13 +113,13 @@ class Database {
   }
 
   // Activity methods
-  async getActivity() {
+  async getActivity () {
     const db = await this.getDb()
     await db.read()
     return db.data.activity
   }
 
-  async setActivity(activity) {
+  async setActivity (activity) {
     const db = await this.getDb()
     await db.read()
     db.data.activity = activity
@@ -129,13 +129,13 @@ class Database {
   }
 
   // Workflows methods
-  async getWorkflows() {
+  async getWorkflows () {
     const db = await this.getDb()
     await db.read()
     return db.data.workflows
   }
 
-  async setWorkflows(workflows) {
+  async setWorkflows (workflows) {
     const db = await this.getDb()
     await db.read()
     db.data.workflows = workflows
@@ -145,13 +145,13 @@ class Database {
   }
 
   // Stats methods
-  async getStats() {
+  async getStats () {
     const db = await this.getDb()
     await db.read()
     return db.data.stats
   }
 
-  async setStats(stats) {
+  async setStats (stats) {
     const db = await this.getDb()
     await db.read()
     db.data.stats = { ...db.data.stats, ...stats }
@@ -161,13 +161,13 @@ class Database {
   }
 
   // Utility methods
-  async getLastUpdated() {
+  async getLastUpdated () {
     const db = await this.getDb()
     await db.read()
     return db.data.lastUpdated
   }
 
-  async getAllData() {
+  async getAllData () {
     const db = await this.getDb()
     await db.read()
     return db.data

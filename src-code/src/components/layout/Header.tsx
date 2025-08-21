@@ -29,7 +29,7 @@ const defaultNavigation: NavigationItem[] = [
 const Header: React.FC<HeaderProps> = ({
   navigation = defaultNavigation,
   logo,
-  siteName = 'Luke Edwards\' Portfolio',
+  siteName = 'Portfolio',
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({
           : 'bg-transparent'
       )}
     >
-      <div className="relative flex items-center h-20 px-6">
+      <div className="container flex items-center justify-between h-20 px-6">
           {/* Logo */}
           <Link
             href="/"
@@ -81,8 +81,8 @@ const Header: React.FC<HeaderProps> = ({
             )}
           </Link>
 
-          {/* Desktop Navigation - Absolutely Centered */}
-          <nav className="hidden md:flex items-center space-x-6 absolute left-1/2 transform -translate-x-1/2">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
             {navigation.map((item) => (
               <Link
                 key={item.href}
@@ -90,33 +90,30 @@ const Header: React.FC<HeaderProps> = ({
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 className={cn(
-                  'relative px-4 py-2 text-sm font-medium transition-all duration-300 group',
-                  'hover:text-accent active:scale-95 transform',
+                  'relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg border-2 border-transparent',
+                  'hover:border-[var(--accent-light)] hover:shadow-[0_0_10px_rgba(16,185,129,0.4)] hover:text-[var(--accent-light)]',
+                  'active:border-[var(--accent-hover)] active:shadow-[0_0_15px_rgba(5,150,105,0.6)]',
                   isActiveLink(item.href)
-                    ? 'text-accent font-semibold'
+                    ? 'border-[var(--accent)] shadow-[0_0_8px_rgba(16,185,129,0.5)] text-[var(--accent)] bg-[var(--accent)]/5'
                     : 'text-gray-700 dark:text-gray-300'
                 )}
               >
                 {item.label}
-                {/* Green line that expands from center on hover */}
-                <span 
-                  className={cn(
-                    'absolute bottom-0 left-1/2 h-0.5 bg-accent transition-all duration-300 transform -translate-x-1/2',
-                    'group-hover:w-full group-active:w-full group-active:bg-accent-hover',
-                    isActiveLink(item.href) ? 'w-full' : 'w-0'
-                  )}
-                />
-                {/* Click ripple effect */}
-                <span className="absolute inset-0 rounded-lg bg-accent/10 scale-0 group-active:scale-100 transition-transform duration-150" />
               </Link>
             ))}
           </nav>
 
-          {/* CTA Button - Far Right with Same Margin as Logo */}
-          <div className="hidden md:flex items-center ml-auto">
-            <Button variant="primary" size="sm">
-                Let&apos;s work together
-              </Button>
+          {/* CTA Button and Theme Toggle */}
+          <div className="hidden md:flex items-center gap-6">
+            <Button 
+              variant="cta" 
+              size="md"
+              responsive={true}
+              touchOptimized={true}
+              className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Get In Touch
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -154,28 +151,26 @@ const Header: React.FC<HeaderProps> = ({
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
                     className={cn(
-                      'relative block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 group overflow-hidden',
-                      'hover:text-accent active:scale-95 transform',
+                      'block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 border-2 border-transparent',
+                      'hover:border-[var(--accent)] hover:shadow-[0_0_8px_rgba(16,185,129,0.4)] hover:text-[var(--accent)]',
+                      'active:border-[var(--accent-hover)] active:shadow-[0_0_12px_rgba(5,150,105,0.6)]',
                       isActiveLink(item.href)
-                        ? 'text-accent font-semibold bg-accent/5'
+                        ? 'border-[var(--accent)] shadow-[0_0_6px_rgba(16,185,129,0.5)] text-[var(--accent)] bg-[var(--accent)]/5'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900'
                     )}
                   >
                     {item.label}
-                    {/* Green line that expands from center on hover */}
-                    <span 
-                      className={cn(
-                        'absolute bottom-0 left-1/2 h-0.5 bg-accent transition-all duration-300 transform -translate-x-1/2',
-                        'group-hover:w-full group-active:w-full group-active:bg-accent-hover',
-                        isActiveLink(item.href) ? 'w-full' : 'w-0'
-                      )}
-                    />
-                    {/* Click ripple effect */}
-                    <span className="absolute inset-0 rounded-lg bg-accent/10 scale-0 group-active:scale-100 transition-transform duration-150" />
                   </Link>
                 ))}
                 <div className="px-4 py-3 flex items-center justify-center border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
-                  <Button variant="primary" size="sm">
+                  <Button 
+                    variant="cta" 
+                    size="lg"
+                    mobileFullWidth={true}
+                    responsive={true}
+                    touchOptimized={true}
+                    className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 min-h-[48px]"
+                  >
                     Get In Touch
                   </Button>
                 </div>

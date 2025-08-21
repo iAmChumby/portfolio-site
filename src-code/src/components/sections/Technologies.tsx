@@ -42,8 +42,8 @@ const Technologies: React.FC = () => {
           <div className="text-center mb-16">
             <div className="relative inline-block">
               <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8 mb-4">
-                <h2 className="heading-2 !text-center mb-4 !text-white">Technologies & Skills</h2>
-                <p className="text-large !text-center max-w-2xl mx-auto !text-white">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white">Technologies & Skills</h2>
+                <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-white">
                   Here are the technologies and tools I work with regularly
                 </p>
               </div>

@@ -59,8 +59,8 @@ export default function Contact() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <div className="relative inline-block bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8">
-              <h2 className="heading-2 !text-center mb-4 !text-white">Get In Touch</h2>
-              <p className="text-large !text-center max-w-2xl mx-auto !text-white">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white">Get In Touch</h2>
+              <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-white">
                 I&apos;m always open to discussing new opportunities and interesting projects
               </p>
             </div>
@@ -69,7 +69,7 @@ export default function Contact() {
           <div className="grid md:grid-cols-2 gap-12">
             <div className="space-y-8">
               <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-6">
-                <h3 className="heading-3 mb-6 !text-white">Let&apos;s Connect</h3>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-white">Let&apos;s Connect</h3>
                 <p className="text-base mb-6 !text-white/80">
                   Whether you have a project in mind, want to collaborate, or just want to say hello, 
                   I&apos;d love to hear from you. Drop me a message and I&apos;ll get back to you as soon as possible.
@@ -211,7 +211,7 @@ export default function Contact() {
           
           {/* Connect Online Section - Full Width */}
           <div className="mt-12 bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-6">
-            <h3 className="heading-3 mb-6 !text-white">Connect Online</h3>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-white">Connect Online</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <a
                 href={siteConfig.site.social.github}

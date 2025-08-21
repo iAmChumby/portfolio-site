@@ -112,7 +112,6 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
       // Ensure canvas and context are valid
       if (!canvas || !ctx) return;
       
-      // Clear with dark background for the new theme
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#0a0a0a'; // Dark background
       ctx.fillRect(0, 0, canvas.width, canvas.height);

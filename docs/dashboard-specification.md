@@ -78,7 +78,6 @@ The Portfolio Dashboard provides comprehensive, privacy-respecting analytics and
 - **Unique Portfolio Features**
   - Constellation interaction frequency
   - Morphing navigation usage patterns
-  - Theme switching preferences (light/dark)
   - Interactive element engagement rates
 - **Real-time Feature Performance**
   - WebSocket connection success rates
@@ -334,7 +333,6 @@ SMS_RATE_LIMIT_PER_HOUR=5
 - **Customizable Views**: Adjustable time ranges and filters
 - **Export Capabilities**: PDF reports and CSV data export
 - **Alert System**: Configurable alerts for critical thresholds
-- **Theme Support**: Dark/light mode matching portfolio design
 
 ## Success Metrics for Dashboard
 

@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 8000
 
 // Security middleware
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
 }))
 
 // Compression middleware
@@ -116,7 +116,7 @@ app.use('*', (req, res) => {
 })
 
 // Global error handler
-app.use((error, req, res, next) => {
+app.use((error, req, res, _next) => {
   console.error('❌ Unhandled error:', error)
   
   res.status(error.status || 500).json({
@@ -138,7 +138,7 @@ process.on('SIGINT', () => {
 })
 
 // Start server
-async function startServer() {
+async function startServer () {
   try {
     // Initialize database
     console.log('🔧 Initializing database...')
@@ -164,7 +164,6 @@ async function startServer() {
       console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`)
       console.log('✅ Server ready to accept connections')
     })
-    
   } catch (error) {
     console.error('❌ Failed to start server:', error)
     process.exit(1)

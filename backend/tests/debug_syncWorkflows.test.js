@@ -24,7 +24,6 @@ const { default: DataSyncJob } = await import('../src/jobs/dataSync.js')
 
 describe('Debug syncWorkflows', () => {
   let dataSyncJob
-  let consoleLogSpy, consoleWarnSpy
 
   beforeEach(async () => {
     jest.clearAllMocks()

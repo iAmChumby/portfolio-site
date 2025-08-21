@@ -9,6 +9,10 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   iconPosition?: 'left' | 'right';
   iconOnly?: boolean;
   fullWidth?: boolean;
+  mobileFullWidth?: boolean;
+  mobileCompact?: boolean;
+  responsive?: boolean;
+  touchOptimized?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -21,6 +25,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     iconPosition = 'left',
     iconOnly = false,
     fullWidth = false,
+    mobileFullWidth = false,
+    mobileCompact = false,
+    responsive = true,
+    touchOptimized = true,
     children, 
     disabled,
     ...props 
@@ -35,8 +43,27 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const sizes = {
       sm: 'btn-sm',
-      md: 'px-6 py-3 text-base min-w-[120px]',
+      md: 'btn-md',
       lg: 'btn-lg'
+    };
+
+    // Generate responsive classes based on props
+    const getResponsiveClasses = () => {
+      const classes = [];
+      
+      if (mobileFullWidth) {
+        classes.push('btn-mobile-full');
+      }
+      
+      if (mobileCompact) {
+        classes.push('btn-mobile-compact');
+      }
+      
+      if (touchOptimized) {
+        classes.push('touch-manipulation');
+      }
+      
+      return classes;
     };
 
     return (
@@ -51,20 +78,43 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             'btn-icon': icon && !iconOnly,
             'btn-icon-only': iconOnly,
             'w-full': fullWidth,
+            'transform transition-transform duration-200 ease-out': responsive,
+            'hover:scale-105 active:scale-95': responsive && !disabled && !loading,
           },
+          getResponsiveClasses(),
           className
         )}
         disabled={disabled || loading}
         ref={ref}
+        aria-label={iconOnly && typeof children === 'string' ? children : undefined}
         {...props}
       >
         {loading ? (
-          <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+            {!iconOnly && (
+              <span className="ml-2 opacity-75">
+                {typeof children === 'string' ? 'Loading...' : children}
+              </span>
+            )}
+          </>
         ) : (
           <>
-            {icon && iconPosition === 'left' && icon}
-            {!iconOnly && children}
-            {icon && iconPosition === 'right' && icon}
+            {icon && iconPosition === 'left' && (
+              <span className={cn('flex-shrink-0', { 'mr-2': !iconOnly })}>
+                {icon}
+              </span>
+            )}
+            {!iconOnly && (
+              <span className="flex-1 text-center">
+                {children}
+              </span>
+            )}
+            {icon && iconPosition === 'right' && (
+              <span className={cn('flex-shrink-0', { 'ml-2': !iconOnly })}>
+                {icon}
+              </span>
+            )}
           </>
         )}
       </button>

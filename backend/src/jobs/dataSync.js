@@ -3,13 +3,13 @@ import GitHubService from '../services/github.js'
 import database from '../config/database.js'
 
 class DataSyncJob {
-  constructor() {
+  constructor () {
     this.githubService = null
     this.isRunning = false
     this.isGitHubConfigured = false
   }
 
-  async initialize() {
+  async initialize () {
     try {
       this.githubService = new GitHubService()
       this.isGitHubConfigured = this.githubService.isConfigured
@@ -27,7 +27,7 @@ class DataSyncJob {
     }
   }
 
-  async initializeMockData() {
+  async initializeMockData () {
     console.log('Initializing with mock data for development...')
     
     const mockUser = {
@@ -101,7 +101,7 @@ class DataSyncJob {
     console.log('✅ Mock data initialized successfully')
   }
 
-  async syncAllData() {
+  async syncAllData () {
     if (this.isRunning) {
       console.log('⏳ Data sync already in progress, skipping...')
       return
@@ -142,7 +142,7 @@ class DataSyncJob {
     }
   }
 
-  async syncUserData() {
+  async syncUserData () {
     try {
       console.log('👤 Syncing user data...')
       const userData = await this.githubService.fetchUser()
@@ -154,7 +154,7 @@ class DataSyncJob {
     }
   }
 
-  async syncRepositories() {
+  async syncRepositories () {
     try {
       console.log('📁 Syncing repositories...')
       const repositories = await this.githubService.fetchAllRepositories()
@@ -166,7 +166,7 @@ class DataSyncJob {
     }
   }
 
-  async syncLanguages() {
+  async syncLanguages () {
     try {
       console.log('💻 Syncing languages...')
       const repositories = await database.getRepositories()
@@ -179,7 +179,7 @@ class DataSyncJob {
     }
   }
 
-  async syncActivity() {
+  async syncActivity () {
     try {
       console.log('📊 Syncing activity...')
       const events = await this.githubService.fetchUserEvents()
@@ -192,7 +192,7 @@ class DataSyncJob {
     }
   }
 
-  async syncWorkflows() {
+  async syncWorkflows () {
     try {
       console.log('🔄 Syncing workflows...')
       const repositories = await database.getRepositories()
@@ -229,7 +229,7 @@ class DataSyncJob {
     }
   }
 
-  async updateStats() {
+  async updateStats () {
     try {
       console.log('📈 Updating stats...')
       const repositories = await database.getRepositories()
@@ -243,7 +243,7 @@ class DataSyncJob {
     }
   }
 
-  startScheduledSync() {
+  startScheduledSync () {
     if (!this.isGitHubConfigured) {
       console.log('⚠️  GitHub not configured, scheduled sync disabled')
       return
@@ -272,7 +272,7 @@ class DataSyncJob {
     console.log('   - Activity sync: Every hour')
   }
 
-  async performInitialSync() {
+  async performInitialSync () {
     if (!this.isGitHubConfigured) {
       console.log('⚠️  GitHub not configured, skipping initial sync (using mock data)')
       return

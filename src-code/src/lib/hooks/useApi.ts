@@ -202,171 +202,149 @@ export const useSkills = (): UseApiState<SkillData[]> => {
   };
 };
 
-// Hook for fetching personal data
-export const usePersonalData = (): UseApiState<PersonalData> => {
+// Hook for personal data
+export const usePersonalData = () => {
   const [state, setState] = useState<{
     data: PersonalData | null;
     loading: boolean;
     error: string | null;
   }>({
     data: null,
-    loading: true,
+    loading: false,
     error: null,
   });
 
-  const fetchPersonalData = useCallback(async () => {
-    setState(prev => ({ ...prev, loading: true, error: null }));
+  const execute = useCallback(async (): Promise<void> => {
+    setState({ data: null, loading: true, error: null });
 
     try {
-      // For now, use local site config
-      const response = await fetch('/data/site-config.json');
-      if (!response.ok) {
-        throw new Error('Failed to fetch personal data');
-      }
-      const config = await response.json();
-      
-      const personalData: PersonalData = {
-        name: config.name,
-        title: config.title,
-        bio: config.bio,
-        location: config.location,
-        email: config.email,
-        phone: config.phone,
-        website: config.website,
-        avatar: config.avatar,
-        resume: config.resume,
-        social: config.social,
-        story: {
-          introduction: config.story?.introduction || 'Passionate developer with a love for creating innovative solutions.',
-          journey: config.story?.journey || ['Started coding', 'Learned web development', 'Built amazing projects'],
-          currentFocus: config.story?.currentFocus || 'Building modern web applications',
-          goals: config.story?.goals || ['Master new technologies', 'Contribute to open source', 'Build impactful products']
-        },
-        experience: config.experience || [],
-        education: config.education || []
-      };
-
-      setState({ data: personalData, loading: false, error: null });
+      const response = await apiClient.get<PersonalData>('/api/personal');
+      setState({ data: response.data, loading: false, error: null });
     } catch (error) {
       setState({ 
-        data: null, 
+        data: null,
         loading: false, 
-        error: error instanceof Error ? error.message : 'Failed to fetch personal data' 
+        error: error instanceof Error ? error.message : 'Failed to fetch personal data'
       });
     }
   }, []);
 
-  useEffect(() => {
-    fetchPersonalData();
-  }, [fetchPersonalData]);
-
   return {
     ...state,
-    refetch: fetchPersonalData,
+    execute,
   };
 };
 
 // Hook for posting data
-export const usePostData = <T, R = unknown>() => {
+export const usePostData = <T, R = unknown>(endpoint: string) => {
   const [state, setState] = useState<{
+    data: R | null;
     loading: boolean;
     error: string | null;
-    success: boolean;
   }>({
+    data: null,
     loading: false,
     error: null,
-    success: false,
   });
 
-  const postData = useCallback(async (endpoint: string, data: T): Promise<R | null> => {
-    setState({ loading: true, error: null, success: false });
+  const execute = useCallback(async (data: T): Promise<void> => {
+    if (!endpoint) {
+      setState(prev => ({ ...prev, error: 'Endpoint is required' }));
+      return;
+    }
+
+    setState({ data: null, loading: true, error: null });
 
     try {
       const response = await apiClient.post<R>(endpoint, data);
-      setState({ loading: false, error: null, success: true });
-      return response.data;
+      setState({ data: response.data, loading: false, error: null });
     } catch (error) {
       setState({ 
+        data: null,
         loading: false, 
-        error: error instanceof Error ? error.message : 'Failed to post data',
-        success: false 
+        error: error instanceof Error ? error.message : 'Failed to post data'
       });
-      return null;
     }
-  }, []);
+  }, [endpoint]);
 
   return {
     ...state,
-    postData,
+    execute,
   };
 };
 
 // Hook for updating data
-export const useUpdateData = <T, R = unknown>() => {
+export const useUpdateData = <T, R = unknown>(endpoint: string) => {
   const [state, setState] = useState<{
+    data: R | null;
     loading: boolean;
     error: string | null;
-    success: boolean;
   }>({
+    data: null,
     loading: false,
     error: null,
-    success: false,
   });
 
-  const updateData = useCallback(async (endpoint: string, data: T): Promise<R | null> => {
-    setState({ loading: true, error: null, success: false });
+  const execute = useCallback(async (data: T): Promise<void> => {
+    if (!endpoint) {
+      setState(prev => ({ ...prev, error: 'Endpoint is required' }));
+      return;
+    }
+
+    setState({ data: null, loading: true, error: null });
 
     try {
       const response = await apiClient.put<R>(endpoint, data);
-      setState({ loading: false, error: null, success: true });
-      return response.data;
+      setState({ data: response.data, loading: false, error: null });
     } catch (error) {
       setState({ 
+        data: null,
         loading: false, 
-        error: error instanceof Error ? error.message : 'Failed to update data',
-        success: false 
+        error: error instanceof Error ? error.message : 'Failed to update data'
       });
-      return null;
     }
-  }, []);
+  }, [endpoint]);
 
   return {
     ...state,
-    updateData,
+    execute,
   };
 };
 
 // Hook for deleting data
-export const useDeleteData = () => {
+export const useDeleteData = (endpoint: string) => {
   const [state, setState] = useState<{
+    data: boolean | null;
     loading: boolean;
     error: string | null;
-    success: boolean;
   }>({
+    data: null,
     loading: false,
     error: null,
-    success: false,
   });
 
-  const deleteData = useCallback(async (endpoint: string): Promise<boolean> => {
-    setState({ loading: true, error: null, success: false });
+  const execute = useCallback(async (): Promise<void> => {
+    if (!endpoint) {
+      setState(prev => ({ ...prev, error: 'Endpoint is required' }));
+      return;
+    }
+
+    setState({ data: null, loading: true, error: null });
 
     try {
       await apiClient.delete(endpoint);
-      setState({ loading: false, error: null, success: true });
-      return true;
+      setState({ data: true, loading: false, error: null });
     } catch (error) {
       setState({ 
+        data: null,
         loading: false, 
-        error: error instanceof Error ? error.message : 'Failed to delete data',
-        success: false 
+        error: error instanceof Error ? error.message : 'Failed to delete data'
       });
-      return false;
     }
-  }, []);
+  }, [endpoint]);
 
   return {
     ...state,
-    deleteData,
+    execute,
   };
 };

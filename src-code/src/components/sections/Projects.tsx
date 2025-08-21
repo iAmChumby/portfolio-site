@@ -77,8 +77,8 @@ export default function Projects() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="relative inline-block bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8">
-              <h2 className="heading-2 !text-center mb-4 !text-white">Featured Projects</h2>
-              <p className="text-large !text-center max-w-2xl mx-auto !text-white">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white">Featured Projects</h2>
+              <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-white">
                 Here are some of my recent projects that showcase my skills and experience
               </p>
             </div>

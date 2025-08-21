@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 class GitHubService {
-  constructor() {
+  constructor () {
     this.token = process.env.GITHUB_TOKEN
     this.username = process.env.GITHUB_USERNAME
     this.baseURL = 'https://api.github.com'
@@ -18,21 +18,21 @@ class GitHubService {
     this.client = axios.create({
       baseURL: this.baseURL,
       headers: {
-        'Authorization': `Bearer ${this.token}`,
-        'Accept': 'application/vnd.github.v3+json',
+        Authorization: `Bearer ${this.token}`,
+        Accept: 'application/vnd.github.v3+json',
         'User-Agent': 'Portfolio-Backend/1.0.0'
       },
       timeout: 10000
     })
   }
 
-  _checkConfiguration() {
+  _checkConfiguration () {
     if (!this.isConfigured) {
       throw new Error('GitHub service is not configured. Please set GITHUB_TOKEN and GITHUB_USERNAME environment variables.')
     }
   }
 
-  async fetchUser() {
+  async fetchUser () {
     this._checkConfiguration()
     try {
       const response = await this.client.get(`/users/${this.username}`)
@@ -43,7 +43,7 @@ class GitHubService {
     }
   }
 
-  async fetchRepositories(page = 1, perPage = 100) {
+  async fetchRepositories (page = 1, perPage = 100) {
     this._checkConfiguration()
     try {
       const response = await this.client.get(`/users/${this.username}/repos`, {
@@ -61,7 +61,7 @@ class GitHubService {
     }
   }
 
-  async fetchAllRepositories() {
+  async fetchAllRepositories () {
     this._checkConfiguration()
     try {
       let allRepos = []
@@ -82,7 +82,7 @@ class GitHubService {
     }
   }
 
-  async fetchRepositoryLanguages(repoName) {
+  async fetchRepositoryLanguages (repoName) {
     this._checkConfiguration()
     try {
       const response = await this.client.get(`/repos/${this.username}/${repoName}/languages`)
@@ -93,7 +93,7 @@ class GitHubService {
     }
   }
 
-  async fetchUserEvents(page = 1, perPage = 30) {
+  async fetchUserEvents (page = 1, perPage = 30) {
     this._checkConfiguration()
     try {
       const response = await this.client.get(`/users/${this.username}/events`, {
@@ -109,7 +109,7 @@ class GitHubService {
     }
   }
 
-  async fetchWorkflowRuns(repoName, page = 1, perPage = 10) {
+  async fetchWorkflowRuns (repoName, page = 1, perPage = 10) {
     this._checkConfiguration()
     try {
       const response = await this.client.get(`/repos/${this.username}/${repoName}/actions/runs`, {
@@ -125,7 +125,7 @@ class GitHubService {
     }
   }
 
-  async aggregateLanguages(repositories) {
+  async aggregateLanguages (repositories) {
     const languageStats = {}
     
     for (const repo of repositories) {
@@ -163,7 +163,7 @@ class GitHubService {
     return languagePercentages
   }
 
-  async calculateStats(repositories, user) {
+  async calculateStats (repositories, user) {
     const stats = {
       totalStars: 0,
       totalForks: 0,
@@ -180,7 +180,7 @@ class GitHubService {
     return stats
   }
 
-  async getFeaturedRepositories(repositories, limit = 6) {
+  async getFeaturedRepositories (repositories, limit = 6) {
     // Filter out forks and sort by stars, then by recent activity
     const nonForks = repositories.filter(repo => !repo.fork)
     
@@ -196,7 +196,7 @@ class GitHubService {
       .slice(0, limit)
   }
 
-  async processRecentActivity(events, limit = 10) {
+  async processRecentActivity (events, limit = 10) {
     const relevantEvents = events
       .filter(event => {
         // Filter for relevant event types
@@ -223,7 +223,7 @@ class GitHubService {
     return relevantEvents
   }
 
-  simplifyPayload(payload, eventType) {
+  simplifyPayload (payload, eventType) {
     switch (eventType) {
       case 'PushEvent':
         return {

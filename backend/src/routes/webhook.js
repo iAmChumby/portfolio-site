@@ -99,7 +99,7 @@ router.post('/github/webhook', express.raw({ type: 'application/json' }), (req, 
 })
 
 // Event handlers
-async function handlePushEvent(payload) {
+async function handlePushEvent (payload) {
   console.log(`📝 Push to ${payload.repository.name}/${payload.ref}`)
   
   // Trigger data refresh for repository updates
@@ -107,7 +107,7 @@ async function handlePushEvent(payload) {
   await dataSyncJob.syncActivity()
 }
 
-async function handleRepositoryEvent(payload) {
+async function handleRepositoryEvent (payload) {
   const action = payload.action
   console.log(`🏗️  Repository ${action}: ${payload.repository.name}`)
   
@@ -117,7 +117,7 @@ async function handleRepositoryEvent(payload) {
   }
 }
 
-async function handleStarEvent(payload) {
+async function handleStarEvent (payload) {
   const action = payload.action
   const repo = payload.repository.name
   console.log(`⭐ Repository ${repo} ${action === 'created' ? 'starred' : 'unstarred'}`)
@@ -127,7 +127,7 @@ async function handleStarEvent(payload) {
   await dataSyncJob.syncActivity()
 }
 
-async function handleForkEvent(payload) {
+async function handleForkEvent (payload) {
   const repo = payload.repository.name
   console.log(`🍴 Repository ${repo} forked`)
   
@@ -136,7 +136,7 @@ async function handleForkEvent(payload) {
   await dataSyncJob.syncActivity()
 }
 
-async function handleReleaseEvent(payload) {
+async function handleReleaseEvent (payload) {
   const action = payload.action
   const repo = payload.repository.name
   const release = payload.release.tag_name
@@ -147,7 +147,7 @@ async function handleReleaseEvent(payload) {
   await dataSyncJob.syncActivity()
 }
 
-async function handleWorkflowRunEvent(payload) {
+async function handleWorkflowRunEvent (payload) {
   const status = payload.workflow_run.status
   const conclusion = payload.workflow_run.conclusion
   const repo = payload.repository.name

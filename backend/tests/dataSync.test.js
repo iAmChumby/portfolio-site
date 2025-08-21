@@ -134,12 +134,11 @@ describe('DataSyncJob', () => {
       expect(dataSyncJob.githubService).toBeDefined()
       expect(consoleLogSpy).toHaveBeenCalled()
       // The isGitHubConfigured property should be set during initialization
-      expect(dataSyncJob.hasOwnProperty('isGitHubConfigured')).toBe(true)
+      expect(Object.prototype.hasOwnProperty.call(dataSyncJob, 'isGitHubConfigured')).toBe(true)
     })
 
     test('should handle initialization errors gracefully', async () => {
       // Mock GitHubService constructor to throw an error
-      const originalMock = jest.mocked(await import('../src/services/github.js')).default
       jest.mocked(await import('../src/services/github.js')).default.mockImplementationOnce(() => {
         throw new Error('GitHub service initialization failed')
       })
@@ -382,7 +381,7 @@ describe('DataSyncJob', () => {
 
       await dataSyncJob.syncWorkflows()
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith(`⚠️  Skipping workflows for repo1:`, 'Workflow fetch failed')
+      expect(consoleWarnSpy).toHaveBeenCalledWith('⚠️  Skipping workflows for repo1:', 'Workflow fetch failed')
       expect(mockDatabase.setWorkflows).toHaveBeenCalledWith([])
       expect(consoleLogSpy).toHaveBeenCalledWith('✅ Synced 0 workflow runs')
     })

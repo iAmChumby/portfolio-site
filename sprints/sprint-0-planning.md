@@ -52,25 +52,6 @@
 
 **Estimated Effort**: 6 hours
 
-#### **Story 1.2**: Design System & Dual Theme Setup
-**As a user, I want a professional design system with dark/light themes so that I can customize my viewing experience.**
-
-**Acceptance Criteria:**
-- [ ] Dark/light theme system with CSS custom properties
-- [ ] Inter font family integration
-- [ ] Responsive breakpoint system
-- [ ] Component-scoped CSS Modules
-
-**Tasks:**
-- [ ] Create `styles/` directory with SCSS architecture
-- [ ] Define design tokens (colors, typography, spacing)
-- [ ] Implement dual-theme CSS custom properties
-- [ ] Set up Inter font with font-display optimization
-- [ ] Create responsive mixins and utilities
-- [ ] Build theme toggle component
-
-**Estimated Effort**: 8 hours
-
 ### **Epic 2: Backend Infrastructure (VPS)**
 
 #### **Story 2.1**: VPS Setup & Configuration

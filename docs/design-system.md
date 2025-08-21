@@ -229,59 +229,6 @@ Smooth, organic hover animations that feel natural and engaging.
 }
 ```
 
-### Theme Transition Effects
-
-#### Smooth Theme Switching
-```scss
-* {
-  transition: 
-    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.theme-toggle {
-  position: relative;
-  width: 60px;
-  height: 30px;
-  background: var(--color-surface-tertiary);
-  border-radius: 15px;
-  border: 2px solid var(--color-border-primary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &__indicator {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 22px;
-    height: 22px;
-    background: var(--color-primary-500);
-    border-radius: 50%;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    &::before {
-      content: '☀️';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 12px;
-      transition: opacity 0.2s ease;
-    }
-  }
-  
-  &--dark &__indicator {
-    transform: translateX(28px);
-    
-    &::before {
-      content: '🌙';
-    }
-  }
-}
-```
-
 ### Micro-Interactions
 
 #### Loading States

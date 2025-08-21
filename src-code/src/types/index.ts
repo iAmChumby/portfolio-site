@@ -82,11 +82,6 @@ export interface Analytics {
     visits: number;
   }>;
 }
-
-export interface Theme {
-  mode: 'light' | 'dark' | 'system';
-}
-
 export interface SEOData {
   title: string;
   description: string;

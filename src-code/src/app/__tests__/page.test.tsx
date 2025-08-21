@@ -1,59 +1,121 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Home from '../page';
+import Home, { metadata } from '../page';
 
-// Mock the site config to match actual implementation
-jest.mock('@/data/site-config.json', () => ({
-  site: {
-    author: {
-      name: 'Luke Edwards',
-    },
+// Mock the Hero component
+jest.mock('@/components/sections', () => ({
+  Hero: function MockHero() {
+    return (
+      <section data-testid="hero-section">
+        <h1>Mock Hero Component</h1>
+        <p>This is a mock hero section</p>
+      </section>
+    );
   },
 }));
 
 describe('Home Page', () => {
-  it('renders the hero section with correct structure', () => {
-    render(<Home />);
-    
-    // Check for the main hero content
-    expect(screen.getByText(/Hi, I'm/)).toBeInTheDocument();
-    expect(screen.getByText('Luke Edwards')).toBeInTheDocument();
-    expect(screen.getByText('Full Stack Developer & UI/UX Designer')).toBeInTheDocument();
+  describe('Rendering', () => {
+    it('renders main element with correct classes', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main).toBeInTheDocument();
+      expect(main).toHaveClass('min-h-screen');
+    });
+
+    it('renders Hero component', () => {
+      render(<Home />);
+      
+      const heroSection = screen.getByTestId('hero-section');
+      expect(heroSection).toBeInTheDocument();
+      expect(screen.getByText('Mock Hero Component')).toBeInTheDocument();
+    });
+
+    it('has proper semantic structure', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      const heroSection = screen.getByTestId('hero-section');
+      
+      expect(main).toContainElement(heroSection);
+    });
   });
 
-  it('renders the hero description', () => {
-    render(<Home />);
-    
-    expect(screen.getByText(/I create beautiful, functional, and user-centered digital experiences/)).toBeInTheDocument();
-    expect(screen.getByText(/Passionate about clean code, innovative design, and solving complex problems/)).toBeInTheDocument();
+  describe('Layout', () => {
+    it('applies correct styling to main element', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main).toHaveClass('min-h-screen');
+    });
+
+    it('contains only Hero component as direct child', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main.children).toHaveLength(1);
+      expect(main.firstElementChild).toHaveAttribute('data-testid', 'hero-section');
+    });
   });
 
-  it('renders the main action buttons', () => {
-    render(<Home />);
-    
-    expect(screen.getByText('View My Work')).toBeInTheDocument();
-    expect(screen.getByText('Get In Touch')).toBeInTheDocument();
+  describe('Accessibility', () => {
+    it('has proper main landmark', () => {
+      render(<Home />);
+      
+      expect(screen.getByRole('main')).toBeInTheDocument();
+    });
+
+    it('maintains semantic structure', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main.tagName.toLowerCase()).toBe('main');
+    });
   });
 
-  it('has proper semantic structure', () => {
-    render(<Home />);
-    
-    // Check for main element
-    const main = screen.getByRole('main');
-    expect(main).toBeInTheDocument();
-    expect(main).toHaveClass('min-h-screen');
+  describe('Component Integration', () => {
+    it('properly integrates Hero component', () => {
+      render(<Home />);
+      
+      // Verify Hero component is rendered within main
+      const main = screen.getByRole('main');
+      const hero = screen.getByTestId('hero-section');
+      
+      expect(main).toContainElement(hero);
+    });
   });
 
-  it('renders with proper heading hierarchy', () => {
-    render(<Home />);
-    
-    // Check for h1 and h2 elements
-    const h1 = screen.getByRole('heading', { level: 1 });
-    const h2 = screen.getByRole('heading', { level: 2 });
-    
-    expect(h1).toBeInTheDocument();
-    expect(h2).toBeInTheDocument();
-    expect(h2).toHaveTextContent('Full Stack Developer & UI/UX Designer');
+  describe('Edge Cases', () => {
+    it('renders without errors', () => {
+      expect(() => render(<Home />)).not.toThrow();
+    });
+
+    it('maintains structure with different viewport sizes', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main).toHaveClass('min-h-screen'); // Responsive height
+    });
+  });
+});
+
+describe('Home Page Metadata', () => {
+  it('exports correct metadata object', () => {
+    expect(metadata).toBeDefined();
+    expect(metadata.title).toBe('Portfolio - Full Stack Developer');
+    expect(metadata.description).toBe('Welcome to my portfolio. I create beautiful, functional, and user-centered digital experiences.');
+  });
+
+  it('has appropriate title for SEO', () => {
+    expect(metadata.title).toContain('Portfolio');
+    expect(metadata.title).toContain('Full Stack Developer');
+  });
+
+  it('has descriptive meta description', () => {
+    expect(metadata.description).toContain('portfolio');
+    expect(metadata.description).toContain('digital experiences');
+    expect(metadata.description?.length).toBeGreaterThan(50); // Good length for SEO
   });
 });

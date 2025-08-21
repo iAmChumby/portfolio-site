@@ -1,51 +1,51 @@
-import express from 'express';
-import fs from 'fs/promises';
-import path from 'path';
+import express from 'express'
+import fs from 'fs/promises'
+import path from 'path'
 
-const router = express.Router();
+const router = express.Router()
 
 // Import DataSyncJob using dynamic import since it's an ES6 module
 let DataSyncJob;
 (async () => {
-  const module = await import('../jobs/dataSync.js');
-  DataSyncJob = module.default;
-})();
+  const module = await import('../jobs/dataSync.js')
+  DataSyncJob = module.default
+})()
 
 // Admin key verification middleware
 const verifyAdminKey = (req, res, next) => {
-  const adminKey = process.env.ADMIN_KEY;
+  const adminKey = process.env.ADMIN_KEY
   
   if (!adminKey) {
     return res.status(500).json({ 
       error: 'Admin access not configured' 
-    });
+    })
   }
 
-  const providedKey = req.body.adminKey || req.headers['x-admin-key'];
+  const providedKey = req.body.adminKey || req.headers['x-admin-key']
   
   if (!providedKey || providedKey !== adminKey) {
     return res.status(401).json({ 
       error: 'Invalid admin key' 
-    });
+    })
   }
 
-  next();
-};
+  next()
+}
 
 // Verify admin access
 router.post('/verify', verifyAdminKey, (req, res) => {
   res.json({ 
     success: true, 
     message: 'Admin access verified' 
-  });
-});
+  })
+})
 
 // Get all data for dashboard
 router.get('/all', async (req, res) => {
   try {
-    const dbPath = path.join(process.cwd(), 'data/db.json');
+    const dbPath = path.join(process.cwd(), 'data/db.json')
     
-    let data = {
+    const data = {
       user: null,
       repositories: [],
       activity: [],
@@ -56,42 +56,42 @@ router.get('/all', async (req, res) => {
         followers: 0
       },
       lastUpdated: null
-    };
+    }
 
     try {
-      const dbContent = await fs.readFile(dbPath, 'utf8');
-      const dbData = JSON.parse(dbContent);
+      const dbContent = await fs.readFile(dbPath, 'utf8')
+      const dbData = JSON.parse(dbContent)
       
-      data.user = dbData.user || null;
-      data.repositories = dbData.repositories || [];
-      data.activity = dbData.activity || [];
-      data.lastUpdated = dbData.lastUpdated || null;
+      data.user = dbData.user || null
+      data.repositories = dbData.repositories || []
+      data.activity = dbData.activity || []
+      data.lastUpdated = dbData.lastUpdated || null
 
       // Calculate stats
       if (data.repositories.length > 0) {
-        data.stats.totalRepos = data.repositories.length;
-        data.stats.totalStars = data.repositories.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0);
-        data.stats.totalForks = data.repositories.reduce((sum, repo) => sum + (repo.forks_count || 0), 0);
+        data.stats.totalRepos = data.repositories.length
+        data.stats.totalStars = data.repositories.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0)
+        data.stats.totalForks = data.repositories.reduce((sum, repo) => sum + (repo.forks_count || 0), 0)
       }
       
       if (data.user) {
-        data.stats.followers = data.user.followers || 0;
+        data.stats.followers = data.user.followers || 0
       }
     } catch (error) {
-      console.log('Database file not found or invalid, returning empty data');
+      console.log('Database file not found or invalid, returning empty data')
     }
 
     res.json({
       success: true,
       data
-    });
+    })
   } catch (error) {
-    console.error('Error fetching dashboard data:', error);
+    console.error('Error fetching dashboard data:', error)
     res.status(500).json({ 
       error: 'Failed to fetch dashboard data' 
-    });
+    })
   }
-});
+})
 
 // Trigger manual data refresh
 router.post('/refresh', async (req, res) => {
@@ -99,39 +99,39 @@ router.post('/refresh', async (req, res) => {
     if (!DataSyncJob) {
       return res.status(500).json({ 
         error: 'DataSyncJob not initialized' 
-      });
+      })
     }
 
-    const dataSyncJob = new DataSyncJob();
-    await dataSyncJob.initialize();
+    const dataSyncJob = new DataSyncJob()
+    await dataSyncJob.initialize()
     
     // Sync user data
-    await dataSyncJob.syncUserData();
+    await dataSyncJob.syncUserData()
     
     // Sync repositories
-    await dataSyncJob.syncRepositories();
+    await dataSyncJob.syncRepositories()
     
     // Sync activity
-    await dataSyncJob.syncActivity();
+    await dataSyncJob.syncActivity()
 
     res.json({ 
       success: true, 
       message: 'Data refresh completed successfully',
       timestamp: new Date().toISOString()
-    });
+    })
   } catch (error) {
-    console.error('Error during manual refresh:', error);
+    console.error('Error during manual refresh:', error)
     res.status(500).json({ 
       error: 'Failed to refresh data',
       details: error.message
-    });
+    })
   }
-});
+})
 
 // Get system information
 router.get('/system', (req, res) => {
-  const uptime = process.uptime();
-  const memoryUsage = process.memoryUsage();
+  const uptime = process.uptime()
+  const memoryUsage = process.memoryUsage()
   
   res.json({
     success: true,
@@ -146,17 +146,17 @@ router.get('/system', (req, res) => {
       platform: process.platform,
       timestamp: new Date().toISOString()
     }
-  });
-});
+  })
+})
 
 // Get logs (last 100 lines)
 router.get('/logs', async (req, res) => {
   try {
-    const logsPath = path.join(process.cwd(), 'logs');
+    const logsPath = path.join(process.cwd(), 'logs')
     
     try {
-      const files = await fs.readdir(logsPath);
-      const logFiles = files.filter(file => file.endsWith('.log'));
+      const files = await fs.readdir(logsPath)
+      const logFiles = files.filter(file => file.endsWith('.log'))
       
       if (logFiles.length === 0) {
         return res.json({
@@ -165,13 +165,13 @@ router.get('/logs', async (req, res) => {
             logs: [],
             message: 'No log files found'
           }
-        });
+        })
       }
 
       // Get the most recent log file
-      const latestLogFile = logFiles.sort().reverse()[0];
-      const logContent = await fs.readFile(path.join(logsPath, latestLogFile), 'utf8');
-      const logLines = logContent.split('\n').filter(line => line.trim()).slice(-100);
+      const latestLogFile = logFiles.sort().reverse()[0]
+      const logContent = await fs.readFile(path.join(logsPath, latestLogFile), 'utf8')
+      const logLines = logContent.split('\n').filter(line => line.trim()).slice(-100)
 
       res.json({
         success: true,
@@ -180,7 +180,7 @@ router.get('/logs', async (req, res) => {
           file: latestLogFile,
           totalLines: logLines.length
         }
-      });
+      })
     } catch (error) {
       res.json({
         success: true,
@@ -188,14 +188,14 @@ router.get('/logs', async (req, res) => {
           logs: [],
           message: 'Logs directory not found or empty'
         }
-      });
+      })
     }
   } catch (error) {
-    console.error('Error fetching logs:', error);
+    console.error('Error fetching logs:', error)
     res.status(500).json({ 
       error: 'Failed to fetch logs' 
-    });
+    })
   }
-});
+})
 
-export default router;
+export default router

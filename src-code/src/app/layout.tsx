@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import AnimatedBackground from "@/components/ui/AnimatedBackground";
 import Footer from "@/components/layout/Footer";
 import PageTransition from "@/components/ui/PageTransition";
+import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import siteConfig from "@/data/site-config.json";
 
 const inter = Inter({
@@ -60,17 +61,19 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
-        <AnimatedBackground />
-        <Header 
-          navigation={siteConfig.site.navigation}
-          siteName={siteConfig.site.name}
-        />
-        <main className="flex-1 pt-16 sm:pt-20 md:pt-24">
-          <PageTransition>
-            {children}
-          </PageTransition>
-        </main>
-        <Footer />
+        <SmoothScrollProvider>
+          <AnimatedBackground />
+          <Header 
+            navigation={siteConfig.site.navigation}
+            siteName={siteConfig.site.name}
+          />
+          <main className="flex-1 pt-16 sm:pt-20 md:pt-24">
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </main>
+          <Footer />
+        </SmoothScrollProvider>
       </body>
     </html>
   );

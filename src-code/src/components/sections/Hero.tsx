@@ -3,10 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import siteConfig from "@/data/site-config.json";
+import { getHeroContent, getSiteConfig } from '@/lib/content-loader';
 
 
 export default function Hero() {
+  const heroContent = getHeroContent();
+  const siteConfig = getSiteConfig();
+  
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
       {/* Background decoration - positioned behind spiral animation */}
@@ -19,37 +22,29 @@ export default function Hero() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-black/30 backdrop-blur-md rounded-lg p-8 border border-white/20">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 animate-fade-in text-white">
-              Hi, I&apos;m <span className="text-gradient">{siteConfig.site.author.name}</span>
+              {heroContent.title} <span className="text-gradient">{heroContent.name}</span>
             </h1>
             
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6 sm:mb-8 text-white animate-fade-in animation-delay-200">
-              Full Stack Developer & UI/UX Designer
+              {heroContent.subtitle}
             </h2>
             
             <p className="text-base sm:text-lg md:text-xl leading-relaxed mb-8 sm:mb-12 max-w-2xl mx-auto text-white animate-fade-in animation-delay-400">
-              I create beautiful, functional, and user-centered digital experiences. 
-              Passionate about clean code, innovative design, and solving complex problems.
+              {heroContent.description}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in animation-delay-600">
-              <Link href="/projects">
-                <Button 
-                  variant="primary" 
-                  size="lg"
-                  className="w-full sm:w-auto"
-                >
-                  View My Work
-                </Button>
-              </Link>
-              <Link href="/contact">
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="w-full sm:w-auto"
-                >
-                  Get In Touch
-                </Button>
-              </Link>
+              {heroContent.buttons.map((button, index) => (
+                <Link key={index} href={button.href}>
+                  <Button 
+                    variant={button.variant} 
+                    size={button.size}
+                    className="w-full sm:w-auto"
+                  >
+                    {button.text}
+                  </Button>
+                </Link>
+              ))}
             </div>
           </div>
         </div>

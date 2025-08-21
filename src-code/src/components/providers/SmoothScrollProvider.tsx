@@ -19,7 +19,7 @@ interface SmoothScrollProviderProps {
   }
 }
 
-export default function SmoothScrollProvider({ 
+export function SmoothScrollProvider({ 
   children, 
   options = {} 
 }: SmoothScrollProviderProps) {

@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { EnvelopeIcon, PhoneIcon, MapPinIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
-import siteConfig from '@/data/site-config.json'
+import { getContactContent, getSiteConfig } from '@/lib/content-loader';
 
 export default function Contact() {
+  const contactContent = getContactContent();
+  const siteConfig = getSiteConfig();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -59,9 +61,9 @@ export default function Contact() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <div className="relative inline-block bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white">Get In Touch</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white">{contactContent.title}</h2>
               <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-white">
-                I&apos;m always open to discussing new opportunities and interesting projects
+                {contactContent.subtitle}
               </p>
             </div>
           </div>
@@ -69,10 +71,9 @@ export default function Contact() {
           <div className="grid md:grid-cols-2 gap-12">
             <div className="space-y-8">
               <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-6">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-white">Let&apos;s Connect</h3>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-white">{contactContent.intro.title}</h3>
                 <p className="text-base mb-6 !text-white/80">
-                  Whether you have a project in mind, want to collaborate, or just want to say hello, 
-                  I&apos;d love to hear from you. Drop me a message and I&apos;ll get back to you as soon as possible.
+                  {contactContent.intro.description}
                 </p>
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -127,7 +128,7 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium mb-2 text-white">
-                    Name
+                    {contactContent.form.fields.name.label}
                   </label>
                   <input
                     type="text"
@@ -138,13 +139,13 @@ export default function Contact() {
                     required
                     disabled={formStatus === 'loading'}
                     className="w-full px-4 py-3 bg-black/30 border border-white/20 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent/50 text-white placeholder-white/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder="Your name"
+                    placeholder={contactContent.form.fields.name.placeholder}
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-2 text-white">
-                    Email
+                    {contactContent.form.fields.email.label}
                   </label>
                   <input
                     type="email"
@@ -155,13 +156,13 @@ export default function Contact() {
                     required
                     disabled={formStatus === 'loading'}
                     className="w-full px-4 py-3 bg-black/30 border border-white/20 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent/50 text-white placeholder-white/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder="your.email@example.com"
+                    placeholder={contactContent.form.fields.email.placeholder}
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium mb-2 text-white">
-                    Message
+                    {contactContent.form.fields.message.label}
                   </label>
                   <textarea
                     id="message"
@@ -172,7 +173,7 @@ export default function Contact() {
                     rows={5}
                     disabled={formStatus === 'loading'}
                     className="w-full px-4 py-3 bg-black/30 border border-white/20 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent/50 text-white placeholder-white/50 resize-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder="Tell me about your project..."
+                    placeholder={contactContent.form.fields.message.placeholder}
                   />
                 </div>
                 
@@ -202,7 +203,7 @@ export default function Contact() {
                       Sending...
                     </>
                   ) : (
-                    'Send Message'
+                    contactContent.form.submitButton
                   )}
                 </button>
               </form>

@@ -2,68 +2,13 @@
 
 import React, { useState } from 'react';
 import { ArrowTopRightOnSquareIcon, CodeBracketIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
-
-const allProjects = [
-  {
-    id: 1,
-    title: 'E-Commerce Platform',
-    description: 'A full-stack e-commerce solution built with Next.js, Stripe, and PostgreSQL. Features include user authentication, payment processing, and admin dashboard.',
-    image: '/api/placeholder/400/250',
-    technologies: ['Next.js', 'TypeScript', 'Stripe', 'PostgreSQL'],
-    liveUrl: '#',
-    githubUrl: '#'
-  },
-  {
-    id: 2,
-    title: 'Task Management App',
-    description: 'A collaborative task management application with real-time updates, drag-and-drop functionality, and team collaboration features.',
-    image: '/api/placeholder/400/250',
-    technologies: ['React', 'Node.js', 'Socket.io', 'MongoDB'],
-    liveUrl: '#',
-    githubUrl: '#'
-  },
-  {
-    id: 3,
-    title: 'Weather Dashboard',
-    description: 'A responsive weather dashboard that displays current conditions and forecasts using multiple weather APIs with beautiful data visualizations.',
-    image: '/api/placeholder/400/250',
-    technologies: ['Vue.js', 'Chart.js', 'Weather API', 'Tailwind'],
-    liveUrl: '#',
-    githubUrl: '#'
-  },
-  {
-    id: 4,
-    title: 'Social Media Analytics',
-    description: 'A comprehensive analytics platform for social media managers to track engagement, growth metrics, and audience insights across multiple platforms.',
-    image: '/api/placeholder/400/250',
-    technologies: ['React', 'D3.js', 'Python', 'FastAPI'],
-    liveUrl: '#',
-    githubUrl: '#'
-  },
-  {
-    id: 5,
-    title: 'Recipe Sharing Platform',
-    description: 'A community-driven recipe sharing platform with advanced search, meal planning, and nutritional analysis features.',
-    image: '/api/placeholder/400/250',
-    technologies: ['Next.js', 'Prisma', 'PostgreSQL', 'AWS S3'],
-    liveUrl: '#',
-    githubUrl: '#'
-  },
-  {
-    id: 6,
-    title: 'Fitness Tracking App',
-    description: 'A mobile-first fitness application with workout tracking, progress visualization, and social features for motivation and accountability.',
-    image: '/api/placeholder/400/250',
-    technologies: ['React Native', 'Firebase', 'Redux', 'Chart.js'],
-    liveUrl: '#',
-    githubUrl: '#'
-  }
-];
+import { getProjectsContent } from '@/lib/content-loader';
 
 export default function Projects() {
+  const projectsContent = getProjectsContent();
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const displayedProjects = showAllProjects ? allProjects : allProjects.slice(0, 3);
+  const displayedProjects = showAllProjects ? projectsContent.items : projectsContent.items.slice(0, 3);
 
   const handleToggleProjects = () => {
     setIsAnimating(true);
@@ -77,9 +22,9 @@ export default function Projects() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="relative inline-block bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white">Featured Projects</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white">{projectsContent.title}</h2>
               <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-white">
-                Here are some of my recent projects that showcase my skills and experience
+                {projectsContent.subtitle}
               </p>
             </div>
           </div>
@@ -100,8 +45,12 @@ export default function Projects() {
                     animationFillMode: 'both'
                   }}
                 >
-                  <div className="aspect-video bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center border-b border-white/10">
-                    <span className="text-4xl font-bold text-accent group-hover:text-white group-hover:scale-110 transition-all duration-300">{project.title.charAt(0)}</span>
+                  <div className="aspect-video bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center border-b border-white/10 overflow-hidden">
+                    <img 
+                      src={project.image} 
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-all duration-300"
+                    />
                   </div>
                   
                   <div className="p-6">
@@ -154,8 +103,8 @@ export default function Projects() {
               </div>
               <span className="transition-all duration-300">
                 {isAnimating 
-                  ? (showAllProjects ? 'Hiding...' : 'Loading...') 
-                  : (showAllProjects ? 'Show Less Projects' : 'View All Projects')
+                  ? (showAllProjects ? projectsContent.buttons.hiding : projectsContent.buttons.loading) 
+                  : (showAllProjects ? projectsContent.buttons.showLess : projectsContent.buttons.showMore)
                 }
               </span>
             </button>

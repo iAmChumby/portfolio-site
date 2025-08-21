@@ -68,21 +68,26 @@ const Header: React.FC<HeaderProps> = ({
           : 'bg-transparent'
       )}
     >
-      <div className="container flex items-center justify-between h-20 px-6">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center space-x-2 text-xl font-bold text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          >
-            {logo ? (
-              <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
-            ) : (
-              <span>{siteName}</span>
-            )}
-          </Link>
+      <div className="container h-20 px-6 mx-auto">
+        {/* Desktop Layout - Centered Content */}
+        <div className="hidden md:flex md:items-center md:justify-center md:h-full md:max-w-6xl md:mx-auto">
+          <div className="flex items-center w-full max-w-5xl">
+          {/* Left Column - Logo */}
+          <div className="flex justify-start flex-1">
+            <Link
+              href="/"
+              className="flex items-center space-x-2 text-xl font-bold text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors whitespace-nowrap"
+            >
+              {logo ? (
+                <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
+              ) : (
+                <span>Luke Edwards Portfolio</span>
+              )}
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          {/* Center Column - Navigation */}
+          <nav className="flex items-center justify-center space-x-6 lg:space-x-8 px-12 lg:px-16">
             {navigation.map((item) => (
               <Link
                 key={item.href}
@@ -90,7 +95,7 @@ const Header: React.FC<HeaderProps> = ({
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 className={cn(
-                  'relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-lg border-2 border-transparent',
+                  'relative px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg border-2 border-transparent whitespace-nowrap',
                   'hover:border-[var(--accent-light)] hover:shadow-[0_0_10px_rgba(16,185,129,0.4)] hover:text-[var(--accent-light)]',
                   'active:border-[var(--accent-hover)] active:shadow-[0_0_15px_rgba(5,150,105,0.6)]',
                   isActiveLink(item.href)
@@ -103,18 +108,34 @@ const Header: React.FC<HeaderProps> = ({
             ))}
           </nav>
 
-          {/* CTA Button and Theme Toggle */}
-          <div className="hidden md:flex items-center gap-6">
+          {/* Right Column - CTA Button */}
+          <div className="flex justify-end flex-1">
             <Button 
               variant="cta" 
               size="md"
               responsive={true}
               touchOptimized={true}
-              className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300"
+              className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap"
             >
               Get In Touch
             </Button>
           </div>
+          </div>
+        </div>
+
+        {/* Mobile Layout - Original Flexbox */}
+        <div className="flex md:hidden items-center justify-between h-full">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center space-x-2 text-xl font-bold text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            {logo ? (
+              <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
+            ) : (
+              <span>{siteName}</span>
+            )}
+          </Link>
 
           {/* Mobile Menu Button */}
           <button
@@ -139,6 +160,7 @@ const Header: React.FC<HeaderProps> = ({
             </svg>
           </button>
         </div>
+      </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (

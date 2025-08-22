@@ -11,7 +11,6 @@ import {
 
 // GitHub API Configuration
 const GITHUB_API_BASE = 'https://api.github.com';
-const GITHUB_TOKEN = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
 
 interface GitHubApiOptions {
   headers?: Record<string, string>;
@@ -31,8 +30,9 @@ class GitHubApi {
     };
 
     // Add authentication if token is available
-    if (GITHUB_TOKEN) {
-      headers['Authorization'] = `token ${GITHUB_TOKEN}`;
+    const githubToken = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+    if (githubToken) {
+      headers['Authorization'] = `token ${githubToken}`;
     }
 
     try {

@@ -255,13 +255,16 @@ describe('GitHubApi', () => {
     api = new GitHubApi();
     jest.clearAllMocks();
     jest.clearAllTimers();
+    mockConsoleError.mockClear();
+    mockConsoleWarn.mockClear();
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.clearAllMocks();
-    mockConsoleError.mockClear();
-    mockConsoleWarn.mockClear();
+    // Don't clear console mocks as tests need to check them
+    // mockConsoleError.mockClear();
+    // mockConsoleWarn.mockClear();
   });
 
   describe('makeRequest', () => {
@@ -287,27 +290,28 @@ describe('GitHubApi', () => {
     });
 
     it('should include authorization header when token is available', async () => {
-      // Mock environment variable
       const originalToken = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
       process.env.NEXT_PUBLIC_GITHUB_TOKEN = 'test-token';
-
-      const mockResponse: MockResponse = {
+      
+      // Create a new instance after setting the environment variable
+      const apiWithToken = new GitHubApi();
+      
+      mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockUser),
-      };
-      mockFetch.mockResolvedValue(mockResponse as unknown as Response);
+      } as unknown as Response);
 
-      await api.getUser('testuser');
+      await apiWithToken.getUser('testuser');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.any(String),
+        'https://api.github.com/users/testuser',
         expect.objectContaining({
           headers: expect.objectContaining({
             'Authorization': 'token test-token',
           }),
         })
       );
-
+      
       // Restore original token
       process.env.NEXT_PUBLIC_GITHUB_TOKEN = originalToken;
     });
@@ -633,16 +637,20 @@ describe('GitHubApi', () => {
         } as unknown as Response);
       });
 
+      // Start the async operation
       const resultPromise = api.getUserLanguages('testuser');
 
-      // Fast-forward timers to handle delays
-      jest.runAllTimers();
-
+      // Use real timers for this test to avoid timing issues
+      jest.useRealTimers();
+      
       const result = await resultPromise;
+      
+      // Restore fake timers
+      jest.useFakeTimers();
 
       expect(result).toEqual({ TypeScript: 15000 });
       expect(mockFetch).toHaveBeenCalledTimes(16); // 1 for repos + 15 for languages
-    });
+    }, 10000);
   });
 
   describe('getFeaturedRepositories', () => {
@@ -758,15 +766,16 @@ describe('GitHubApi', () => {
         } as unknown as Response);
       });
 
-      const resultPromise = api.getUserWorkflowRuns('testuser');
-
-      // Fast-forward timers to handle delays
-      jest.runAllTimers();
-
-      const result = await resultPromise;
+      // Use real timers for this test to avoid timing issues
+      jest.useRealTimers();
+      
+      const result = await api.getUserWorkflowRuns('testuser');
 
       expect(result).toEqual([]);
       expect(mockFetch).toHaveBeenCalledTimes(11); // 1 for repos + 10 for workflows
+      
+      // Restore fake timers
+      jest.useFakeTimers();
     });
   });
 
@@ -799,7 +808,7 @@ describe('GitHubApi', () => {
 
       expect(result).toBe(null);
       expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to get stats for testuser/test-repo'),
+        'Failed to get stats for testuser/test-repo:',
         expect.any(Error)
       );
     });

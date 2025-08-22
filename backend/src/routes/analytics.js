@@ -6,11 +6,32 @@ import { DatabaseError, ValidationError } from '../utils/errors.js'
 
 const router = express.Router()
 
+// Admin key verification middleware
+const verifyAdminKey = (req, res, next) => {
+  const adminKey = process.env.ADMIN_KEY
+  
+  if (!adminKey) {
+    return res.status(500).json({ 
+      error: 'Admin access not configured' 
+    })
+  }
+
+  const providedKey = req.body.adminKey || req.headers['x-admin-key']
+  
+  if (!providedKey || providedKey !== adminKey) {
+    return res.status(401).json({ 
+      error: 'Invalid admin key' 
+    })
+  }
+
+  next()
+}
+
 /**
  * GET /api/analytics/summary
  * Get analytics summary including total visits, unique visitors, and top pages
  */
-router.get('/summary', asyncHandler(async (req, res) => {
+router.get('/summary', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const summary = await getAnalyticsSummary()
     
@@ -34,7 +55,7 @@ router.get('/summary', asyncHandler(async (req, res) => {
  * GET /api/analytics/visits
  * Get total visits count
  */
-router.get('/visits', asyncHandler(async (req, res) => {
+router.get('/visits', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const analytics = await database.getAnalytics()
     
@@ -60,7 +81,7 @@ router.get('/visits', asyncHandler(async (req, res) => {
  * GET /api/analytics/visitors
  * Get unique visitors count
  */
-router.get('/visitors', asyncHandler(async (req, res) => {
+router.get('/visitors', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const analytics = await database.getAnalytics()
     
@@ -86,7 +107,7 @@ router.get('/visitors', asyncHandler(async (req, res) => {
  * GET /api/analytics/daily
  * Get daily statistics
  */
-router.get('/daily', asyncHandler(async (req, res) => {
+router.get('/daily', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 30
     
@@ -131,7 +152,7 @@ router.get('/daily', asyncHandler(async (req, res) => {
  * GET /api/analytics/hourly
  * Get hourly statistics for today
  */
-router.get('/hourly', asyncHandler(async (req, res) => {
+router.get('/hourly', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const analytics = await database.getAnalytics()
     
@@ -157,7 +178,7 @@ router.get('/hourly', asyncHandler(async (req, res) => {
  * GET /api/analytics/pages
  * Get popular pages statistics
  */
-router.get('/pages', asyncHandler(async (req, res) => {
+router.get('/pages', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10
     
@@ -197,7 +218,7 @@ router.get('/pages', asyncHandler(async (req, res) => {
  * GET /api/analytics/referrers
  * Get referrer statistics
  */
-router.get('/referrers', asyncHandler(async (req, res) => {
+router.get('/referrers', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const analytics = await database.getAnalytics()
     const { limit = 10 } = req.query
@@ -231,7 +252,7 @@ router.get('/referrers', asyncHandler(async (req, res) => {
  * GET /api/analytics/browsers
  * Get browser/user agent statistics
  */
-router.get('/browsers', asyncHandler(async (req, res) => {
+router.get('/browsers', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const analytics = await database.getAnalytics()
     const { limit = 10 } = req.query
@@ -265,7 +286,7 @@ router.get('/browsers', asyncHandler(async (req, res) => {
  * GET /api/analytics/performance
  * Get response time statistics
  */
-router.get('/performance', asyncHandler(async (req, res) => {
+router.get('/performance', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const analytics = await database.getAnalytics()
     
@@ -296,7 +317,7 @@ router.get('/performance', asyncHandler(async (req, res) => {
  * GET /api/analytics/requests
  * Get recent request logs
  */
-router.get('/requests', asyncHandler(async (req, res) => {
+router.get('/requests', verifyAdminKey, asyncHandler(async (req, res) => {
   try {
     const analytics = await database.getAnalytics()
     const { limit = 50 } = req.query

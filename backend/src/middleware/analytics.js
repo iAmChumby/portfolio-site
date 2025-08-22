@@ -64,7 +64,8 @@ export function analyticsMiddleware() {
           await database.incrementVisits()
           
           // Add visitor (handles uniqueness internally)
-          await database.addVisitor(req.ip || req.connection.remoteAddress || 'unknown', req.get('User-Agent'))
+          const visitorId = generateVisitorId(req.ip || req.connection.remoteAddress || 'unknown', req.get('User-Agent'))
+          await database.addVisitor(visitorId, req.get('User-Agent'))
           
           // Update page statistics
           await database.updatePageStats(req.path)

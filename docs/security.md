@@ -133,8 +133,8 @@ COOKIE_SAME_SITE=strict
 
 ```bash
 # API Configuration
-NEXT_PUBLIC_API_URL=https://api.lukeedwards.me/api
-NEXTAUTH_URL=https://lukeedwards.me
+NEXT_PUBLIC_API_URL=https://your-api-domain.com/api
+NEXTAUTH_URL=https://your-production-domain.com
 ```
 
 ## Security Testing

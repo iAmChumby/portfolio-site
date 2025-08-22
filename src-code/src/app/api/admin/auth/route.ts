@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 // Simple admin authentication - in production, use proper authentication
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
+
+// Only check for ADMIN_PASSWORD at runtime, not during build
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL && !ADMIN_PASSWORD) {
+  console.warn('Warning: ADMIN_PASSWORD environment variable is not set')
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if ADMIN_PASSWORD is available at runtime
+    if (!ADMIN_PASSWORD) {
+      return NextResponse.json(
+        { error: 'Admin authentication not configured' },
+        { status: 500 }
+      )
+    }
+    
     const { password } = await request.json()
     
     if (!password) {

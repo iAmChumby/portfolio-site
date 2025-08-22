@@ -32,7 +32,7 @@ jest.mock('@/components/layout/Header', () => {
       <header data-testid="header">
         <div data-testid="site-name">{siteName}</div>
         <nav data-testid="navigation">
-          {navigation?.map((item: any) => (
+          {navigation?.map((item: { href: string; label: string }) => (
             <a key={item.href} href={item.href}>
               {item.label}
             </a>
@@ -80,6 +80,9 @@ jest.mock('@/components/layout/Footer', () => {
 // Mock lenis
 jest.mock('lenis', () => {
   class MockLenis {
+    options: Record<string, unknown>;
+    isRunning: boolean;
+
     constructor(options = {}) {
       this.options = options;
       this.isRunning = false;
@@ -97,15 +100,18 @@ jest.mock('lenis', () => {
       this.isRunning = false;
     }
 
-    on(event: string, callback: Function) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    on(_event: string, _callback: () => void) {
       // Mock event listener
     }
 
-    off(event: string, callback: Function) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    off(_event: string, _callback: () => void) {
       // Mock event listener removal
     }
 
-    scrollTo(target: any, options = {}) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    scrollTo(_target: string | number | HTMLElement, _options = {}) {
       // Mock scroll to functionality
     }
   }

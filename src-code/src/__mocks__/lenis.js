@@ -18,15 +18,18 @@ class MockLenis {
     this.isRunning = false;
   }
 
-  on(event, callback) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  on(_event, _callback) {
     // Mock event listener
   }
 
-  off(event, callback) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  off(_event, _callback) {
     // Mock event listener removal
   }
 
-  scrollTo(target, options = {}) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  scrollTo(_target, _options = {}) {
     // Mock scroll to functionality
   }
 }

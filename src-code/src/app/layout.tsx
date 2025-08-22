@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
+import AnimatedBackground from "@/components/ui/AnimatedBackground";
+import Footer from "@/components/layout/Footer";
+import PageTransition from "@/components/ui/PageTransition";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import siteConfig from "@/data/site-config.json";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -53,15 +59,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
-        <Header 
-          navigation={siteConfig.site.navigation}
-          siteName={siteConfig.site.name}
-        />
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <SmoothScrollProvider>
+          <AnimatedBackground />
+          <Header 
+            navigation={siteConfig.site.navigation}
+            siteName={siteConfig.site.name}
+          />
+          <main className="flex-1 pt-16 sm:pt-20 md:pt-24">
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </main>
+          <Footer />
+        </SmoothScrollProvider>
       </body>
     </html>
   );

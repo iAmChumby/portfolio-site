@@ -1,21 +1,28 @@
 {
   "site": {
-    "name": "Your Portfolio",
+    "name": "Luke Edwards' Portfolio",
     "title": "Full Stack Developer & Designer",
     "description": "Passionate full-stack developer creating innovative web solutions with modern technologies.",
-    "url": "https://yourportfolio.com",
+    "url": "https://lukeedwards.me",
     "author": {
-      "name": "Your Name",
-      "email": "your.email@domain.com",
-      "bio": "Full-stack developer with expertise in React, Node.js, and modern web technologies.",
-      "location": "Your City, Country",
+      "name": "Luke Edwards",
+      "email": "edwards.lukec@gmail.com",
+      "bio": "Full-stack developer with expertise in React, Node.js, Python, Java, and modern web technologies.",
+      "location": "Utica, New York",
+      "phone": "+1 (315) 725-1833",
       "avatar": "/images/avatar.jpg"
     },
     "social": {
-      "github": "https://github.com/yourusername",
+      "github": "https://github.com/iAmChumby",
       "linkedin": "https://linkedin.com/in/yourprofile",
       "twitter": "https://twitter.com/yourusername",
-      "email": "your.email@domain.com"
+      "email": "edwards.lukec@gmail.com"
+    },
+    "github": {
+      "username": "iAmChumby",
+      "showActivity": true,
+      "showStats": true,
+      "featuredRepos": 6
     },
     "navigation": [
       {
@@ -34,18 +41,17 @@
         "external": false
       },
       {
-        "label": "Blog",
-        "href": "/blog",
+        "label": "Contact",
+        "href": "/contact",
         "external": false
       },
       {
-        "label": "Contact",
-        "href": "/contact",
+        "label": "Live Feed",
+        "href": "/github",
         "external": false
       }
     ],
     "features": {
-      "darkMode": true,
       "analytics": true,
       "blog": true,
       "contact": true,
@@ -54,8 +60,8 @@
     }
   },
   "seo": {
-    "defaultTitle": "Your Portfolio - Full Stack Developer",
-    "titleTemplate": "%s | Your Portfolio",
+    "defaultTitle": "Luke Edwards - Full Stack Developer",
+    "titleTemplate": "%s | Luke Edwards",
     "defaultDescription": "Passionate full-stack developer creating innovative web solutions with modern technologies.",
     "keywords": [
       "full-stack developer",
@@ -74,9 +80,15 @@
     "vercelAnalytics": true
   },
   "contact": {
-    "email": "your.email@domain.com",
-    "phone": "+1 (555) 123-4567",
-    "location": "Your City, Country",
+    "email": "edwards.lukec@gmail.com",
+    "phone": "+1 (315) 725-1833",
+    "location": "Utica, New York",
     "availability": "Available for freelance work"
+  },
+  "github": {
+    "username": "iAmChumby",
+    "showActivity": true,
+    "showStats": true,
+    "featuredRepos": 6
   }
 }

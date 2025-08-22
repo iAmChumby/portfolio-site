@@ -98,26 +98,6 @@ class CodeConstellation {
 - **Idle State**: Gentle floating motion, subtle pulsing
 - **Hover State**: Node expansion, connection highlighting
 - **Active State**: Ripple effects, enhanced glow
-- **Theme Transition**: Smooth color morphing
-
-#### Color Schemes
-```scss
-// Light Theme Constellation
-$constellation-light: (
-  node-primary: rgba(22, 163, 74, 0.8),      // Dark green primary
-  node-secondary: rgba(21, 128, 61, 0.6),    // Darker green secondary
-  connection: rgba(22, 163, 74, 0.3),        // Dark green connections
-  glow: rgba(22, 163, 74, 0.4)               // Dark green glow
-);
-
-// Dark Theme Constellation
-$constellation-dark: (
-  node-primary: rgba(34, 197, 94, 0.9),      // Bright green for visibility
-  node-secondary: rgba(74, 222, 128, 0.7),   // Lighter green secondary
-  connection: rgba(34, 197, 94, 0.4),        // Bright green connections
-  glow: rgba(34, 197, 94, 0.5)               // Bright green glow
-);
-```
 
 ## 2. Intelligent Activity Feed
 
@@ -441,9 +421,8 @@ interface EngagementMetrics {
 
 ### Phase 1: Foundation (Weeks 1-2)
 1. Code Constellation basic implementation
-2. Theme system with smooth transitions
-3. Basic GitHub integration
-4. Morphing navigation core functionality
+2. Basic GitHub integration
+3. Morphing navigation core functionality
 
 ### Phase 2: Intelligence (Weeks 3-4)
 1. AI content generation pipeline

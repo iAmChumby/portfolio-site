@@ -37,7 +37,7 @@
 **Acceptance Criteria:**
 - [ ] Next.js 14+ with App Router initialized
 - [ ] TypeScript configuration complete
-- [ ] CSS Modules and SCSS support enabled
+- [ ] Tailwind CSS
 - [ ] Image optimization configured
 - [ ] SEO meta tags structure ready
 - [ ] Environment variables setup for API endpoints
@@ -51,27 +51,6 @@
 - [ ] Configure environment variables for VPS API endpoints
 
 **Estimated Effort**: 6 hours
-
-#### **Story 1.2**: Design System & Dual Theme Setup
-**As a user, I want a professional design system with dark/light themes so that I can customize my viewing experience.**
-
-**Acceptance Criteria:**
-- [ ] SCSS architecture with design tokens
-- [ ] Dark/light theme system with CSS custom properties
-- [ ] Inter font family integration
-- [ ] Responsive breakpoint system
-- [ ] Component-scoped CSS Modules
-- [ ] Theme toggle functionality
-
-**Tasks:**
-- [ ] Create `styles/` directory with SCSS architecture
-- [ ] Define design tokens (colors, typography, spacing)
-- [ ] Implement dual-theme CSS custom properties
-- [ ] Set up Inter font with font-display optimization
-- [ ] Create responsive mixins and utilities
-- [ ] Build theme toggle component
-
-**Estimated Effort**: 8 hours
 
 ### **Epic 2: Backend Infrastructure (VPS)**
 

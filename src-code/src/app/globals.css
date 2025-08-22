@@ -1,26 +1,267 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --background: #d2d3d3;
+  --foreground: #000000;
+  --primary: #000000;
+  --secondary: #ffffff;
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --accent-light: #34d399;
+  --muted: #f5f5f5;
+  --border: #e5e5e5;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #202125;
+    --foreground: #ffffff;
+    --primary: #ffffff;
+    --secondary: #000000;
+    --accent: #10b981;
+    --accent-hover: #059669;
+    --accent-light: #34d399;
+    --muted: #1a1a1a;
+    --border: #333333;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Enhanced Button Styles */
+.btn {
+  @apply inline-flex items-center justify-center font-medium transition-all duration-300 ease-out;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+  @apply rounded-lg border border-transparent;
+  @apply transform-gpu will-change-transform;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Button Variants */
+.btn-primary {
+  @apply bg-accent text-white border-accent;
+  @apply hover:bg-accent-hover hover:border-accent-hover hover:shadow-lg hover:shadow-accent/25;
+  @apply active:scale-95 active:shadow-md;
+  @apply focus:ring-accent/50;
+}
+
+.btn-secondary {
+  @apply bg-transparent text-accent border-accent;
+  @apply hover:bg-accent hover:text-white hover:shadow-lg hover:shadow-accent/25;
+  @apply active:scale-95;
+  @apply focus:ring-accent/50;
+}
+
+.btn-outline {
+  @apply bg-transparent text-foreground border-border;
+  @apply hover:bg-foreground hover:text-background hover:border-foreground;
+  @apply active:scale-95;
+  @apply focus:ring-foreground/50;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-foreground border-transparent;
+  @apply hover:bg-muted hover:text-foreground;
+  @apply active:scale-95;
+  @apply focus:ring-foreground/50;
+}
+
+.btn-cta {
+  @apply bg-gradient-to-r from-accent to-accent-light text-white border-transparent;
+  @apply hover:from-accent-hover hover:to-accent hover:shadow-xl hover:shadow-accent/30;
+  @apply active:scale-95 active:shadow-lg;
+  @apply focus:ring-accent/50;
+}
+
+/* Responsive Button Sizes */
+.btn-sm {
+  @apply px-3 py-2 text-sm min-h-[36px] min-w-[80px];
+  @apply sm:px-4 sm:py-2.5 sm:text-sm sm:min-h-[40px] sm:min-w-[100px];
+  @apply md:px-5 md:py-3 md:text-base md:min-h-[44px] md:min-w-[120px];
+}
+
+.btn-md {
+  @apply px-4 py-2.5 text-sm min-h-[40px] min-w-[100px];
+  @apply sm:px-5 sm:py-3 sm:text-base sm:min-h-[44px] sm:min-w-[120px];
+  @apply md:px-6 md:py-3.5 md:text-base md:min-h-[48px] md:min-w-[140px];
+  @apply lg:px-7 lg:py-4 lg:text-lg lg:min-h-[52px] lg:min-w-[160px];
+}
+
+.btn-lg {
+  @apply px-5 py-3 text-base min-h-[44px] min-w-[120px];
+  @apply sm:px-6 sm:py-3.5 sm:text-base sm:min-h-[48px] sm:min-w-[140px];
+  @apply md:px-7 md:py-4 md:text-lg md:min-h-[52px] md:min-w-[160px];
+  @apply lg:px-8 lg:py-5 lg:text-xl lg:min-h-[56px] lg:min-w-[180px];
+}
+
+/* Icon Button Styles */
+.btn-icon {
+  @apply gap-2;
+}
+
+.btn-icon-only {
+  @apply aspect-square p-0;
+}
+
+.btn-icon-only.btn-sm {
+  @apply w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11;
+}
+
+.btn-icon-only.btn-md {
+  @apply w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 lg:w-12 lg:h-12;
+}
+
+.btn-icon-only.btn-lg {
+  @apply w-11 h-11 sm:w-12 sm:h-12 md:w-12 md:h-12 lg:w-12 lg:h-12;
+}
+
+/* Advanced button hover and focus states */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition-duration: 0.1s;
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.2);
+}
+
+/* Enhanced CTA button animations */
+.btn-cta {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-cta::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  transition: all 0.6s ease;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.btn-cta:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-cta:hover {
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4), 0 6px 15px rgba(16, 185, 129, 0.2);
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 640px) {
+  .btn {
+    @apply min-h-[44px]; /* iOS/Android recommended touch target */
+    transition: all 0.2s ease;
+  }
+  
+  .btn:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .btn:active {
+    transform: scale(0.96);
+    transition-duration: 0.1s;
+  }
+  
+  .btn-mobile-full {
+    @apply w-full;
+    justify-content: center;
+    padding: 1rem 2rem;
+  }
+  
+  .btn-mobile-compact {
+    @apply px-3 py-2 text-sm;
+  }
+  
+  /* Enhanced mobile CTA animations */
+  .btn-cta:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  }
+}
+
+/* Accessibility and reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn::before,
+  .btn::after {
+    transition: none;
+    animation: none;
+  }
+  
+  .btn:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .btn {
+    @apply border-2;
+    font-weight: 700;
+  }
+  
+  .btn:focus-visible {
+    outline-width: 4px;
+    outline-offset: 4px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .btn:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn:active {
+    transform: scale(0.95);
+    transition-duration: 0.1s;
+  }
 }

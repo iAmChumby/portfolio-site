@@ -1,106 +1,121 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Home from '../page';
+import Home, { metadata } from '../page';
 
-// Mock the data files
-jest.mock('@/data/site-config.json', () => ({
-  site: {
-    author: {
-      name: 'Test Author',
-      bio: 'Test bio description',
-      location: 'Test City, Test Country',
-      email: 'test@example.com',
-    },
-    title: 'Test Developer',
-    description: 'Test description for the site',
+// Mock the Hero component
+jest.mock('@/components/sections', () => ({
+  Hero: function MockHero() {
+    return (
+      <section data-testid="hero-section">
+        <h1>Mock Hero Component</h1>
+        <p>This is a mock hero section</p>
+      </section>
+    );
   },
-  contact: {
-    availability: 'Available for work',
-  },
-}));
-
-jest.mock('@/data/projects.json', () => ({
-  projects: [
-    {
-      id: 'test-project-1',
-      title: 'Test Project 1',
-      description: 'Test project description',
-      technologies: ['React', 'TypeScript', 'Next.js'],
-      githubUrl: 'https://github.com/test/project1',
-      liveUrl: 'https://project1.example.com',
-      featured: true,
-    },
-    {
-      id: 'test-project-2',
-      title: 'Test Project 2',
-      description: 'Another test project',
-      technologies: ['Node.js', 'Express'],
-      githubUrl: 'https://github.com/test/project2',
-      featured: false,
-    },
-  ],
 }));
 
 describe('Home Page', () => {
-  it('renders the hero section with author information', () => {
-    render(<Home />);
-    
-    expect(screen.getByText('Test Author')).toBeInTheDocument();
-    expect(screen.getByText('Test Developer')).toBeInTheDocument();
-    expect(screen.getByText('Test description for the site')).toBeInTheDocument();
+  describe('Rendering', () => {
+    it('renders main element with correct classes', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main).toBeInTheDocument();
+      expect(main).toHaveClass('min-h-screen');
+    });
+
+    it('renders Hero component', () => {
+      render(<Home />);
+      
+      const heroSection = screen.getByTestId('hero-section');
+      expect(heroSection).toBeInTheDocument();
+      expect(screen.getByText('Mock Hero Component')).toBeInTheDocument();
+    });
+
+    it('has proper semantic structure', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      const heroSection = screen.getByTestId('hero-section');
+      
+      expect(main).toContainElement(heroSection);
+    });
   });
 
-  it('renders the about section with author details', () => {
-    render(<Home />);
-    
-    expect(screen.getByText('About Me')).toBeInTheDocument();
-    expect(screen.getByText('Test bio description')).toBeInTheDocument();
-    expect(screen.getByText('Test City, Test Country')).toBeInTheDocument();
-    expect(screen.getByText('test@example.com')).toBeInTheDocument();
-    expect(screen.getByText('Available for work')).toBeInTheDocument();
+  describe('Layout', () => {
+    it('applies correct styling to main element', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main).toHaveClass('min-h-screen');
+    });
+
+    it('contains only Hero component as direct child', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main.children).toHaveLength(1);
+      expect(main.firstElementChild).toHaveAttribute('data-testid', 'hero-section');
+    });
   });
 
-  it('renders featured projects section', () => {
-    render(<Home />);
-    
-    expect(screen.getByText('Featured Projects')).toBeInTheDocument();
-    expect(screen.getByText('Test Project 1')).toBeInTheDocument();
-    expect(screen.getByText('Test project description')).toBeInTheDocument();
-    
-    // Should only show featured projects
-    expect(screen.queryByText('Test Project 2')).not.toBeInTheDocument();
+  describe('Accessibility', () => {
+    it('has proper main landmark', () => {
+      render(<Home />);
+      
+      expect(screen.getByRole('main')).toBeInTheDocument();
+    });
+
+    it('maintains semantic structure', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main.tagName.toLowerCase()).toBe('main');
+    });
   });
 
-  it('renders project technologies as tags', () => {
-    render(<Home />);
-    
-    expect(screen.getByText('React')).toBeInTheDocument();
-    expect(screen.getByText('TypeScript')).toBeInTheDocument();
-    expect(screen.getByText('Next.js')).toBeInTheDocument();
+  describe('Component Integration', () => {
+    it('properly integrates Hero component', () => {
+      render(<Home />);
+      
+      // Verify Hero component is rendered within main
+      const main = screen.getByRole('main');
+      const hero = screen.getByTestId('hero-section');
+      
+      expect(main).toContainElement(hero);
+    });
   });
 
-  it('renders contact CTA section', () => {
-    render(<Home />);
-    
-    expect(screen.getByText("Let's Work Together")).toBeInTheDocument();
-    expect(screen.getByText(/I'm always interested in new opportunities/)).toBeInTheDocument();
+  describe('Edge Cases', () => {
+    it('renders without errors', () => {
+      expect(() => render(<Home />)).not.toThrow();
+    });
+
+    it('maintains structure with different viewport sizes', () => {
+      render(<Home />);
+      
+      const main = screen.getByRole('main');
+      expect(main).toHaveClass('min-h-screen'); // Responsive height
+    });
+  });
+});
+
+describe('Home Page Metadata', () => {
+  it('exports correct metadata object', () => {
+    expect(metadata).toBeDefined();
+    expect(metadata.title).toBe('Portfolio - Full Stack Developer');
+    expect(metadata.description).toBe('Welcome to my portfolio. I create beautiful, functional, and user-centered digital experiences.');
   });
 
-  it('renders all main action buttons', () => {
-    render(<Home />);
-    
-    expect(screen.getByText('View My Work')).toBeInTheDocument();
-    expect(screen.getByText('Get In Touch')).toBeInTheDocument();
-    expect(screen.getByText('Learn More About Me')).toBeInTheDocument();
-    expect(screen.getByText('View All Projects')).toBeInTheDocument();
-    expect(screen.getByText('Start a Conversation')).toBeInTheDocument();
+  it('has appropriate title for SEO', () => {
+    expect(metadata.title).toContain('Portfolio');
+    expect(metadata.title).toContain('Full Stack Developer');
   });
 
-  it('renders project action buttons for featured projects', () => {
-    render(<Home />);
-    
-    expect(screen.getByText('GitHub')).toBeInTheDocument();
-    expect(screen.getByText('Live Demo')).toBeInTheDocument();
+  it('has descriptive meta description', () => {
+    expect(metadata.description).toContain('portfolio');
+    expect(metadata.description).toContain('digital experiences');
+    expect(metadata.description?.length).toBeGreaterThan(50); // Good length for SEO
   });
 });

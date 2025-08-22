@@ -12,8 +12,9 @@ const mockFs = {
 
 jest.doMock('fs/promises', () => mockFs)
 
-// Import admin router after mocking
+// Import admin router and error handler after mocking
 const { default: adminRouter } = await import('../src/routes/admin.js')
+const { errorHandler, requestId } = await import('../src/middleware/errorHandler.js')
 jest.mock('../src/jobs/dataSync.js', () => {
   return {
     default: jest.fn().mockImplementation(() => ({
@@ -45,7 +46,9 @@ describe('Admin Routes', () => {
     // Create Express app with admin routes
     app = express()
     app.use(express.json())
+    app.use(requestId)
     app.use('/admin', adminRouter)
+    app.use(errorHandler)
 
     // Reset all mocks
     jest.clearAllMocks()
@@ -249,15 +252,20 @@ describe('Admin Routes', () => {
       expect(response.status).toBe(200)
       expect(response.body.success).toBe(true)
       expect(response.body.data).toEqual({
+        nodeVersion: process.version,
+        platform: process.platform,
+        arch: expect.any(String),
         uptime: expect.any(Number),
         memory: {
           rss: expect.stringMatching(/^\d+ MB$/),
           heapTotal: expect.stringMatching(/^\d+ MB$/),
           heapUsed: expect.stringMatching(/^\d+ MB$/)
         },
-        nodeVersion: process.version,
-        platform: process.platform,
-        timestamp: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+        env: expect.any(String),
+        timestamp: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+        pid: expect.any(Number),
+        cwd: expect.any(String),
+        versions: expect.any(Object)
       })
     })
   })
@@ -339,26 +347,25 @@ describe('Admin Routes', () => {
       expect(response.body.data.message).toBe('Logs directory not found or empty')
     })
 
-    test('should handle unexpected errors', async () => {
+    test('should handle validation errors', async () => {
       process.env.ADMIN_KEY = 'test-admin-key'
-      // Mock path.join to throw an error
-      const originalJoin = path.join
-      path.join = jest.fn().mockImplementation(() => {
-        throw new Error('Unexpected error')
-      })
-
+      
+      // Test with invalid limit parameter
       const response = await request(app)
-        .get('/admin/logs')
+        .get('/admin/logs?limit=2000')
         .set('x-admin-key', 'test-admin-key')
 
-      expect(response.status).toBe(500)
+      expect(response.status).toBe(400)
       expect(response.body).toEqual({
-        error: 'Failed to fetch logs'
+        success: false,
+        error: {
+          message: 'Limit must be between 1 and 1000',
+          code: 'VALIDATION_ERROR',
+          stack: expect.any(String)
+        },
+        requestId: expect.any(String),
+        timestamp: expect.any(String)
       })
-      expect(console.error).toHaveBeenCalledWith('Error fetching logs:', expect.any(Error))
-
-      // Restore path.join
-      path.join = originalJoin
     })
   })
 })

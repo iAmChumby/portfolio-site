@@ -28,7 +28,7 @@ The admin dashboard uses the following backend endpoints:
 
 The admin dashboard is accessible at:
 ```
-http://localhost:3000/admin-dashboard-xyz123
+https://lukeedwards.me/admin-dashboard-xyz123
 ```
 
 **Security Note:** The URL path `admin-dashboard-xyz123` is intentionally obscure. You can change this by renaming the folder in `src-code/src/app/`.
@@ -37,7 +37,7 @@ http://localhost:3000/admin-dashboard-xyz123
 
 ### Accessing the Dashboard
 
-1. Navigate to `http://localhost:3000/admin-dashboard-xyz123`
+1. Navigate to `https://lukeedwards.me/admin-dashboard-xyz123`
 2. Enter your admin key (the value from your `.env` file)
 3. Click "Access Dashboard"
 

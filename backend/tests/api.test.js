@@ -20,6 +20,7 @@ jest.unstable_mockModule('../src/config/database.js', () => ({
 
 // Import the routes AFTER setting up the mock
 const { default: apiRoutes } = await import('../src/routes/api.js')
+const { errorHandler, requestId } = await import('../src/middleware/errorHandler.js')
 
 describe('API Routes', () => {
   let app
@@ -27,7 +28,9 @@ describe('API Routes', () => {
   beforeEach(() => {
     app = express()
     app.use(express.json())
+    app.use(requestId)
     app.use('/api', apiRoutes)
+    app.use(errorHandler)
     
     // Clear all mocks
     jest.clearAllMocks()
@@ -40,11 +43,11 @@ describe('API Routes', () => {
         .expect(200)
 
       expect(response.body).toEqual({
-        status: 'healthy',
+        success: true,
+        message: 'API is healthy',
         timestamp: expect.any(String),
         uptime: expect.any(Number),
-        memory: expect.any(Object),
-        version: '1.0.0'
+        memory: expect.any(Object)
       })
     })
   })
@@ -79,7 +82,14 @@ describe('API Routes', () => {
 
       expect(response.body).toEqual({
         success: false,
-        error: 'User data not found'
+        error: {
+          message: 'User profile not found',
+          code: 'NOT_FOUND',
+          resource: 'User profile',
+          stack: expect.any(String)
+        },
+        requestId: expect.any(String),
+        timestamp: expect.any(String)
       })
     })
   })
@@ -303,7 +313,14 @@ describe('API Routes', () => {
 
       expect(response.body).toEqual({
         success: false,
-        error: 'Internal server error'
+        error: {
+          message: 'Internal server error',
+          code: 'INTERNAL_ERROR',
+          originalError: 'Database connection failed',
+          stack: expect.any(String)
+        },
+        requestId: expect.any(String),
+        timestamp: expect.any(String)
       })
     })
   })

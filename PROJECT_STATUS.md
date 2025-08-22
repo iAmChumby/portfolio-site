@@ -91,14 +91,14 @@ A modern, full-stack portfolio website with GitHub integration, real-time data s
 
 #### Backend Configuration:
 - ✅ **Port**: 8000 (consistent across all files)
-- ✅ **CORS**: Configured for `http://localhost:3000`
+- ✅ **CORS**: Configured for `https://lukeedwards.me`
 - ✅ **Environment Variables**: Complete `.env` and `.env.example`
 - ✅ **Database Path**: Properly configured
 - ✅ **GitHub Integration**: API keys and webhook settings
 - ✅ **Admin Authentication**: ADMIN_KEY configured
 
 #### Frontend Configuration:
-- ✅ **API URL**: `http://localhost:8000/api` (synchronized)
+- ✅ **API URL**: `https://api.lukeedwards.me/api` (synchronized)
 - ✅ **Environment Files**: `.env.local` and `.env.example` updated
 - ✅ **API Client**: Default fallback URL corrected
 - ✅ **Admin Dashboard**: Proper API endpoint configuration
@@ -179,8 +179,8 @@ cd src-code
 npm install
 npm run dev  # Starts on http://localhost:3000
 
-# Admin Dashboard Access
-http://localhost:3000/admin-dashboard-xyz123
+# Admin Dashboard Access (Production)
+https://lukeedwards.me/admin-dashboard-xyz123
 ```
 
 ---

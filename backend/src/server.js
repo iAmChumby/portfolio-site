@@ -10,10 +10,14 @@ import dotenv from 'dotenv'
 import apiRoutes from './routes/api.js'
 import webhookRoutes from './routes/webhook.js'
 import adminRoutes from './routes/admin.js'
+import analyticsRoutes from './routes/analytics.js'
 
 // Import services
 import database from './config/database.js'
 import dataSyncJob from './jobs/dataSync.js'
+import { analyticsMiddleware } from './middleware/analytics.js'
+import { securityMiddleware, httpsEnforcement, validateSecurityHeaders } from './middleware/security.js'
+import { errorHandler, requestId, notFoundHandler, setupGracefulShutdown, healthCheck } from './middleware/errorHandler.js'
 
 // Load environment variables
 dotenv.config()
@@ -21,10 +25,37 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 8000
 
-// Security middleware
+// Security middleware with enhanced HTTPS security
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' }
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true
+  },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+      scriptSrc: ["'self'", "https:"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:"],
+      fontSrc: ["'self'", "https:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"]
+    }
+  },
+  crossOriginEmbedderPolicy: false, // Allow embedding for GitHub integration
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }))
+
+// HTTPS enforcement and security validation
+app.use(httpsEnforcement)
+app.use(validateSecurityHeaders)
+
+// Enhanced security middleware
+app.use(securityMiddleware())
 
 // Compression middleware
 app.use(compression())
@@ -59,10 +90,20 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
+// Request ID middleware (for error tracking)
+app.use(requestId)
+
+// Analytics middleware (track all requests)
+app.use(analyticsMiddleware())
+
+// Health check endpoint (before other routes)
+app.get('/api/health', healthCheck)
+
 // Routes
 app.use('/api', apiRoutes)
 app.use('/api', webhookRoutes)
 app.use('/api/admin', adminRoutes)
+app.use('/api/analytics', analyticsRoutes)
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -82,61 +123,36 @@ app.get('/', (req, res) => {
       stats: '/api/stats',
       all: '/api/all',
       webhook: '/api/github/webhook',
-      admin: '/api/admin/*'
+      admin: '/api/admin/*',
+      analytics: '/api/analytics/*'
     }
   })
 })
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'Endpoint not found',
-    message: `The endpoint ${req.method} ${req.originalUrl} does not exist`,
-    availableEndpoints: [
-      'GET /',
-      'GET /api/health',
-      'GET /api/user',
-      'GET /api/repositories',
-      'GET /api/repositories/featured',
-      'GET /api/languages',
-      'GET /api/activity',
-      'GET /api/workflows',
-      'GET /api/stats',
-      'GET /api/all',
-      'POST /api/github/webhook',
-      'POST /api/admin/verify',
-      'GET /api/admin/all',
-      'POST /api/admin/refresh',
-      'GET /api/admin/system',
-      'GET /api/admin/logs'
-    ]
-  })
-})
+// 404 handler for unmatched routes
+app.use('*', notFoundHandler)
 
-// Global error handler
-app.use((error, req, res, _next) => {
-  console.error('❌ Unhandled error:', error)
+// Global error handler (must be last)
+app.use(errorHandler)
+
+// Start server and setup graceful shutdown
+const server = app.listen(PORT, async () => {
+  console.log(`🚀 Server running on port ${PORT}`)
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`)
+  console.log(`🔗 API URL: http://localhost:${PORT}`)
   
-  res.status(error.status || 500).json({
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong',
-    timestamp: new Date().toISOString()
-  })
+  // Initialize and start data sync job
+  await dataSyncJob.initialize()
+  dataSyncJob.startScheduledSync()
+  await dataSyncJob.performInitialSync()
+  console.log('📡 Data sync job started')
 })
 
-// Graceful shutdown handler
-process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM received, shutting down gracefully...')
-  process.exit(0)
-})
+// Setup graceful shutdown handling
+setupGracefulShutdown(server)
 
-process.on('SIGINT', () => {
-  console.log('🛑 SIGINT received, shutting down gracefully...')
-  process.exit(0)
-})
-
-// Start server
-async function startServer () {
+// Initialize and start services
+async function initializeServices() {
   try {
     // Initialize database
     console.log('🔧 Initializing database...')
@@ -152,22 +168,14 @@ async function startServer () {
     // Start scheduled sync jobs
     dataSyncJob.startScheduledSync()
     
-    // Start HTTP server
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log('🚀 Portfolio Backend Server Started')
-      console.log(`📡 Server running on port ${PORT}`)
-      console.log(`🌐 API available at http://localhost:${PORT}`)
-      console.log(`📊 Health check: http://localhost:${PORT}/api/health`)
-      console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`)
-      console.log('✅ Server ready to accept connections')
-    })
+    console.log('✅ All services initialized successfully')
   } catch (error) {
-    console.error('❌ Failed to start server:', error)
+    console.error('❌ Failed to initialize services:', error)
     process.exit(1)
   }
 }
 
-// Start the server
-startServer()
+// Initialize services
+initializeServices()
 
 export default app

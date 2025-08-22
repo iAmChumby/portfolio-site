@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui'
 import { adminApi } from '@/lib/api/admin'
-import type { LogEntry, SystemInfo } from '@/lib/api/admin'
+import type { LogEntry, ConfigEntry, CreateConfigRequest } from '@/lib/api/admin'
 
 interface AdminDataManagerProps {
   onDataUpdate?: () => void
@@ -12,7 +12,7 @@ interface AdminDataManagerProps {
 interface EditableItem {
   id: string
   type: 'log' | 'system' | 'config'
-  data: any
+  data: Record<string, unknown>
   isEditing: boolean
 }
 
@@ -24,35 +24,43 @@ interface FormData {
   description?: string
   message?: string
   source?: string
-  meta?: Record<string, any>
-  [key: string]: any
+  meta?: Record<string, unknown>
+  [key: string]: unknown
 }
 
 export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps) {
   const [items, setItems] = useState<EditableItem[]>([])
+  const [formData, setFormData] = useState<FormData>({})
+  const [editingItem, setEditingItem] = useState<EditableItem | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [newItemType, setNewItemType] = useState<'log' | 'system' | 'config'>('log')
   const [showAddForm, setShowAddForm] = useState(false)
 
-  const handleCreate = async (type: string, data: any) => {
+  const handleCreate = async (type: string, data: Record<string, unknown>) => {
     setLoading(true)
     setError('')
     
     try {
-      let createdItem: any
+      let createdItem: LogEntry | ConfigEntry | Record<string, unknown>
       
       if (type === 'log') {
         const logData = {
           timestamp: new Date().toISOString(),
-          level: data.level || 'info',
-          message: data.message || '',
-          source: data.source || 'manual',
-          meta: data.meta || {}
+          level: (data.level as 'error' | 'warn' | 'info' | 'debug') || 'info',
+          message: (data.message as string) || '',
+          source: (data.source as string) || 'manual',
+          meta: (data.meta as Record<string, unknown>) || {} as Record<string, unknown>
         }
         createdItem = await adminApi.createLog(logData)
       } else if (type === 'config') {
-        createdItem = await adminApi.createConfig(data)
+        const configData: CreateConfigRequest = {
+          key: (data.key as string) || '',
+          value: data.value || '',
+          description: data.description as string,
+          category: data.category as string
+        }
+        createdItem = await adminApi.createConfig(configData)
       } else {
         throw new Error(`Unsupported item type: ${type}`)
       }
@@ -60,7 +68,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
       const newItem: EditableItem = {
         id: createdItem.id || Date.now().toString(),
         type: type as 'log' | 'system' | 'config',
-        data: createdItem,
+        data: createdItem as unknown as Record<string, unknown>,
         isEditing: false
       }
       
@@ -76,7 +84,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
     }
   }
 
-  const handleUpdate = async (id: string, updatedData: any) => {
+  const handleUpdate = async (id: string, updatedData: Record<string, unknown>) => {
     setLoading(true)
     setError('')
     
@@ -86,7 +94,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
         throw new Error('Item not found')
       }
       
-      let updatedItem: any
+      let updatedItem: LogEntry | ConfigEntry | Record<string, unknown>
       
       if (item.type === 'log') {
         updatedItem = await adminApi.updateLog(id, updatedData)
@@ -98,7 +106,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
       
       setItems(prev => prev.map(item => 
         item.id === id 
-          ? { ...item, data: updatedItem, isEditing: false }
+          ? { ...item, data: updatedItem as unknown as Record<string, unknown>, isEditing: false }
           : item
       ))
       onDataUpdate?.()
@@ -142,28 +150,38 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
     }
   }
 
-  const toggleEdit = (id: string) => {
-    setItems(prev => prev.map(item => 
-      item.id === id 
-        ? { ...item, isEditing: !item.isEditing }
-        : item
-    ))
+  const handleEditClick = (item: EditableItem) => {
+    if (editingItem?.id === item.id) {
+      resetForm()
+    } else {
+      startEditing(item)
+    }
   }
 
-  const renderItemForm = (item?: EditableItem) => {
-    const [formData, setFormData] = useState<FormData>(item?.data || {})
-    
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault()
-      if (item) {
-        handleUpdate(item.id, formData)
-      } else {
-        handleCreate(newItemType, formData)
-      }
+  const resetForm = () => {
+    setFormData({})
+    setEditingItem(null)
+  }
+
+  const startEditing = (item: EditableItem) => {
+    setFormData(item.data as FormData)
+    setEditingItem(item)
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (editingItem) {
+      handleUpdate(editingItem.id, formData)
+    } else {
+      handleCreate(newItemType, formData)
     }
+    resetForm()
+  }
+
+  const renderItemForm = () => {
 
     return (
-      <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <form onSubmit={handleFormSubmit} className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -216,13 +234,13 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
             variant="cta"
             size="sm"
           >
-            {item ? 'Update' : 'Create'}
+            {editingItem ? 'Update' : 'Create'}
           </Button>
           <Button
             type="button"
             onClick={() => {
-              if (item) {
-                toggleEdit(item.id)
+              if (editingItem) {
+                resetForm()
               } else {
                 setShowAddForm(false)
               }
@@ -285,8 +303,8 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
       <div className="space-y-4">
         {items.map((item) => (
           <div key={item.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-            {item.isEditing ? (
-              renderItemForm(item)
+            {editingItem?.id === item.id ? (
+              renderItemForm()
             ) : (
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -303,19 +321,19 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
                       item.data.status === 'warning' || item.data.level === 'warning' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                       'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                     }`}>
-                      {item.data.status || item.data.level || 'info'}
+                      {String(item.data.status || item.data.level || 'info')}
                     </span>
                   </div>
                   <h3 className="font-medium text-gray-900 dark:text-white mb-1">
-                    {item.data.title || item.data.name || 'Untitled'}
+                    {String(item.data.title || item.data.name || 'Untitled')}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {item.data.description || item.data.message || 'No description'}
+                    {String(item.data.description || item.data.message || 'No description')}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <Button
-                    onClick={() => toggleEdit(item.id)}
+                    onClick={() => handleEditClick(item)}
                     variant="outline"
                     size="sm"
                   >
@@ -345,7 +363,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
             <p>No items to manage yet</p>
-            <p className="text-sm mt-1">Click "Add Item" to create your first entry</p>
+            <p className="text-sm mt-1">Click &quot;Add Item&quot; to create your first entry</p>
           </div>
         )}
       </div>

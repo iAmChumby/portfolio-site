@@ -3,20 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   adminApi,
-  AdminAuthResponse,
   DashboardData,
   SystemHealth,
   AnalyticsData,
   LogsResponse,
   SystemInfo,
-  LogEntry,
 } from '../api/admin';
-
-// Loading state interface
-interface LoadingState {
-  isLoading: boolean;
-  error: string | null;
-}
 
 // Admin authentication hook
 export const useAdminAuth = () => {
@@ -213,7 +205,7 @@ export const useLogs = (options?: {
   const [data, setData] = useState<LogsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(options?.page || 1);
+  const currentPage = options?.page || 1;
 
   const loadLogs = useCallback(async () => {
     setLoading(true);

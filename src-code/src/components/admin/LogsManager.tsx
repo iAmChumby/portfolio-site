@@ -18,7 +18,6 @@ export default function LogsManager({ onDataUpdate }: LogsManagerProps) {
     search: ''
   })
   const [page, setPage] = useState(1)
-  const [editingLog, setEditingLog] = useState<LogEntry | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [newLog, setNewLog] = useState({
     level: 'info' as 'info' | 'warn' | 'error' | 'debug',
@@ -46,7 +45,7 @@ export default function LogsManager({ onDataUpdate }: LogsManagerProps) {
 
   useEffect(() => {
     loadLogs()
-  }, [page, filters])
+  }, [page, filters, loadLogs])
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -91,7 +90,7 @@ export default function LogsManager({ onDataUpdate }: LogsManagerProps) {
         meta: log.meta
       })
       
-      setEditingLog(null)
+      resetForm()
       await refreshLogs()
       onDataUpdate?.()
     } catch (err) {
@@ -126,37 +125,66 @@ export default function LogsManager({ onDataUpdate }: LogsManagerProps) {
     }
   }
 
-  const renderLogForm = (log?: LogEntry) => {
-    const [formData, setFormData] = useState(log || {
-      level: 'info' as 'info' | 'warn' | 'error' | 'debug',
+  // Form state for log editing
+  const [formData, setFormData] = useState<{
+    level: 'info' | 'warn' | 'error' | 'debug';
+    message: string;
+    source: string;
+    meta: Record<string, unknown>;
+  }>({
+    level: 'info',
+    message: '',
+    source: '',
+    meta: {}
+  })
+  const [metadataStr, setMetadataStr] = useState('{}');
+  const [editingLog, setEditingLog] = useState<LogEntry | null>(null);
+
+  const resetForm = () => {
+    setFormData({
+      level: 'info',
       message: '',
       source: '',
-      metadata: {}
-    })
-    const [metadataStr, setMetadataStr] = useState(
-      JSON.stringify(log?.metadata || {}, null, 2)
-    )
+      meta: {}
+    });
+    setMetadataStr('{}');
+    setEditingLog(null);
+  };
 
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault()
-      try {
-        const logData = {
-          ...formData,
-          metadata: JSON.parse(metadataStr)
-        }
-        
-        if (log) {
-          handleUpdateLog({ ...log, ...logData })
-        } else {
-          handleCreateLog(e)
-        }
-      } catch (err) {
-        alert('Invalid JSON in metadata field')
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const logData = {
+        ...formData,
+        meta: JSON.parse(metadataStr)
+      };
+      
+      if (editingLog) {
+        handleUpdateLog({ ...editingLog, ...logData });
+      } else {
+        handleCreateLog(e);
       }
+      resetForm();
+    } catch {
+      alert('Invalid JSON in metadata field');
     }
+  };
+
+  const startEditing = (log: LogEntry) => {
+    setFormData({
+      level: log.level,
+      message: log.message,
+      source: log.source || '',
+      meta: log.meta || {}
+    });
+    setMetadataStr(JSON.stringify(log.meta || {}, null, 2));
+    setEditingLog(log);
+  };
+
+  const renderLogForm = () => {
 
     return (
-      <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <form onSubmit={handleFormSubmit} className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -164,7 +192,7 @@ export default function LogsManager({ onDataUpdate }: LogsManagerProps) {
             </label>
             <select
               value={formData.level}
-              onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value as any }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value as 'info' | 'warn' | 'error' | 'debug' }))}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               required
             >
@@ -224,13 +252,13 @@ export default function LogsManager({ onDataUpdate }: LogsManagerProps) {
             variant="cta"
             size="sm"
           >
-            {log ? 'Update' : 'Create'}
+            {editingLog ? 'Update' : 'Create'}
           </Button>
           <Button
             type="button"
             onClick={() => {
-              if (log) {
-                setEditingLog(null)
+              if (editingLog) {
+                resetForm()
               } else {
                 setShowAddForm(false)
               }
@@ -356,7 +384,7 @@ export default function LogsManager({ onDataUpdate }: LogsManagerProps) {
         {logs.map((log) => (
           <div key={log.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
             {editingLog?.id === log.id ? (
-              renderLogForm(log)
+              renderLogForm()
             ) : (
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -374,20 +402,20 @@ export default function LogsManager({ onDataUpdate }: LogsManagerProps) {
                     </span>
                   </div>
                   <p className="text-gray-900 dark:text-white mb-2">{log.message}</p>
-                  {log.metadata && Object.keys(log.metadata).length > 0 && (
+                  {log.meta && Object.keys(log.meta).length > 0 && (
                     <details className="mt-2">
                       <summary className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
                         View Metadata
                       </summary>
                       <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs overflow-x-auto">
-                        {JSON.stringify(log.metadata, null, 2)}
+                        {JSON.stringify(log.meta, null, 2)}
                       </pre>
                     </details>
                   )}
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <Button
-                    onClick={() => setEditingLog(log)}
+                    onClick={() => startEditing(log)}
                     variant="outline"
                     size="sm"
                   >

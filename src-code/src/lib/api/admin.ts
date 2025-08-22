@@ -1,5 +1,4 @@
 import { apiClient, handleApiError } from './client';
-import { ApiResponse } from './types';
 
 // Admin-specific types
 export interface AdminAuthRequest {
@@ -153,6 +152,30 @@ export interface SystemInfo {
   };
 }
 
+export interface ConfigEntry {
+  id: string;
+  key: string;
+  value: unknown;
+  description?: string;
+  category?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateConfigRequest {
+  key: string;
+  value: unknown;
+  description?: string;
+  category?: string;
+}
+
+export interface UpdateConfigRequest {
+  key?: string;
+  value?: unknown;
+  description?: string;
+  category?: string;
+}
+
 // Admin API Service Class
 class AdminApiService {
   private adminKey: string | null = null;
@@ -213,7 +236,18 @@ class AdminApiService {
   // System Health
   async getSystemHealth(): Promise<SystemHealth> {
     try {
-      const response = await apiClient.get<any>('/admin/system', undefined, this.getAuthHeaders());
+      interface SystemHealthResponse {
+        success: boolean;
+        data: {
+          uptime?: number;
+          memory?: {
+            heapUsed?: string;
+            rss?: string;
+          };
+        };
+      }
+      
+      const response = await apiClient.get<SystemHealthResponse>('/admin/system', undefined, this.getAuthHeaders());
       
       if (response.data.success && response.data.data) {
         // Transform backend response to match SystemHealth interface
@@ -238,7 +272,12 @@ class AdminApiService {
   // Analytics Data
   async getAnalyticsData(): Promise<AnalyticsData> {
     try {
-      const response = await apiClient.get<any>('/admin/analytics', undefined, this.getAuthHeaders());
+      interface AnalyticsResponse {
+        success: boolean;
+        data: AnalyticsData;
+      }
+      
+      const response = await apiClient.get<AnalyticsResponse>('/admin/analytics', undefined, this.getAuthHeaders());
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -248,7 +287,12 @@ class AdminApiService {
   // Refresh Data
   async refreshData(): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await apiClient.post<any>('/admin/refresh', undefined, {
+      interface RefreshResponse {
+        success: boolean;
+        message: string;
+      }
+      
+      const response = await apiClient.post<RefreshResponse>('/admin/refresh', undefined, {
         'Content-Type': 'application/json',
         ...this.getAuthHeaders(),
       });
@@ -261,7 +305,12 @@ class AdminApiService {
   // Get System Information
   async getSystemInfo(): Promise<SystemInfo> {
     try {
-      const response = await apiClient.get<any>('/admin/system', undefined, this.getAuthHeaders());
+      interface SystemInfoResponse {
+        success: boolean;
+        data: SystemInfo;
+      }
+      
+      const response = await apiClient.get<SystemInfoResponse>('/admin/system', undefined, this.getAuthHeaders());
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -304,9 +353,9 @@ class AdminApiService {
   }
 
   // Create System Config
-  async createConfig(configData: any): Promise<any> {
+  async createConfig(configData: CreateConfigRequest): Promise<ConfigEntry> {
     try {
-      const response = await apiClient.post<any>('/admin/config', configData, {
+      const response = await apiClient.post<ConfigEntry>('/admin/config', configData, {
         'Content-Type': 'application/json',
         ...this.getAuthHeaders(),
       });
@@ -317,9 +366,9 @@ class AdminApiService {
   }
 
   // Update System Config
-  async updateConfig(id: string, configData: any): Promise<any> {
+  async updateConfig(id: string, configData: UpdateConfigRequest): Promise<ConfigEntry> {
     try {
-      const response = await apiClient.put<any>(`/admin/config/${id}`, configData, {
+      const response = await apiClient.put<ConfigEntry>(`/admin/config/${id}`, configData, {
         'Content-Type': 'application/json',
         ...this.getAuthHeaders(),
       });
@@ -361,13 +410,25 @@ class AdminApiService {
       
       // Transform backend response to match expected LogsResponse format
       if (response.success && response.data) {
+        interface RawLogEntry {
+          id?: string;
+          timestamp?: string;
+          level?: 'error' | 'warn' | 'info' | 'debug';
+          message?: string;
+          source?: string;
+          meta?: Record<string, unknown>;
+          stack?: string;
+        }
+        
         const logs = Array.isArray(response.data.logs) 
-          ? response.data.logs.map((log: any) => ({
+          ? response.data.logs.map((log: RawLogEntry) => ({
               id: log.id || `log-${Math.random().toString(36).substring(2, 9)}`,
               timestamp: log.timestamp || new Date().toISOString(),
               level: log.level || 'info' as const,
               message: log.message || '',
-              source: log.source || response.data?.logs || 'system'
+              source: log.source || 'system',
+              meta: log.meta,
+              stack: log.stack
             }))
           : [];
         

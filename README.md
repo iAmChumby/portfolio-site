@@ -1,4 +1,4 @@
-# Portfolio Site
+# Portfolio Site 
 
 A modern, responsive portfolio website built with Next.js, TypeScript, and comprehensive testing.
 

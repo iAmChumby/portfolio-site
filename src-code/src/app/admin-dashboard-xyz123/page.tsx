@@ -100,9 +100,13 @@ export default function AdminDashboard() {
     try {
       setLoading(true)
       
-      // Load all dashboard data
+      // Load all dashboard data with admin authentication
       const [allDataRes, healthRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/all`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/all`, {
+          headers: {
+            'x-admin-key': secretKey
+          }
+        }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/health`)
       ])
 
@@ -125,8 +129,11 @@ export default function AdminDashboard() {
   const triggerRefresh = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/refresh`, {
-        method: 'POST'
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/refresh`, {
+        method: 'POST',
+        headers: {
+          'x-admin-key': secretKey
+        }
       })
       
       if (response.ok) {

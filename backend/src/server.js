@@ -13,7 +13,7 @@ import adminRoutes from './routes/admin.js'
 
 // Import services
 import database from './config/database.js'
-import DataSyncJob from './jobs/dataSync.js'
+import dataSyncJob from './jobs/dataSync.js'
 
 // Load environment variables
 dotenv.config()
@@ -82,7 +82,6 @@ app.get('/', (req, res) => {
       stats: '/api/stats',
       all: '/api/all',
       webhook: '/api/github/webhook',
-      refresh: '/api/refresh',
       admin: '/api/admin/*'
     }
   })
@@ -105,7 +104,6 @@ app.use('*', (req, res) => {
       'GET /api/stats',
       'GET /api/all',
       'POST /api/github/webhook',
-      'POST /api/refresh',
       'POST /api/admin/verify',
       'GET /api/admin/all',
       'POST /api/admin/refresh',
@@ -146,7 +144,6 @@ async function startServer () {
     
     // Initialize and start data sync job
     console.log('🔧 Initializing data sync job...')
-    const dataSyncJob = new DataSyncJob()
     await dataSyncJob.initialize()
     
     // Perform initial data sync

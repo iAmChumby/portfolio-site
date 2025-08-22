@@ -9,6 +9,13 @@ class DataSyncJob {
     this.isGitHubConfigured = false
   }
 
+  static getInstance () {
+    if (!DataSyncJob.instance) {
+      DataSyncJob.instance = new DataSyncJob()
+    }
+    return DataSyncJob.instance
+  }
+
   async initialize () {
     try {
       this.githubService = new GitHubService()
@@ -283,4 +290,5 @@ class DataSyncJob {
   }
 }
 
-export default DataSyncJob
+// Export singleton instance
+export default DataSyncJob.getInstance()

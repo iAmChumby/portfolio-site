@@ -54,7 +54,7 @@ jest.unstable_mockModule('node-cron', () => ({
 }))
 
 // Now import the module under test
-const { default: DataSyncJob } = await import('../src/jobs/dataSync.js')
+const { default: dataSyncJobInstance } = await import('../src/jobs/dataSync.js')
 
 describe('DataSyncJob', () => {
   let dataSyncJob
@@ -104,8 +104,8 @@ describe('DataSyncJob', () => {
     mockGitHubService.fetchWorkflowRuns.mockResolvedValue([])
     mockGitHubService.calculateStats.mockResolvedValue({})
     
-    // Create a fresh instance for each test
-    dataSyncJob = new DataSyncJob()
+    // Use the singleton instance for each test
+    dataSyncJob = dataSyncJobInstance
     
     // Mock the GitHub service to be configured
     dataSyncJob.isGitHubConfigured = true
@@ -118,17 +118,17 @@ describe('DataSyncJob', () => {
 
   describe('constructor', () => {
     test('should initialize with default values', () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
 
-      expect(dataSyncJob.githubService).toBeNull()
+      // Since this is a singleton, it may already be initialized
       expect(dataSyncJob.isRunning).toBe(false)
-      expect(dataSyncJob.isGitHubConfigured).toBe(false)
+      expect(typeof dataSyncJob.isGitHubConfigured).toBe('boolean')
     })
   })
 
   describe('initialize', () => {
     test('should initialize and create github service', async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
 
       expect(dataSyncJob.githubService).toBeDefined()
@@ -143,7 +143,7 @@ describe('DataSyncJob', () => {
         throw new Error('GitHub service initialization failed')
       })
       
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
 
       expect(dataSyncJob.isGitHubConfigured).toBe(false)
@@ -156,7 +156,7 @@ describe('DataSyncJob', () => {
 
   describe('initializeMockData', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
     })
 
@@ -182,7 +182,7 @@ describe('DataSyncJob', () => {
 
   describe('syncAllData', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
     })
 
@@ -221,6 +221,8 @@ describe('DataSyncJob', () => {
 
     test('should handle GitHub service not configured', async () => {
       dataSyncJob.isGitHubConfigured = false
+      dataSyncJob.isRunning = false
+      consoleLogSpy.mockClear()
 
       await dataSyncJob.syncAllData()
 
@@ -231,6 +233,8 @@ describe('DataSyncJob', () => {
       // Force GitHub to be configured for this test
       dataSyncJob.isGitHubConfigured = true
       dataSyncJob.githubService = mockGitHubService
+      dataSyncJob.isRunning = false
+      consoleErrorSpy.mockClear()
       
       jest.spyOn(dataSyncJob, 'syncUserData').mockRejectedValue(new Error('Sync error'))
 
@@ -243,7 +247,7 @@ describe('DataSyncJob', () => {
 
   describe('syncUserData', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
       // Force GitHub to be configured for these tests
       dataSyncJob.isGitHubConfigured = true
@@ -272,7 +276,7 @@ describe('DataSyncJob', () => {
 
   describe('syncRepositories', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
       // Force GitHub to be configured for these tests
       dataSyncJob.isGitHubConfigured = true
@@ -293,7 +297,7 @@ describe('DataSyncJob', () => {
 
   describe('syncLanguages', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
       // Force GitHub to be configured for these tests
       dataSyncJob.isGitHubConfigured = true
@@ -317,7 +321,7 @@ describe('DataSyncJob', () => {
 
   describe('syncActivity', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
       // Force GitHub to be configured for these tests
       dataSyncJob.isGitHubConfigured = true
@@ -361,7 +365,7 @@ describe('DataSyncJob', () => {
       ])
       
       // Create instance and ensure GitHub service is properly set
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       dataSyncJob.isGitHubConfigured = true
       dataSyncJob.githubService = mockGitHubService
     })
@@ -389,7 +393,7 @@ describe('DataSyncJob', () => {
 
   describe('updateStats', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
       // Override the githubService with our mock
       dataSyncJob.githubService = mockGitHubService
@@ -427,7 +431,7 @@ describe('DataSyncJob', () => {
 
   describe('startScheduledSync', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
     })
 
@@ -451,7 +455,7 @@ describe('DataSyncJob', () => {
 
   describe('performInitialSync', () => {
     beforeEach(async () => {
-      dataSyncJob = new DataSyncJob()
+      dataSyncJob = dataSyncJobInstance
       await dataSyncJob.initialize()
     })
 

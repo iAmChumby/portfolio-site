@@ -1,9 +1,8 @@
 import express from 'express'
 import crypto from 'crypto'
-import DataSyncJob from '../jobs/dataSync.js'
+import dataSyncJob from '../jobs/dataSync.js'
 
 const router = express.Router()
-const dataSyncJob = new DataSyncJob()
 
 // Middleware to verify GitHub webhook signature
 const verifyGitHubSignature = (req, res, next) => {
@@ -157,24 +156,6 @@ async function handleWorkflowRunEvent (payload) {
   await dataSyncJob.syncWorkflows()
 }
 
-// Manual refresh endpoint (for testing)
-router.post('/refresh', async (req, res) => {
-  try {
-    console.log('🔄 Manual data refresh triggered')
-    
-    await dataSyncJob.syncAllData()
-    
-    res.json({
-      message: 'Data refresh completed',
-      timestamp: new Date().toISOString()
-    })
-  } catch (error) {
-    console.error('❌ Manual refresh failed:', error)
-    res.status(500).json({
-      error: 'Refresh failed',
-      message: error.message
-    })
-  }
-})
+// Manual refresh endpoint removed for security - use /api/admin/refresh with authentication instead
 
 export default router

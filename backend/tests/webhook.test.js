@@ -11,10 +11,8 @@ const mockDataSyncJob = {
   syncAllData: jest.fn()
 }
 
-const MockDataSyncJob = jest.fn().mockImplementation(() => mockDataSyncJob)
-
 jest.unstable_mockModule('../src/jobs/dataSync.js', () => ({
-  default: MockDataSyncJob
+  default: mockDataSyncJob
 }))
 
 // Import webhook routes after mocking
@@ -297,32 +295,5 @@ describe('Webhook Routes', () => {
     })
   })
 
-  describe('POST /api/refresh', () => {
-    test('should trigger manual data refresh', async () => {
-      mockDataSyncJob.syncAllData.mockResolvedValue()
 
-      const response = await request(app)
-        .post('/api/refresh')
-        .expect(200)
-
-      expect(response.body).toEqual({
-        message: 'Data refresh completed',
-        timestamp: expect.any(String)
-      })
-      expect(mockDataSyncJob.syncAllData).toHaveBeenCalledTimes(1)
-    })
-
-    test('should handle refresh errors', async () => {
-      mockDataSyncJob.syncAllData.mockRejectedValue(new Error('Refresh failed'))
-
-      const response = await request(app)
-        .post('/api/refresh')
-        .expect(500)
-
-      expect(response.body).toEqual({
-        error: 'Refresh failed',
-        message: 'Refresh failed'
-      })
-    })
-  })
 })

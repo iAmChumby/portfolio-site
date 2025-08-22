@@ -35,11 +35,12 @@
     "type-check": "cd src-code && npm run type-check",
     "install:all": "npm install && cd src-code && npm install && cd ../backend && npm install",
     "clean": "npm run clean:frontend && npm run clean:backend",
-    "clean:frontend": "cd src-code && rm -rf .next node_modules",
-    "clean:backend": "cd backend && rm -rf node_modules"
+    "clean:frontend": "cd src-code && rimraf .next node_modules",
+    "clean:backend": "cd backend && rimraf node_modules"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -53,8 +54,6 @@
     "github-integration"
   ],
   "author": "Your Name",
-  "license": "MIT",
-  "dependencies": {
-    "fs": "^0.0.1-security"
-  }
+  "license": "MIT"
+
 }

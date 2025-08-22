@@ -5,14 +5,8 @@ import database from '../config/database.js'
 
 const router = express.Router()
 
-// Import DataSyncJob using dynamic import since it's an ES6 module
-let dataSyncJobInstance = null;
-(async () => {
-  const module = await import('../jobs/dataSync.js')
-  const DataSyncJob = module.default
-  dataSyncJobInstance = new DataSyncJob()
-  await dataSyncJobInstance.initialize()
-})()
+// Import DataSyncJob singleton instance
+import dataSyncJobInstance from '../jobs/dataSync.js'
 
 // Admin key verification middleware
 const verifyAdminKey = (req, res, next) => {
@@ -64,12 +58,6 @@ router.get('/all', verifyAdminKey, async (req, res) => {
 // Trigger manual data refresh
 router.post('/refresh', verifyAdminKey, async (req, res) => {
   try {
-    if (!dataSyncJobInstance) {
-      return res.status(500).json({ 
-        error: 'DataSyncJob not initialized' 
-      })
-    }
-
     if (dataSyncJobInstance.isRunning) {
       return res.status(409).json({ 
         error: 'Data sync is already in progress' 

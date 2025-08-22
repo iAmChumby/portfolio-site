@@ -9,7 +9,7 @@ import { DatabaseError } from '../utils/errors.js'
  * @returns {string} - Unique visitor ID
  */
 export function generateVisitorId(ip, userAgent) {
-  const data = `${ip}-${userAgent}-${Date.now()}-${Math.random()}`
+  const data = `${ip}-${userAgent}`
   return crypto.createHash('sha256').update(data).digest('hex').substring(0, 16)
 }
 

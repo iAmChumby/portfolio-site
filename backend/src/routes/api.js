@@ -5,17 +5,6 @@ import { DatabaseError, NotFoundError, ValidationError } from '../utils/errors.j
 
 const router = express.Router()
 
-// Health check endpoint (moved to main server.js, keeping for backward compatibility)
-router.get('/health', asyncHandler(async (req, res) => {
-  res.json({
-    success: true,
-    message: 'API is healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    memory: process.memoryUsage()
-  })
-}))
-
 // Get user profile
 router.get('/user', asyncHandler(async (req, res) => {
   const user = await database.getUser()

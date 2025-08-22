@@ -99,7 +99,7 @@ router.get('/analytics', verifyAdminKey, asyncHandler(async (req, res) => {
     .map(([date, stats]) => ({
       date,
       visits: stats.visits || 0,
-      uniqueVisitors: Array.isArray(stats.uniqueVisitors) ? stats.uniqueVisitors.length : 0
+      uniqueVisitors: stats.uniqueVisitors.length
     }))
   
   // Get top 10 popular pages

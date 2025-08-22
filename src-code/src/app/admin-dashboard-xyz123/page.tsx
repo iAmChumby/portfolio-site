@@ -3,42 +3,26 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui'
 import { Card, CardHeader, CardBody } from '@/components/ui'
-
-interface DashboardData {
-  analytics: {
-    totalViews: number
-    uniqueVisitors: number
-    bounceRate: number
-    avgSessionDuration: string
-  }
-  projects: Array<{
-    id: string
-    name: string
-    status: string
-    lastUpdated: string
-  }>
-  logs: Array<{
-    id: string
-    timestamp: string
-    level: string
-    message: string
-  }>
-}
+import { adminApi } from '@/lib/api/admin'
+import type { DashboardData, SystemHealth, AnalyticsData } from '@/lib/api/admin'
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [password, setPassword] = useState('')
+  const [adminKey, setAdminKey] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null)
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
 
   // Check authentication on mount
   useEffect(() => {
-    const authStatus = localStorage.getItem('admin-authenticated')
-    if (authStatus === 'true') {
+    const savedAdminKey = localStorage.getItem('admin-key')
+    if (savedAdminKey && adminApi.isAuthenticated()) {
       setIsAuthenticated(true)
+      setAdminKey(savedAdminKey)
       fetchDashboardData()
     }
   }, [])
@@ -60,21 +44,19 @@ export default function AdminDashboard() {
     setError('')
 
     try {
-      const response = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      })
-
-      if (response.ok) {
+      // Use the proper authentication method
+      const authResponse = await adminApi.authenticate(adminKey)
+      
+      if (authResponse.success) {
+        localStorage.setItem('admin-key', adminKey)
         setIsAuthenticated(true)
-        localStorage.setItem('admin-authenticated', 'true')
         await fetchDashboardData()
       } else {
-        setError('Invalid password')
+        setError(authResponse.message || 'Invalid admin key')
       }
-    } catch (err) {
-      setError('Authentication failed')
+    } catch (error) {
+      console.error('Authentication error:', error)
+      setError('Authentication failed. Please check your admin key.')
     } finally {
       setLoading(false)
     }
@@ -82,13 +64,21 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch('/api/admin/dashboard')
-      if (response.ok) {
-        const data = await response.json()
-        setDashboardData(data)
-      }
-    } catch (err) {
-      console.error('Failed to fetch dashboard data:', err)
+      setIsRefreshing(true)
+      
+      // Fetch all data from backend API
+      const [dashData, healthData, analyticsData] = await Promise.all([
+        adminApi.getDashboardData(),
+        adminApi.getSystemHealth(),
+        adminApi.getAnalyticsData()
+      ])
+      
+      setDashboardData(dashData)
+      setSystemHealth(healthData)
+      setAnalyticsData(analyticsData)
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+      setError('Failed to fetch dashboard data')
     } finally {
       setIsRefreshing(false)
     }
@@ -96,15 +86,28 @@ export default function AdminDashboard() {
 
   const handleRefresh = async () => {
     setLoading(true)
-    await fetchDashboardData()
-    setLoading(false)
+    try {
+      // Trigger backend data refresh first
+      await adminApi.refreshData()
+      // Then fetch the updated data
+      await fetchDashboardData()
+    } catch (error) {
+      console.error('Error refreshing data:', error)
+      setError('Failed to refresh data')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleLogout = () => {
+    localStorage.removeItem('admin-key')
+    adminApi.clearAuth()
     setIsAuthenticated(false)
-    localStorage.removeItem('admin-authenticated')
     setDashboardData(null)
-    setPassword('')
+    setSystemHealth(null)
+    setAnalyticsData(null)
+    setAdminKey('')
+    setError('')
   }
 
   if (!isAuthenticated) {
@@ -130,9 +133,9 @@ export default function AdminDashboard() {
                 </label>
                 <input
                   type="password"
-                  placeholder="Enter your admin password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your admin key"
+                  value={adminKey}
+                  onChange={(e) => setAdminKey(e.target.value)}
                   required
                   className="w-full px-4 py-3 border border-green-500/30 bg-gray-800 text-green-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 placeholder-gray-500"
                 />
@@ -172,9 +175,9 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="border-b bg-white shadow-sm">
+      <div className="border-b bg-black/20 backdrop-blur-sm shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
@@ -184,8 +187,8 @@ export default function AdminDashboard() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Portfolio Admin</h1>
-                <p className="text-sm text-gray-600">Management Dashboard</p>
+                <h1 className="text-2xl font-bold text-white">Portfolio Admin</h1>
+                <p className="text-sm text-gray-300">Management Dashboard</p>
                 {isRefreshing && (
                   <div className="flex items-center gap-2 mt-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -270,7 +273,7 @@ export default function AdminDashboard() {
                       <h3 className="text-sm font-medium text-gray-600">Total Views</h3>
                     </CardHeader>
                     <CardBody>
-                      <div className="text-2xl font-bold text-gray-900">{dashboardData?.analytics.totalViews || 0}</div>
+                      <div className="text-2xl font-bold text-gray-900">{analyticsData?.summary?.totalVisits?.toLocaleString() || '0'}</div>
                     </CardBody>
                   </Card>
                   <Card>
@@ -278,7 +281,7 @@ export default function AdminDashboard() {
                       <h3 className="text-sm font-medium text-gray-600">Unique Visitors</h3>
                     </CardHeader>
                     <CardBody>
-                      <div className="text-2xl font-bold text-gray-900">{dashboardData?.analytics.uniqueVisitors || 0}</div>
+                      <div className="text-2xl font-bold text-gray-900">{analyticsData?.summary?.uniqueVisitors?.toLocaleString() || '0'}</div>
                     </CardBody>
                   </Card>
                   <Card>
@@ -286,7 +289,7 @@ export default function AdminDashboard() {
                       <h3 className="text-sm font-medium text-gray-600">Bounce Rate</h3>
                     </CardHeader>
                     <CardBody>
-                      <div className="text-2xl font-bold text-gray-900">{dashboardData?.analytics.bounceRate || 0}%</div>
+                      <div className="text-2xl font-bold text-gray-900">{analyticsData?.summary?.bounceRate || '0'}%</div>
                     </CardBody>
                   </Card>
                   <Card>
@@ -294,7 +297,7 @@ export default function AdminDashboard() {
                       <h3 className="text-sm font-medium text-gray-600">Avg Session</h3>
                     </CardHeader>
                     <CardBody>
-                      <div className="text-2xl font-bold text-gray-900">{dashboardData?.analytics.avgSessionDuration || '0m'}</div>
+                      <div className="text-2xl font-bold text-gray-900">{analyticsData?.summary?.avgSessionDuration || '0m'}</div>
                     </CardBody>
                   </Card>
                 </div>
@@ -313,11 +316,11 @@ export default function AdminDashboard() {
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <p className="text-sm font-medium text-gray-600">Total Page Views</p>
-                          <p className="text-2xl font-bold text-gray-900">{dashboardData?.analytics.totalViews || 0}</p>
+                          <p className="text-2xl font-bold text-gray-900">{analyticsData?.summary?.totalVisits?.toLocaleString() || '0'}</p>
                         </div>
                         <div className="space-y-2">
                           <p className="text-sm font-medium text-gray-600">Unique Visitors</p>
-                          <p className="text-2xl font-bold text-gray-900">{dashboardData?.analytics.uniqueVisitors || 0}</p>
+                          <p className="text-2xl font-bold text-gray-900">{analyticsData?.summary?.uniqueVisitors?.toLocaleString() || '0'}</p>
                         </div>
                       </div>
                     </div>
@@ -330,27 +333,29 @@ export default function AdminDashboard() {
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <h2 className="text-lg font-semibold text-gray-900">Projects</h2>
-                    <p className="text-sm text-gray-600">Manage your portfolio projects</p>
+                    <h2 className="text-lg font-semibold text-gray-900">GitHub Repositories</h2>
+                    <p className="text-sm text-gray-600">Recent repositories from GitHub</p>
                   </CardHeader>
                   <CardBody>
                     <div className="space-y-4">
-                      {dashboardData?.projects?.map((project) => (
-                        <div key={project.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                          <div>
-                            <h3 className="font-medium text-gray-900">{project.name}</h3>
-                            <p className="text-sm text-gray-600">Last updated: {project.lastUpdated}</p>
+                      {dashboardData?.repositories && dashboardData.repositories.length > 0 ? (
+                        dashboardData.repositories.slice(0, 5).map((repo) => (
+                          <div key={repo.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                            <div>
+                              <h3 className="font-medium text-gray-900">{repo.name}</h3>
+                              <p className="text-sm text-gray-600">{repo.description || 'No description'}</p>
+                              <p className="text-xs text-gray-500">Updated: {new Date(repo.updated_at).toLocaleDateString()}</p>
+                            </div>
+                            <div className="text-right">
+                              <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                {repo.language || 'Unknown'}
+                              </span>
+                              <p className="text-xs text-gray-500 mt-1">⭐ {repo.stargazers_count}</p>
+                            </div>
                           </div>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            project.status === 'active' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {project.status}
-                          </span>
-                        </div>
-                      )) || (
-                        <p className="text-gray-600">No projects found</p>
+                        ))
+                      ) : (
+                        <p className="text-gray-600">No repositories found</p>
                       )}
                     </div>
                   </CardBody>
@@ -362,31 +367,54 @@ export default function AdminDashboard() {
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <h2 className="text-lg font-semibold text-gray-900">System Logs</h2>
-                    <p className="text-sm text-gray-600">Recent system activity and logs</p>
+                    <h2 className="text-lg font-semibold text-gray-900">System Health</h2>
+                    <p className="text-sm text-gray-600">Current system status and health metrics</p>
                   </CardHeader>
                   <CardBody>
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {dashboardData?.logs?.map((log) => (
-                        <div key={log.id} className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            log.level === 'error' 
-                              ? 'bg-red-100 text-red-800' 
-                              : log.level === 'warning' 
-                              ? 'bg-yellow-100 text-yellow-800' 
-                              : 'bg-blue-100 text-blue-800'
-                          }`}>
-                            {log.level}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-900">{log.message}</p>
-                            <p className="text-xs text-gray-600">{log.timestamp}</p>
+                    {systemHealth ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-4 bg-gray-50 rounded-lg">
+                            <p className="text-sm font-medium text-gray-600 mb-2">System Status</p>
+                            <p className={`text-xl font-semibold ${
+                              systemHealth.status === 'healthy' ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {systemHealth.status?.toUpperCase() || 'UNKNOWN'}
+                            </p>
+                          </div>
+                          <div className="p-4 bg-gray-50 rounded-lg">
+                            <p className="text-sm font-medium text-gray-600 mb-2">Uptime</p>
+                            <p className="text-xl font-semibold text-gray-900">{systemHealth.uptime || 'N/A'}</p>
+                          </div>
+                          <div className="p-4 bg-gray-50 rounded-lg">
+                            <p className="text-sm font-medium text-gray-600 mb-2">Memory Usage</p>
+                            <p className="text-xl font-semibold text-gray-900">
+                              {systemHealth.memory ? 
+                                `${Math.round(systemHealth.memory.used / 1024 / 1024)} MB / ${Math.round(systemHealth.memory.total / 1024 / 1024)} MB` 
+                                : 'N/A'
+                              }
+                            </p>
+                          </div>
+                          <div className="p-4 bg-gray-50 rounded-lg">
+                            <p className="text-sm font-medium text-gray-600 mb-2">Database Status</p>
+                            <p className={`text-xl font-semibold ${
+                              systemHealth.database?.connected ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {systemHealth.database?.connected ? 'CONNECTED' : 'DISCONNECTED'}
+                            </p>
                           </div>
                         </div>
-                      )) || (
-                        <p className="text-gray-600">No logs available</p>
-                      )}
-                    </div>
+                        {systemHealth.lastUpdated && (
+                          <div className="text-center text-sm text-gray-500">
+                            Last updated: {new Date(systemHealth.lastUpdated).toLocaleString()}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500">Loading system health data...</p>
+                      </div>
+                    )}
                   </CardBody>
                 </Card>
               </div>

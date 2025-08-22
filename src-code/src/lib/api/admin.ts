@@ -62,6 +62,7 @@ export interface SystemHealth {
   status: string;
   uptime: number;
   timestamp: string;
+  lastUpdated?: string;
   memory?: {
     used: number;
     total: number;
@@ -73,6 +74,7 @@ export interface SystemHealth {
   database?: {
     status: string;
     responseTime: number;
+    connected: boolean;
   };
 }
 
@@ -80,6 +82,8 @@ export interface AnalyticsData {
   summary: {
     totalVisits: number;
     uniqueVisitors: number;
+    bounceRate: number;
+    avgSessionDuration: number;
     topPages: Array<{ page: string; visits: number }>;
     dailyStats: {
       today: number;
@@ -163,6 +167,10 @@ class AdminApiService {
     this.adminKey = null;
   }
 
+  clearAuth(): void {
+    this.adminKey = null;
+  }
+
   // Get headers with admin authentication
   private getAuthHeaders(): Record<string, string> {
     if (!this.adminKey) {
@@ -184,6 +192,7 @@ class AdminApiService {
         this.setAdminKey(adminKey);
       }
       
+      console.log('Admin auth response:', response.data);
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -193,18 +202,9 @@ class AdminApiService {
   // Dashboard Data
   async getDashboardData(): Promise<DashboardData> {
     try {
-      const response = await apiClient.get<DashboardData>('/admin/all', undefined);
-      // Add auth headers manually since apiClient doesn't support custom headers in get method
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/all`, {
-        headers: this.getAuthHeaders(),
-      });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const data = await authResponse.json();
-      return data.data;
+      // Use apiClient with auth headers
+      const response = await apiClient.get<DashboardData>('/admin/all', undefined, this.getAuthHeaders());
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -213,8 +213,23 @@ class AdminApiService {
   // System Health
   async getSystemHealth(): Promise<SystemHealth> {
     try {
-      const response = await apiClient.get<SystemHealth>('/health');
-      return response.data;
+      const response = await apiClient.get<any>('/admin/system', undefined, this.getAuthHeaders());
+      
+      if (response.data.success && response.data.data) {
+        // Transform backend response to match SystemHealth interface
+        return {
+          status: 'healthy',
+          uptime: response.data.data.uptime || 0,
+          timestamp: new Date().toISOString(),
+          memory: response.data.data.memory ? {
+            used: parseInt(response.data.data.memory.heapUsed?.replace(' MB', '') || '0'),
+            total: parseInt(response.data.data.memory.rss?.replace(' MB', '') || '0'),
+            percentage: Math.round((parseInt(response.data.data.memory.heapUsed?.replace(' MB', '') || '0') / parseInt(response.data.data.memory.rss?.replace(' MB', '') || '1')) * 100)
+          } : undefined
+        };
+      }
+      
+      throw new Error('Invalid response format');
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -223,16 +238,8 @@ class AdminApiService {
   // Analytics Data
   async getAnalyticsData(): Promise<AnalyticsData> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/analytics`, {
-        headers: this.getAuthHeaders(),
-      });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const data = await authResponse.json();
-      return data.data;
+      const response = await apiClient.get<any>('/admin/analytics', undefined, this.getAuthHeaders());
+      return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -241,20 +248,11 @@ class AdminApiService {
   // Refresh Data
   async refreshData(): Promise<{ success: boolean; message: string }> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...this.getAuthHeaders(),
-        },
+      const response = await apiClient.post<any>('/admin/refresh', undefined, {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
       });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const data = await authResponse.json();
-      return data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -263,16 +261,8 @@ class AdminApiService {
   // Get System Information
   async getSystemInfo(): Promise<SystemInfo> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/system`, {
-        headers: this.getAuthHeaders(),
-      });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const data = await authResponse.json();
-      return data.data;
+      const response = await apiClient.get<any>('/admin/system', undefined, this.getAuthHeaders());
+      return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -281,20 +271,10 @@ class AdminApiService {
   // Create Log Entry
   async createLog(logData: Omit<LogEntry, 'id'>): Promise<LogEntry> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/logs`, {
-        method: 'POST',
-        headers: {
-          ...this.getAuthHeaders(),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(logData),
+      const response = await apiClient.post<LogEntry>('/admin/logs', logData, {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
       });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const response = await authResponse.json();
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -304,20 +284,10 @@ class AdminApiService {
   // Update Log Entry
   async updateLog(id: string, logData: Partial<LogEntry>): Promise<LogEntry> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/logs/${id}`, {
-        method: 'PUT',
-        headers: {
-          ...this.getAuthHeaders(),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(logData),
+      const response = await apiClient.put<LogEntry>(`/admin/logs/${id}`, logData, {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
       });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const response = await authResponse.json();
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -327,14 +297,7 @@ class AdminApiService {
   // Delete Log Entry
   async deleteLog(id: string): Promise<void> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/logs/${id}`, {
-        method: 'DELETE',
-        headers: this.getAuthHeaders(),
-      });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
+      await apiClient.delete(`/admin/logs/${id}`, this.getAuthHeaders());
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -343,20 +306,10 @@ class AdminApiService {
   // Create System Config
   async createConfig(configData: any): Promise<any> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/config`, {
-        method: 'POST',
-        headers: {
-          ...this.getAuthHeaders(),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(configData),
+      const response = await apiClient.post<any>('/admin/config', configData, {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
       });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const response = await authResponse.json();
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -366,20 +319,11 @@ class AdminApiService {
   // Update System Config
   async updateConfig(id: string, configData: any): Promise<any> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/config/${id}`, {
-        method: 'PUT',
-        headers: {
-          ...this.getAuthHeaders(),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(configData),
+      const response = await apiClient.put<any>(`/admin/config/${id}`, configData, {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
       });
       
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const response = await authResponse.json();
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -389,14 +333,7 @@ class AdminApiService {
   // Delete System Config
   async deleteConfig(id: string): Promise<void> {
     try {
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/config/${id}`, {
-        method: 'DELETE',
-        headers: this.getAuthHeaders(),
-      });
-      
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
+      await apiClient.delete(`/admin/config/${id}`, this.getAuthHeaders());
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -417,26 +354,20 @@ class AdminApiService {
       if (params?.level && params.level !== 'all') queryParams.append('level', params.level);
       if (params?.search) queryParams.append('search', params.search);
       
-      const url = `/api/admin/logs${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}${url}`, {
-        headers: this.getAuthHeaders(),
-      });
+      const url = `/admin/logs${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      const apiResponse = await apiClient.get<LogsResponse>(url, undefined, this.getAuthHeaders());
       
-      if (!authResponse.ok) {
-        throw new Error(`HTTP ${authResponse.status}: ${authResponse.statusText}`);
-      }
-      
-      const response = await authResponse.json();
+      const response = apiResponse;
       
       // Transform backend response to match expected LogsResponse format
       if (response.success && response.data) {
         const logs = Array.isArray(response.data.logs) 
-          ? response.data.logs.map((log: string, index: number) => ({
-              id: `log-${index}`,
-              timestamp: new Date().toISOString(),
-              level: 'info' as const,
-              message: log,
-              source: response.data.file || 'system'
+          ? response.data.logs.map((log: any) => ({
+              id: log.id || `log-${Math.random().toString(36).substring(2, 9)}`,
+              timestamp: log.timestamp || new Date().toISOString(),
+              level: log.level || 'info' as const,
+              message: log.message || '',
+              source: log.source || response.data?.logs || 'system'
             }))
           : [];
         

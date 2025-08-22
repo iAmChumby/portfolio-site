@@ -16,6 +16,18 @@ interface EditableItem {
   isEditing: boolean
 }
 
+interface FormData {
+  title?: string
+  name?: string
+  status?: string
+  level?: string
+  description?: string
+  message?: string
+  source?: string
+  meta?: Record<string, any>
+  [key: string]: any
+}
+
 export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps) {
   const [items, setItems] = useState<EditableItem[]>([])
   const [loading, setLoading] = useState(false)
@@ -139,7 +151,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
   }
 
   const renderItemForm = (item?: EditableItem) => {
-    const [formData, setFormData] = useState(item?.data || {})
+    const [formData, setFormData] = useState<FormData>(item?.data || {})
     
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault()
@@ -160,7 +172,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
             <input
               type="text"
               value={formData.title || formData.name || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value, name: e.target.value }))}
+              onChange={(e) => setFormData((prev: FormData) => ({...prev, title: e.target.value, name: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               required
             />
@@ -172,7 +184,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
             </label>
             <select
               value={formData.status || formData.level || 'info'}
-              onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value, level: e.target.value }))}
+              onChange={(e) => setFormData((prev: FormData) => ({ ...prev, status: e.target.value, level: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="info">Info</option>
@@ -189,7 +201,7 @@ export default function AdminDataManager({ onDataUpdate }: AdminDataManagerProps
           </label>
           <textarea
             value={formData.description || formData.message || ''}
-            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value, message: e.target.value }))}
+            onChange={(e) => setFormData((prev: FormData) => ({ ...prev, description: e.target.value, message: e.target.value }))}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             required

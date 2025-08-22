@@ -89,6 +89,7 @@ describe('ApiClient', () => {
     });
 
     it('should handle HTTP errors without JSON response', async () => {
+      jest.useRealTimers();
       const mockResponse = {
         ok: false,
         status: 500,
@@ -102,7 +103,8 @@ describe('ApiClient', () => {
         code: 'HTTP_ERROR',
         status: 500,
       });
-    });
+      jest.useFakeTimers();
+    }, 15000);
 
     it('should handle network errors', async () => {
       mockFetch.mockRejectedValue(new Error('Network error'));
@@ -111,24 +113,33 @@ describe('ApiClient', () => {
     });
 
     it('should handle timeout', async () => {
-      mockFetch.mockImplementation(() => 
-        new Promise((resolve) => {
-          setTimeout(() => resolve({
-            ok: true,
-            json: () => Promise.resolve({ data: 'test' })
-          } as unknown as Response), 15000);
-        })
-      );
+      jest.useRealTimers();
+      
+      // Create a client with a very short timeout for testing
+      const timeoutClient = new ApiClient({ timeout: 100 });
+      
+      // Mock fetch to simulate a request that respects AbortController
+      mockFetch.mockImplementation((url, options) => {
+        return new Promise((resolve, reject) => {
+          const signal = options?.signal;
+          if (signal) {
+            signal.addEventListener('abort', () => {
+              const abortError = new Error('The operation was aborted');
+              abortError.name = 'AbortError';
+              reject(abortError);
+            });
+          }
+          // Never resolve to simulate hanging request
+        });
+      });
 
-      const requestPromise = client.get('/test');
+      await expect(timeoutClient.get('/test')).rejects.toThrow('Request timeout');
       
-      // Fast-forward time to trigger timeout
-      jest.advanceTimersByTime(10000);
-      
-      await expect(requestPromise).rejects.toThrow('Request timeout');
-    });
+      jest.useFakeTimers();
+    }, 10000);
 
     it('should retry on retryable errors', async () => {
+      jest.useRealTimers();
       const errorResponse = {
         ok: false,
         status: 500,
@@ -148,7 +159,8 @@ describe('ApiClient', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(result).toEqual({ data: 'success' });
-    }, 10000);
+      jest.useFakeTimers();
+    }, 15000);
 
     it('should not retry on non-retryable errors', async () => {
       const errorResponse = {
@@ -167,6 +179,7 @@ describe('ApiClient', () => {
     });
 
     it('should respect retry limit', async () => {
+      jest.useRealTimers();
       const errorResponse = {
         ok: false,
         status: 500,
@@ -180,7 +193,8 @@ describe('ApiClient', () => {
       });
 
       expect(mockFetch).toHaveBeenCalledTimes(3); // Initial + 2 retries
-    }, 10000);
+      jest.useFakeTimers();
+    }, 15000);
   });
 
   describe('HTTP methods', () => {
@@ -325,6 +339,7 @@ describe('ApiClient', () => {
     });
 
     it('should handle retry logic for timeout errors', async () => {
+      jest.useRealTimers();
       mockFetch
         .mockRejectedValueOnce(new Error('timeout'))
         .mockResolvedValueOnce({
@@ -336,7 +351,8 @@ describe('ApiClient', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(result).toEqual({ data: 'success' });
-    }, 10000);
+      jest.useFakeTimers();
+    }, 15000);
   });
 });
 

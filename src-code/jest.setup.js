@@ -38,19 +38,20 @@ Object.defineProperty(window, 'scrollTo', {
 })
 
 // Suppress console errors during tests (optional)
-const originalError = console.error
-beforeAll(() => {
-  console.error = (...args) => {
-    if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render is no longer supported')
-    ) {
-      return
-    }
-    originalError.call(console, ...args)
-  }
-})
+// Note: Commented out to allow jest spies on console.error to work properly
+// const originalError = console.error
+// beforeAll(() => {
+//   console.error = (...args) => {
+//     if (
+//       typeof args[0] === 'string' &&
+//       args[0].includes('Warning: ReactDOM.render is no longer supported')
+//     ) {
+//       return
+//     }
+//     originalError.call(console, ...args)
+//   }
+// })
 
-afterAll(() => {
-  console.error = originalError
-})
+// afterAll(() => {
+//   console.error = originalError
+// })

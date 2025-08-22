@@ -67,7 +67,7 @@ The backend is deployed on a self-managed VPS, containerized with Docker, revers
 - Environment variables loaded from `.env`.
 - Container bound to `127.0.0.1:8000` (not exposed publicly).
 - Health check:
-  - Queries `http://localhost:8000/api/health`.
+  - Queries `https://api.lukeedwards.me/api/health`.
   - Retries until healthy.
 - If health fails:
   - Container is stopped.

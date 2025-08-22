@@ -67,13 +67,11 @@ class Database {
   // User data methods
   async getUser () {
     const db = await this.getDb()
-    await db.read()
     return db.data.user
   }
 
   async setUser (userData) {
     const db = await this.getDb()
-    await db.read()
     db.data.user = userData
     db.data.lastUpdated = new Date().toISOString()
     await db.write()
@@ -83,13 +81,11 @@ class Database {
   // Repository methods
   async getRepositories () {
     const db = await this.getDb()
-    await db.read()
     return db.data.repositories
   }
 
   async setRepositories (repositories) {
     const db = await this.getDb()
-    await db.read()
     db.data.repositories = repositories
     db.data.lastUpdated = new Date().toISOString()
     await db.write()
@@ -99,13 +95,11 @@ class Database {
   // Languages methods
   async getLanguages () {
     const db = await this.getDb()
-    await db.read()
     return db.data.languages
   }
 
   async setLanguages (languages) {
     const db = await this.getDb()
-    await db.read()
     db.data.languages = languages
     db.data.lastUpdated = new Date().toISOString()
     await db.write()
@@ -115,13 +109,11 @@ class Database {
   // Activity methods
   async getActivity () {
     const db = await this.getDb()
-    await db.read()
     return db.data.activity
   }
 
   async setActivity (activity) {
     const db = await this.getDb()
-    await db.read()
     db.data.activity = activity
     db.data.lastUpdated = new Date().toISOString()
     await db.write()
@@ -131,13 +123,11 @@ class Database {
   // Workflows methods
   async getWorkflows () {
     const db = await this.getDb()
-    await db.read()
     return db.data.workflows
   }
 
   async setWorkflows (workflows) {
     const db = await this.getDb()
-    await db.read()
     db.data.workflows = workflows
     db.data.lastUpdated = new Date().toISOString()
     await db.write()
@@ -147,13 +137,11 @@ class Database {
   // Stats methods
   async getStats () {
     const db = await this.getDb()
-    await db.read()
     return db.data.stats
   }
 
   async setStats (stats) {
     const db = await this.getDb()
-    await db.read()
     db.data.stats = { ...db.data.stats, ...stats }
     db.data.lastUpdated = new Date().toISOString()
     await db.write()
@@ -163,13 +151,11 @@ class Database {
   // Utility methods
   async getLastUpdated () {
     const db = await this.getDb()
-    await db.read()
     return db.data.lastUpdated
   }
 
   async getAllData () {
     const db = await this.getDb()
-    await db.read()
     return db.data
   }
 }

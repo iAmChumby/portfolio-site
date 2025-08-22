@@ -110,15 +110,17 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Right Column - CTA Button */}
           <div className="flex justify-end flex-1">
-            <Button 
-              variant="cta" 
-              size="md"
-              responsive={true}
-              touchOptimized={true}
-              className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap"
-            >
-              Get In Touch
-            </Button>
+            <Link href="/contact">
+              <Button 
+                variant="cta" 
+                size="md"
+                responsive={true}
+                touchOptimized={true}
+                className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap"
+              >
+                Get In Touch
+              </Button>
+            </Link>
           </div>
           </div>
         </div>
@@ -185,16 +187,18 @@ const Header: React.FC<HeaderProps> = ({
                   </Link>
                 ))}
                 <div className="px-4 py-3 flex items-center justify-center border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
-                  <Button 
-                    variant="cta" 
-                    size="lg"
-                    mobileFullWidth={true}
-                    responsive={true}
-                    touchOptimized={true}
-                    className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 min-h-[48px]"
-                  >
-                    Get In Touch
-                  </Button>
+                  <Link href="/contact">
+                    <Button 
+                      variant="cta" 
+                      size="lg"
+                      mobileFullWidth={true}
+                      responsive={true}
+                      touchOptimized={true}
+                      className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 min-h-[48px]"
+                    >
+                      Get In Touch
+                    </Button>
+                  </Link>
                 </div>
               </div>
           </div>

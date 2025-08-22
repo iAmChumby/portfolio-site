@@ -34,8 +34,8 @@ export interface ProjectItem {
   description: string;
   image: string;
   technologies: string[];
-  liveUrl: string;
-  githubUrl: string;
+  demo: string;
+  code: string;
 }
 
 export interface ProjectsContent {
@@ -57,10 +57,7 @@ export interface FormField {
   required: boolean;
 }
 
-export interface ContactInfo {
-  label: string;
-  icon: string;
-}
+
 
 export interface ContactContent {
   title: string;

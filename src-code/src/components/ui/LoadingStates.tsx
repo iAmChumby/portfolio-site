@@ -11,20 +11,26 @@ export function TextSkeleton({
   lines?: number
   className?: string 
 }) {
+  // Pre-generate skeleton elements to avoid Array.from overhead
+  const skeletonElements = []
+  for (let i = 0; i < lines; i++) {
+    skeletonElements.push(
+      <motion.div
+        key={i}
+        className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
+        style={{
+          width: i === lines - 1 ? '75%' : '100%'
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: i * 0.1 }}
+      />
+    )
+  }
+  
   return (
     <div className={`space-y-3 ${className}`}>
-      {Array.from({ length: lines }).map((_, i) => (
-        <motion.div
-          key={i}
-          className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
-          style={{
-            width: i === lines - 1 ? '75%' : '100%'
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: i * 0.1 }}
-        />
-      ))}
+      {skeletonElements}
     </div>
   )
 }
@@ -37,27 +43,33 @@ export function CardSkeleton({
   count?: number
   className?: string 
 }) {
+  // Pre-generate card elements to avoid Array.from overhead
+  const cardElements = []
+  for (let i = 0; i < count; i++) {
+    cardElements.push(
+      <motion.div
+        key={i}
+        className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: i * 0.1 }}
+      >
+        <div className="animate-pulse">
+          <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4" />
+          <div className="flex space-x-2">
+            <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+            <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
+  
   return (
     <div className={`grid gap-6 md:grid-cols-2 lg:grid-cols-3 ${className}`}>
-      {Array.from({ length: count }).map((_, i) => (
-        <motion.div
-          key={i}
-          className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1 }}
-        >
-          <div className="animate-pulse">
-            <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4" />
-            <div className="flex space-x-2">
-              <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
-              <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
-            </div>
-          </div>
-        </motion.div>
-      ))}
+      {cardElements}
     </div>
   )
 }

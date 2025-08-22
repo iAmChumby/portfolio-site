@@ -3,7 +3,6 @@
 import { motion, AnimatePresence, MotionConfig, cubicBezier } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useState, useEffect } from 'react'
-import type { LenisInstance } from '@/types/lenis'
 
 interface PageTransitionProps {
   children: ReactNode
@@ -15,6 +14,9 @@ const useLocalReducedMotion = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
+    // Check if window is available (SSR safety)
+    if (typeof window === 'undefined') return
+    
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     setPrefersReducedMotion(mediaQuery.matches)
 
@@ -96,11 +98,14 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
   // Enhanced scroll to top with Lenis integration
   const scrollToTop = () => {
+    // Check if window is available (SSR safety)
+    if (typeof window === 'undefined') return
+    
     // Use Lenis if available for smoother scrolling
-    const lenis = window.lenis
+    const lenis = (window as { lenis?: { scrollTo?: (position: number, options?: { duration?: number; easing?: (t: number) => number }) => void } }).lenis
     if (lenis && typeof lenis.scrollTo === 'function') {
       lenis.scrollTo(0, { duration: 0.8, easing: (t: number) => 1 - Math.pow(1 - t, 3) })
-    } else if ('scrollBehavior' in document.documentElement.style) {
+    } else if (typeof document !== 'undefined' && 'scrollBehavior' in document.documentElement.style) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
       window.scrollTo(0, 0)
@@ -110,18 +115,22 @@ export default function PageTransition({ children }: PageTransitionProps) {
   // Stop Lenis during page transitions to prevent conflicts
   const handleTransitionStart = () => {
     setIsTransitioning(true)
-    const lenis = window.lenis
-    if (lenis && typeof lenis.stop === 'function') {
-      lenis.stop()
+    if (typeof window !== 'undefined') {
+      const lenis = (window as { lenis?: { stop?: () => void } }).lenis
+      if (lenis && typeof lenis.stop === 'function') {
+        lenis.stop()
+      }
     }
   }
 
   const handleTransitionComplete = () => {
     setIsTransitioning(false)
-    const lenis = window.lenis
-    if (lenis && typeof lenis.start === 'function') {
-      // Small delay to ensure smooth transition
-      setTimeout(() => lenis.start(), 100)
+    if (typeof window !== 'undefined') {
+      const lenis = (window as { lenis?: { start?: () => void } }).lenis
+      if (lenis && typeof lenis.start === 'function') {
+        // Small delay to ensure smooth transition
+        setTimeout(() => lenis.start?.(), 100)
+      }
     }
   }
 

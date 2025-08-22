@@ -69,14 +69,24 @@ export default function Projects() {
                     </div>
                     
                     <div className="flex gap-3">
-                      <button className="flex items-center gap-2 px-4 py-2 bg-accent/20 text-accent border border-accent/30 rounded-lg text-sm font-medium hover:bg-accent hover:text-white transition-all duration-300">
-                        <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                        Live Demo
-                      </button>
-                      <button className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg text-sm font-medium hover:bg-white/20 hover:border-white/40 transition-all duration-300">
-                        <CodeBracketIcon className="w-4 h-4" />
-                        Code
-                      </button>
+                      {project.demo && project.demo !== '#' && (
+                        <button 
+                          onClick={() => window.open(project.demo, '_blank')}
+                          className="flex items-center gap-2 px-4 py-2 bg-accent/20 text-accent border border-accent/30 rounded-lg text-sm font-medium hover:bg-accent hover:text-white transition-all duration-300"
+                        >
+                          <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                          Live Demo
+                        </button>
+                      )}
+                      {project.code && project.code !== '#' && (
+                        <button 
+                          onClick={() => window.open(project.code, '_blank')}
+                          className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg text-sm font-medium hover:bg-white/20 hover:border-white/40 transition-all duration-300"
+                        >
+                          <CodeBracketIcon className="w-4 h-4" />
+                          Code
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

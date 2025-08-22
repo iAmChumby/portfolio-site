@@ -3,12 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { getHeroContent, getSiteConfig } from '@/lib/content-loader';
+import { getHeroContent } from '@/lib/content-loader';
 
 
 export default function Hero() {
   const heroContent = getHeroContent();
-  const siteConfig = getSiteConfig();
   
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden">

@@ -25,8 +25,6 @@ export default function Contact() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Handle form submission
-      console.log('Form submitted:', formData);
-      
       setFormStatus('success');
       setStatusMessage('Thank you! Your message has been sent successfully.');
       

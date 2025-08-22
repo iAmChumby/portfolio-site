@@ -75,8 +75,8 @@
     "description": "A Model Context Protocol (MCP) server with an integrated FastAPI backend for managing requests and API endpoints. It enables LLMs to analyze and extract structured data from PDFs, including metadata parsing, text and image extraction, and OCR for scanned documents. Built in two variants: pdf-y (full-featured) and pdf-y-lite (lightweight, optimized). This keeps in mind that many LLM's have 40-tool limits for their MCP server support, allowing users to keep their favorite servers active. Includes comprehensive Pytest suites for reliability and can be easily deployed in Docker containers for portability and scalability.",
     "image": "/images/pdfy.jpg",
     "technologies": ["Python", "MCP", "Docker", "FastAPI", "Pytest", "Tesseract OCR"],
-    "liveUrl": "#",
-    "githubUrl": "https://github.com/iAmChumby/pdf-y"
+    "demo": "#",
+    "code": "https://github.com/iAmChumby/pdf-y"
   },
   {
     "id": 1,
@@ -84,8 +84,8 @@
     "description": "A modern audio metadata and cover art management application, built as a cross-platform desktop solution. Developed with Electron for the desktop shell and packaged with Electron Builder for deployment, the app combines a Node.js backend for efficient file operations with a React frontend that offers extensive customization. Users can tailor the interface and manage metadata seamlessly, delivering both flexibility and a clean, intuitive experience.",
     "image": "/images/metamanager.png",
     "technologies": ["Electron", "TypeScript", "JavaScript", "Node.js", "React"],
-    "liveUrl": "#",
-    "githubUrl": "https://github.com/iAmChumby/metager"
+    "demo": "#",
+    "code": "https://github.com/iAmChumby/metager"
   },
   {
     "id": 7,
@@ -93,8 +93,8 @@
     "description": "A full Java implementation of the classic Rush Hour sliding block puzzle, developed across three iterative phases. The project began with a command-line version of the game, including input parsing, move validation, and exception handling. In the second phase, the system was expanded with a JavaFX graphical interface, an observer pattern for real-time updates, and interactive move feedback. The final phase introduced a backtracking solver that could automatically compute solutions, integrated into both the CLI and GUI. Throughout development, the team employed version control, pair programming, and JUnit testing to ensure maintainability and reliability.",
     "image": "/images/rushhour.png",
     "technologies": ["Java", "JavaFX", "JUnit", "Object-Oriented Design", "Backtracking Algorithms"],
-    "liveUrl": "#",
-    "githubUrl": "https://github.com/iAmChumby/gcis124-rushhour-final"
+    "demo": "#",
+    "code": "https://github.com/iAmChumby/gcis124-rushhour-final"
   },
   {
     "id": 8,
@@ -102,8 +102,8 @@
     "description": "A full-stack web application designed to help animal shelters manage and fund the needs of animals awaiting adoption. Managers can create, update, and prioritize needs for specific animals, which are stored in a digital cupboard. Helpers can browse, add items to a basket, and fund them through a checkout system. The backend, built with Spring Boot and Java, manages users and needs via JSON persistence (DAO pattern), while the frontend, built with Angular and TypeScript, provides a responsive interface for managers and helpers. Development followed user stories, including listing needs, searching by name, and CRUD operations, with attention to code quality through static analysis.",
     "image": "/images/ufund.jpg",
     "technologies": ["Java", "Spring Boot", "Angular", "TypeScript", "File I/O"],
-    "liveUrl": "#",
-    "githubUrl": "#"
+    "demo": "#",
+    "code": "#"
   },
   {
     "id": 3,
@@ -111,8 +111,8 @@
     "description": "A full-stack Pokémon web application featuring an interactive quiz and a powerful search page. Users can filter Pokémon by name, color, type, generation, and other attributes for quick discovery. The project is deployed across Vercel (frontend) and PythonAnywhere (backend), with data managed in-memory through structured JSON storage.",
     "image": "/images/pokegames.png",
     "technologies": ["Python", "Flask", "React"],
-    "liveUrl": "https://poke-games-five.vercel.app/",
-    "githubUrl": "https://github.com/iAmChumby/PokeGames"
+    "demo": "https://poke-games-five.vercel.app/",
+    "code": "https://github.com/iAmChumby/PokeGames"
   },
   {
     "id": 6,
@@ -120,8 +120,8 @@
     "description": "A dark-themed web experience that explores the connection between color and music. Users start on a page with a color wheel and navigation bar; selecting a hue loads a curated album page tied to that color. Each album page features the album cover, title, artist, an overview of the record, key thematic points, and streaming links with a 30-second preview. A link to a research report explains how color influences musical perception.",
     "image": "/images/albumcolors.png",
     "technologies": ["React", "JavaScript", "Tailwind CSS", "Spotify API Integration"],
-    "liveUrl": "https://iamchumby.github.io/AlbumColors/",
-    "githubUrl": "https://github.com/iAmChumby/AlbumColors"
+    "demo": "https://iamchumby.github.io/AlbumColors/",
+    "code": "https://github.com/iAmChumby/AlbumColors"
   },
   {
     "id": 4,
@@ -129,8 +129,8 @@
     "description": "A responsive web application that converts numbers between binary, decimal, hexadecimal, and octal formats. The interface presents four input/output cards—one for each base—allowing users to enter a value in any base and immediately see the equivalent values in the other bases. Users can clear inputs, save conversions, and view a conversion history section, which stores previous conversions and lets them download the history as JSON or CSV or clear it entirely.",
     "image": "/images/converter.png",
     "technologies": ["JavaScript", "React", "Github Pages"],
-    "liveUrl": "https://iAmChumby.github.io/converter/",
-    "githubUrl": "https://github.com/iAmChumby/converter"
+    "demo": "https://iAmChumby.github.io/converter/",
+    "code": "https://github.com/iAmChumby/converter"
   },
   {
     "id": 5,
@@ -138,8 +138,8 @@
     "description": "An interactive navigation and transportation concept app designed in Figma. The project includes wireframes, storyboards, and prototypes that reimagine medieval travel with modern UX principles. Features include routing, danger reporting, telepathic connections, dragon ride ordering, and personalized user settings. The design emphasizes accessibility, intuitive menus, and a rustic visual theme inspired by modern navigation apps like Google Maps and Uber.",
     "image": "/images/medievalmaps.png",
     "technologies": ["Figma", "UI/UX Design", "Wireframing", "Prototyping"],
-    "liveUrl": "https://www.figma.com/proto/H3L2JCFVVqdM8oAIvo9PkU/Medieval-Maps?node-id=186-138&p=f&t=hkqaf05sRoLihyee-0&scaling=scale-down&content-scaling=fixed&page-id=177%3A338&starting-point-node-id=186%3A138&hotspot-hints=0&hide-ui=1",
-    "githubUrl": "#"
+    "demo": "https://www.figma.com/proto/H3L2JCFVVqdM8oAIvo9PkU/Medieval-Maps?node-id=186-138&p=f&t=hkqaf05sRoLihyee-0&scaling=scale-down&content-scaling=fixed&page-id=177%3A338&starting-point-node-id=186%3A138&hotspot-hints=0&hide-ui=1",
+    "code": "#"
   },
   {
     "id": 9,
@@ -147,8 +147,8 @@
     "description":  "A product and project management case study developed around a hypothetical disaster-response platform. The project focused on applying Agile methodologies (Scrum) to explore stakeholder needs, define user stories, and build a structured product backlog. Deliverables included estimation and scheduling artifacts, sprint planning, risk and stakeholder analysis, and conceptual models of the proposed system. While entirely abstract, the project emphasized teamwork, iterative planning, and the use of Agile practices to manage complexity in software-oriented problem solving.",
     "image": "/images/hris.jpg",
     "technologies": ["Agile Methodologies", "Scrum", "Product Backlog Management", "Sprint Planning", "Risk Analysis", "Stakeholder Mapping", "Work Breakdown Structure (WBS)"],
-    "liveUrl": "#",
-    "githubUrl": "#"
+    "demo": "#",
+    "code": "#"
   }
 
 

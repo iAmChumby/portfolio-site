@@ -1,14 +1,17 @@
 import express from 'express'
-import fs from 'fs/promises'
 import path from 'path'
+import { promises as fs } from 'fs'
+import database from '../config/database.js'
 
 const router = express.Router()
 
 // Import DataSyncJob using dynamic import since it's an ES6 module
-let DataSyncJob;
+let dataSyncJobInstance = null;
 (async () => {
   const module = await import('../jobs/dataSync.js')
-  DataSyncJob = module.default
+  const DataSyncJob = module.default
+  dataSyncJobInstance = new DataSyncJob()
+  await dataSyncJobInstance.initialize()
 })()
 
 // Admin key verification middleware
@@ -41,45 +44,10 @@ router.post('/verify', verifyAdminKey, (req, res) => {
 })
 
 // Get all data for dashboard
-router.get('/all', async (req, res) => {
+router.get('/all', verifyAdminKey, async (req, res) => {
   try {
-    const dbPath = path.join(process.cwd(), 'data/db.json')
-    
-    const data = {
-      user: null,
-      repositories: [],
-      activity: [],
-      stats: {
-        totalRepos: 0,
-        totalStars: 0,
-        totalForks: 0,
-        followers: 0
-      },
-      lastUpdated: null
-    }
-
-    try {
-      const dbContent = await fs.readFile(dbPath, 'utf8')
-      const dbData = JSON.parse(dbContent)
-      
-      data.user = dbData.user || null
-      data.repositories = dbData.repositories || []
-      data.activity = dbData.activity || []
-      data.lastUpdated = dbData.lastUpdated || null
-
-      // Calculate stats
-      if (data.repositories.length > 0) {
-        data.stats.totalRepos = data.repositories.length
-        data.stats.totalStars = data.repositories.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0)
-        data.stats.totalForks = data.repositories.reduce((sum, repo) => sum + (repo.forks_count || 0), 0)
-      }
-      
-      if (data.user) {
-        data.stats.followers = data.user.followers || 0
-      }
-    } catch (error) {
-      console.log('Database file not found or invalid, returning empty data')
-    }
+    await database.initialize()
+    const data = await database.getAllData()
 
     res.json({
       success: true,
@@ -94,25 +62,22 @@ router.get('/all', async (req, res) => {
 })
 
 // Trigger manual data refresh
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', verifyAdminKey, async (req, res) => {
   try {
-    if (!DataSyncJob) {
+    if (!dataSyncJobInstance) {
       return res.status(500).json({ 
         error: 'DataSyncJob not initialized' 
       })
     }
 
-    const dataSyncJob = new DataSyncJob()
-    await dataSyncJob.initialize()
+    if (dataSyncJobInstance.isRunning) {
+      return res.status(409).json({ 
+        error: 'Data sync is already in progress' 
+      })
+    }
     
-    // Sync user data
-    await dataSyncJob.syncUserData()
-    
-    // Sync repositories
-    await dataSyncJob.syncRepositories()
-    
-    // Sync activity
-    await dataSyncJob.syncActivity()
+    // Use the singleton instance to sync data
+    await dataSyncJobInstance.syncAllData()
 
     res.json({ 
       success: true, 
@@ -129,7 +94,7 @@ router.post('/refresh', async (req, res) => {
 })
 
 // Get system information
-router.get('/system', (req, res) => {
+router.get('/system', verifyAdminKey, (req, res) => {
   const uptime = process.uptime()
   const memoryUsage = process.memoryUsage()
   
@@ -150,7 +115,7 @@ router.get('/system', (req, res) => {
 })
 
 // Get logs (last 100 lines)
-router.get('/logs', async (req, res) => {
+router.get('/logs', verifyAdminKey, async (req, res) => {
   try {
     const logsPath = path.join(process.cwd(), 'logs')
     

@@ -47,15 +47,19 @@ export function SmoothScrollProvider({
       ...options
     })
 
-    // Animation loop
+    // Animation loop with proper cleanup
+    let rafId: number
     function raf(time: number) {
       lenisRef.current?.raf(time)
-      requestAnimationFrame(raf)
+      rafId = requestAnimationFrame(raf)
     }
-    requestAnimationFrame(raf)
+    rafId = requestAnimationFrame(raf)
 
     // Cleanup
     return () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId)
+      }
       lenisRef.current?.destroy()
       lenisRef.current = null
     }

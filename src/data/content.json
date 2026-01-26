@@ -3,7 +3,7 @@
     "greeting": "Hey there",
     "name": "Luke",
     "tagline": "Full-stack. Systems to UI.",
-    "description": "I build software that works hard—desktop apps, backend systems, and everything in between. Clean code, solid interfaces, shipped products.",
+    "description": "I build software that works hard; desktop apps, backend systems, and everything in between. Clean code, solid interfaces, and products that actually ship.",
     "buttons": [
       {
         "text": "See my work",
@@ -21,7 +21,7 @@
     "title": "About Me",
     "subtitle": "Software Engineering Student | Building functional tools that keep users safe",
     "bio": [
-      "I'm a rising fourth-year Software Engineering student at RIT, actively seeking my first co-op experience. My focus is on building reliable, secure, and performant applications with strong UI/UX foundations.",
+      "I'm a current fourth-year Software Engineering student at RIT, actively seeking my second co-op. My focus is on building solutions for problems that work for everyone.",
       "When I'm not working on a project I like to spend my time tinkering with my own technology, spending time with friends and family, playing any and every video game I can get my hands on, watching some basketball (Go Knicks!), or trying a new recipe in the kitchen.",
       "I've worked on projects spanning from desigining and deploying this website to designing entire backend systems. From project management to evaluating interface heuristics I have an expanse of knowledge that could be at your disposal."
     ],
@@ -59,7 +59,7 @@
   },
   "projects": {
     "title": "Featured Projects",
-    "subtitle": "Some of the projects I’ve built to explore systems design, security, and usability",
+    "subtitle": "Some of the projects I’ve built to explore technologies, strategies, and solutions",
     "buttons": {
       "showMore": "View All Projects",
       "showLess": "Show Less Projects",

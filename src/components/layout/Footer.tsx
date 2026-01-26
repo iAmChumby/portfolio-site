@@ -26,14 +26,14 @@ export default function Footer() {
           <div className="neu-surface p-6 sm:p-8 space-y-4 text-center md:text-left">
             <h4 className="text-lg font-semibold text-neu-text-primary">Quick Links</h4>
             <nav className="flex flex-col space-y-3">
-              {['About', 'Technologies', 'Projects', 'Contact'].map((item) => (
+              {siteConfig.site.navigation.map((item: { label: string; href: string }) => (
                 <a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
+                  key={item.href}
+                  href={item.href}
                   className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200 flex items-center justify-center md:justify-start group"
                 >
                   <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 mr-0 group-hover:mr-2 h-[2px] bg-neu-accent"></span>
-                  {item}
+                  {item.label}
                 </a>
               ))}
             </nav>

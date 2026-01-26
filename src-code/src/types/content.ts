@@ -1,14 +1,14 @@
 export interface ButtonConfig {
   text: string;
   href: string;
-  variant: 'primary' | 'outline' | 'secondary';
-  size: 'sm' | 'md' | 'lg';
+  variant: 'primary' | 'outline' | 'secondary' | 'raised';
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export interface HeroContent {
-  title: string;
+  greeting: string;
   name: string;
-  subtitle: string;
+  tagline: string;
   description: string;
   buttons: ButtonConfig[];
 }

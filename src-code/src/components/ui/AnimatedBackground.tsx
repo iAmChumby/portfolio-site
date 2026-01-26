@@ -114,7 +114,7 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
       
       // Clear with dark background for the new theme
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#0a0a0a'; // Dark background
+      ctx.fillStyle = '#0a1510'; // Neumorphic dark green background
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Set font for ASCII characters - only set once for performance
@@ -131,11 +131,11 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
         const colorElevation = (point.animatedElevation + 1.05) / 2.1;
         const clampedColorElevation = Math.max(0, Math.min(1, colorElevation));
         
-        // Dark green color scheme for the new theme
+        // Neumorphic dark green color scheme - warmer, muted tones
         const colorIntensity = clampedColorElevation;
-        const red = Math.floor(colorIntensity * 40); // Very low red for dark green
-        const green = Math.floor(colorIntensity * 180); // Primary green component
-        const blue = Math.floor(colorIntensity * 60); // Low blue for dark green
+        const red = Math.floor(15 + colorIntensity * 40); // Slightly warmer
+        const green = Math.floor(30 + colorIntensity * 130); // Muted sage green
+        const blue = Math.floor(20 + colorIntensity * 50); // Subtle depth
         
         ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
         
@@ -290,7 +290,7 @@ const AnimatedBackgroundWrapper: React.FC<AnimatedBackgroundWrapperProps> = ({
         left: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: '#0a0a0a'  // Updated background color to match theme
+        backgroundColor: '#0a1510'  // Neumorphic dark green background
       }}
     />
   );

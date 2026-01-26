@@ -22,7 +22,6 @@ interface HeaderProps {
 const defaultNavigation: NavigationItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Projects', href: '/projects' },
-  { label: 'GitHub', href: '/github' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -64,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled
-          ? 'bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:bg-black/95 dark:border-gray-800'
+          ? 'bg-[#0a1510]/95 backdrop-blur-md shadow-[8px_8px_16px_rgba(5,10,8,0.7)] border-b border-[#234d35]'
           : 'bg-transparent'
       )}
     >
@@ -76,18 +75,18 @@ const Header: React.FC<HeaderProps> = ({
           <div className="flex justify-start flex-1">
             <Link
               href="/"
-              className="flex items-center space-x-2 text-xl font-bold text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors whitespace-nowrap"
+              className="flex items-center space-x-2 text-xl font-bold text-neu-text-primary hover:text-neu-text-secondary transition-colors whitespace-nowrap"
             >
               {logo ? (
                 <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
               ) : (
-                <span>Luke Edwards Portfolio</span>
+                <span className="neu-text-gradient">Luke Edwards Portfolio</span>
               )}
             </Link>
           </div>
 
           {/* Center Column - Navigation */}
-          <nav className="flex items-center justify-center space-x-6 lg:space-x-8 px-12 lg:px-16">
+          <nav className="flex items-center justify-center space-x-4 lg:space-x-6 px-4">
             {navigation.map((item) => (
               <Link
                 key={item.href}
@@ -95,12 +94,10 @@ const Header: React.FC<HeaderProps> = ({
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 className={cn(
-                  'relative px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg border-2 border-transparent whitespace-nowrap',
-                  'hover:border-[var(--accent-light)] hover:shadow-[0_0_10px_rgba(16,185,129,0.4)] hover:text-[var(--accent-light)]',
-                  'active:border-[var(--accent-hover)] active:shadow-[0_0_15px_rgba(5,150,105,0.6)]',
+                  'relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-xl whitespace-nowrap',
                   isActiveLink(item.href)
-                    ? 'border-[var(--accent)] shadow-[0_0_8px_rgba(16,185,129,0.5)] text-[var(--accent)] bg-[var(--accent)]/5'
-                    : 'text-gray-700 dark:text-gray-300'
+                    ? 'text-neu-accent shadow-[inset_2px_2px_4px_rgba(5,10,8,0.7),inset_-2px_-2px_4px_rgba(35,77,53,0.4)] bg-[#0d1f17]'
+                    : 'text-neu-text-secondary hover:text-neu-text-primary hover:shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] hover:bg-[#132e1f]'
                 )}
               >
                 {item.label}
@@ -111,15 +108,11 @@ const Header: React.FC<HeaderProps> = ({
           {/* Right Column - CTA Button */}
           <div className="flex justify-end flex-1">
             <Link href="/contact">
-              <Button 
-                variant="cta" 
-                size="md"
-                responsive={true}
-                touchOptimized={true}
-                className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap"
+              <button 
+                className="neu-btn neu-btn-raised w-auto text-sm px-6 py-2.5"
               >
                 Get In Touch
-              </Button>
+              </button>
             </Link>
           </div>
           </div>
@@ -130,19 +123,19 @@ const Header: React.FC<HeaderProps> = ({
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 text-xl font-bold text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="flex items-center space-x-2 text-xl font-bold text-neu-text-primary hover:text-neu-text-secondary transition-colors"
           >
             {logo ? (
               <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
             ) : (
-              <span>{siteName}</span>
+              <span className="neu-text-gradient">{siteName}</span>
             )}
           </Link>
 
           {/* Mobile Menu Button */}
           <button
             onClick={toggleMenu}
-            className="md:hidden p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="md:hidden p-2 rounded-xl text-neu-text-secondary hover:text-neu-text-primary hover:shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] hover:bg-[#132e1f] transition-all"
             aria-label="Toggle menu"
           >
             <svg
@@ -167,7 +160,7 @@ const Header: React.FC<HeaderProps> = ({
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-4 pt-4 pb-6 space-y-2 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 shadow-lg">
+            <div className="px-4 pt-4 pb-6 space-y-3 bg-[#0a1510] border-t border-[#234d35] shadow-lg">
                 {navigation.map((item) => (
                   <Link
                     key={item.href}
@@ -175,29 +168,22 @@ const Header: React.FC<HeaderProps> = ({
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
                     className={cn(
-                      'block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 border-2 border-transparent',
-                      'hover:border-[var(--accent)] hover:shadow-[0_0_8px_rgba(16,185,129,0.4)] hover:text-[var(--accent)]',
-                      'active:border-[var(--accent-hover)] active:shadow-[0_0_12px_rgba(5,150,105,0.6)]',
+                      'block px-4 py-3 rounded-xl text-base font-medium transition-all duration-300',
                       isActiveLink(item.href)
-                        ? 'border-[var(--accent)] shadow-[0_0_6px_rgba(16,185,129,0.5)] text-[var(--accent)] bg-[var(--accent)]/5'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900'
+                        ? 'text-neu-accent shadow-[inset_2px_2px_4px_rgba(5,10,8,0.7),inset_-2px_-2px_4px_rgba(35,77,53,0.4)] bg-[#0d1f17]'
+                        : 'text-neu-text-secondary hover:text-neu-text-primary hover:shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] hover:bg-[#132e1f]'
                     )}
                   >
                     {item.label}
                   </Link>
                 ))}
-                <div className="px-4 py-3 flex items-center justify-center border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
-                  <Link href="/contact">
-                    <Button 
-                      variant="cta" 
-                      size="lg"
-                      mobileFullWidth={true}
-                      responsive={true}
-                      touchOptimized={true}
-                      className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 min-h-[48px]"
+                <div className="px-4 py-3 flex items-center justify-center border-t border-[#234d35] mt-4 pt-4">
+                  <Link href="/contact" className="w-full">
+                    <button 
+                      className="neu-btn neu-btn-raised w-full text-base py-3"
                     >
                       Get In Touch
-                    </Button>
+                    </button>
                   </Link>
                 </div>
               </div>

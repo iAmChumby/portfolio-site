@@ -1,21 +1,19 @@
 {
   "hero": {
-    "title": "Hi, I'm",
-    "name": "Luke Edwards",
-    "subtitle": "Software Engineer | Full-Stack & Systems Developer",
-    "description": "I build performant, secure, and user-friendly software; from peer-to-peer desktop apps to scalable backend systems. Passionate about intuitive development, clean interfaces, and bridging the gaps to make a dependable, reliable, and useful software ready to be pushed to its limits. Join me on my journey as I navigate my way through a dynamic and ever-changing industry.",
+    "greeting": "Hey there",
+    "name": "Luke",
+    "tagline": "Full-stack. Systems to UI.",
+    "description": "I build software that works hard—desktop apps, backend systems, and everything in between. Clean code, solid interfaces, shipped products.",
     "buttons": [
       {
-        "text": "View My Work",
+        "text": "See my work",
         "href": "/projects",
-        "variant": "primary",
-        "size": "lg"
+        "variant": "raised"
       },
       {
-        "text": "Get In Touch",
+        "text": "Let's chat",
         "href": "/contact",
-        "variant": "outline",
-        "size": "lg"
+        "variant": "outline"
       }
     ]
   },

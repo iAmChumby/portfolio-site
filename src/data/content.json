@@ -76,6 +76,14 @@
         "url": "https://wheredoieat.at/"
       },
       {
+        "id": 11,
+        "title": "Portfolio Site (2025)",
+        "description": "My personal developer portfolio featuring a custom neumorphic dark green design system, smooth animations with Framer Motion, and interactive elements like swipe-to-contact gestures. Built with Next.js 16 and TypeScript, it includes a dynamic 'Now' page pulling live data, SEO optimization with OpenGraph tags, and a glassmorphism UI aesthetic. Deployed on Vercel with analytics integration.",
+        "image": "/images/portfolio-site.png",
+        "technologies": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Vercel", "DNS Management", "CI/CD", "GitHub Actions", "SEO"],
+        "url": "https://lukeedwards.me"
+      },
+      {
     "id": 2,
     "title": "PDF-y & PDF-y Lite (2025)",
     "description": "A Model Context Protocol (MCP) server with an integrated FastAPI backend for managing requests and API endpoints. It enables LLMs to analyze and extract structured data from PDFs, including metadata parsing, text and image extraction, and OCR for scanned documents. Built in two variants: pdf-y (full-featured) and pdf-y-lite (lightweight, optimized). This keeps in mind that many LLM's have 40-tool limits for their MCP server support, allowing users to keep their favorite servers active. Includes comprehensive Pytest suites for reliability and can be easily deployed in Docker containers for portability and scalability.",

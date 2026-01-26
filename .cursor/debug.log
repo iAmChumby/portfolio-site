@@ -47,3 +47,4 @@
 {"location":"redis.ts:12","message":"getRedisClient called","data":{"hasExistingClient":true},"timestamp":1769410004226,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
 {"location":"LikeButton.tsx:89","message":"Toggle like response received","data":{"postId":"post-001","status":200,"statusText":"OK","ok":true},"timestamp":1769410004634,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
 {"location":"LikeButton.tsx:95","message":"Toggle like success","data":{"postId":"post-001","liked":false,"count":0},"timestamp":1769410004635,"sessionId":"debug-session","runId":"run1","hypothesisId":"D"}
+{"location":"LikeButton.tsx:119","message":"LikeButton returning null - no fingerprint","data":{"postId":"post-001"},"timestamp":1769411363318,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}

@@ -24,30 +24,6 @@ export default function LikeButton({
   const [error, setError] = useState<string | null>(null);
   const [fingerprint, setFingerprint] = useState<string | null>(null);
 
-  // Get fingerprint on mount
-  useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/328294ec-665f-4097-afcf-9ff5c7a99673',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LikeButton.tsx:28',message:'Fingerprint mount effect started',data:{postId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
-    try {
-      const fp = getFingerprint();
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/328294ec-665f-4097-afcf-9ff5c7a99673',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LikeButton.tsx:31',message:'Fingerprint generated',data:{fingerprint:fp,postId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
-      setFingerprint(fp);
-      // Fetch initial state if fingerprint is available
-      if (fp) {
-        fetchLikes(fp);
-      }
-    } catch (err) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/328294ec-665f-4097-afcf-9ff5c7a99673',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LikeButton.tsx:37',message:'Fingerprint generation failed',data:{error:err instanceof Error?err.message:String(err),postId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
-      console.error('Failed to get fingerprint:', err);
-      setError('Unable to identify browser');
-    }
-  }, []);
-
   // Fetch current like state
   const fetchLikes = useCallback(async (fp: string) => {
     // #region agent log
@@ -83,6 +59,30 @@ export default function LikeButton({
       // Don't set error for initial fetch, just use defaults
     }
   }, [postId]);
+
+  // Get fingerprint on mount
+  useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/328294ec-665f-4097-afcf-9ff5c7a99673',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LikeButton.tsx:28',message:'Fingerprint mount effect started',data:{postId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    try {
+      const fp = getFingerprint();
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/328294ec-665f-4097-afcf-9ff5c7a99673',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LikeButton.tsx:31',message:'Fingerprint generated',data:{fingerprint:fp,postId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
+      setFingerprint(fp);
+      // Fetch initial state if fingerprint is available
+      if (fp) {
+        fetchLikes(fp);
+      }
+    } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/328294ec-665f-4097-afcf-9ff5c7a99673',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LikeButton.tsx:37',message:'Fingerprint generation failed',data:{error:err instanceof Error?err.message:String(err),postId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
+      console.error('Failed to get fingerprint:', err);
+      setError('Unable to identify browser');
+    }
+  }, [postId, fetchLikes]);
 
   // Toggle like with optimistic updates
   const toggleLike = useCallback(async () => {

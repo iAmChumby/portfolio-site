@@ -87,6 +87,15 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
               </p>
 
               <div className="flex gap-2 sm:gap-3">
+                  {project.url && project.url !== '#' && (
+                      <button 
+                          onClick={() => window.open(project.url, '_blank')}
+                          className="flex-1 flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#4ade80] text-black font-semibold rounded-lg hover:bg-[#22c55e] transition-colors text-xs sm:text-sm"
+                      >
+                      <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      Visit App
+                      </button>
+                  )}
                   {project.demo && project.demo !== '#' && (
                       <button 
                           onClick={() => window.open(project.demo, '_blank')}

@@ -20,9 +20,15 @@ interface GraphNode {
   fy?: number | null;
 }
 
+interface GraphLinkInput {
+  source: string | number;
+  target: string | number;
+  type: string;
+}
+
 interface GraphLink {
-  source: string | number | GraphNode;
-  target: string | number | GraphNode;
+  source: GraphNode;
+  target: GraphNode;
   type: string;
 }
 
@@ -34,15 +40,14 @@ interface ProjectGraphProps {
 export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const simulationRef = useRef<any>(null);
+  const simulationRef = useRef<d3Force.Simulation<GraphNode, GraphLink> | null>(null);
   const zoomBehaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
-  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Convert projects data to react-d3-graph format
   const graphData = useMemo(() => {
     const nodes: GraphNode[] = [];
-    const links: GraphLink[] = [];
+    const links: GraphLinkInput[] = [];
     const addedTechs = new Set<string>();
 
     projects.forEach(project => {
@@ -111,11 +116,13 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
     const zoomContainer = svg.append('g').attr('class', 'zoom-container');
 
     // Create simulation
-    const simulation = d3Force.forceSimulation(graphData.nodes as any)
-      .force('link', d3Force.forceLink(graphData.links).id((d: any) => d.id).distance(120))
+    // Note: d3-force mutates the links array, converting IDs to GraphNode objects
+    const linksForSimulation = graphData.links as unknown as GraphLink[];
+    const simulation = d3Force.forceSimulation<GraphNode>(graphData.nodes)
+      .force('link', d3Force.forceLink<GraphNode, GraphLink>(linksForSimulation).id((d: GraphNode) => d.id).distance(120))
       .force('charge', d3Force.forceManyBody().strength(-400))
       .force('center', d3Force.forceCenter(width / 2, height / 2))
-      .force('collision', d3Force.forceCollide().radius((d: any) => d.type === 'project' ? 60 : 25));
+      .force('collision', d3Force.forceCollide<GraphNode>().radius((d: GraphNode) => d.type === 'project' ? 60 : 25));
 
     simulationRef.current = simulation;
 
@@ -173,13 +180,12 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
       .scaleExtent([0.1, 8])
       .on('zoom', (event) => {
         zoomContainer.attr('transform', event.transform);
-        setZoomLevel(event.transform.k);
         
         // Update tech label visibility based on zoom level
-        node.selectAll('.node-label')
-          .style('opacity', function(d: any) {
-            if (d.type === 'project') return 1;
-            return event.transform.k > 1.2 ? 1 : 0;
+        node.selectAll<SVGTextElement, GraphNode>('.node-label')
+          .style('opacity', function(d) {
+            if (d.type === 'project') return '1';
+            return event.transform.k > 1.2 ? '1' : '0';
           });
       });
 
@@ -191,19 +197,19 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
 
     // Node interaction handlers
     node.on('mouseenter', function() {
-      select(this).select('.node-circle')
+      select<SVGCircleElement, GraphNode>(this).select<SVGCircleElement, GraphNode>('.node-circle')
         .transition()
         .duration(200)
-        .attr('r', function(d: any) {
+        .attr('r', function(d) {
           return (d.type === 'project' ? 16 : 8) * 1.2;
         });
       svg.style('cursor', 'pointer');
     })
     .on('mouseleave', function() {
-      select(this).select('.node-circle')
+      select<SVGCircleElement, GraphNode>(this).select<SVGCircleElement, GraphNode>('.node-circle')
         .transition()
         .duration(200)
-        .attr('r', (d: any) => d.type === 'project' ? 16 : 8);
+        .attr('r', (d) => d.type === 'project' ? 16 : 8);
       svg.style('cursor', 'move');
     })
     .on('click', (_event, d) => {
@@ -225,14 +231,18 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
     });
 
     // Update positions on each tick
+    // At this point, d3-force has mutated links to have GraphNode objects
     simulation.on('tick', () => {
+      // Type assertion: d3-force mutates links to have GraphNode objects
+      const processedLinks = linksForSimulation as unknown as GraphLink[];
       link
-        .attr('x1', (d: any) => d.source.x)
-        .attr('y1', (d: any) => d.source.y)
-        .attr('x2', (d: any) => d.target.x)
-        .attr('y2', (d: any) => d.target.y);
+        .data(processedLinks)
+        .attr('x1', (d) => d.source.x ?? 0)
+        .attr('y1', (d) => d.source.y ?? 0)
+        .attr('x2', (d) => d.target.x ?? 0)
+        .attr('y2', (d) => d.target.y ?? 0);
 
-      node.attr('transform', (d: any) => `translate(${d.x},${d.y})`);
+      node.attr('transform', (d) => `translate(${d.x ?? 0},${d.y ?? 0})`);
     });
 
     return () => {
@@ -276,7 +286,8 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
       .translate(-graphCenterX, -graphCenterY);
 
     // Animate to fit
-    svg.transition()
+    select<SVGSVGElement, unknown>(svg.node()!)
+      .transition()
       .duration(1000)
       .call(zoomBehaviorRef.current.transform, transform);
 
@@ -323,7 +334,7 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         height={dimensions.height}
         className="w-full h-full"
       />
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes pulse {
           0%, 100% {
             r: 20px;
@@ -334,7 +345,7 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
             opacity: 0.3;
           }
         }
-      `}</style>
+      `}} />
     </div>
   );
 }

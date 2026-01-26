@@ -68,6 +68,14 @@
     },
     "items": [
       {
+        "id": 10,
+        "title": "wheredoieat (2025)",
+        "description": "An application meant to intelligently recommend restaurants to users. Users' tastes get profile based on their interactions with the site. wheredoieat features a gamified, Tinder-like interface that allows users to swipe on restaurants as they encounter them.",
+        "image": "/images/wheredoieat.png",
+        "technologies": ["Python", "FastAPI", "Next.js", "React", "PostgreSQL", "Railway", "Vercel", "Supabase", "Tailwind CSS", "Machine Learning"],
+        "url": "https://wheredoieat.at/"
+      },
+      {
     "id": 2,
     "title": "PDF-y & PDF-y Lite (2025)",
     "description": "A Model Context Protocol (MCP) server with an integrated FastAPI backend for managing requests and API endpoints. It enables LLMs to analyze and extract structured data from PDFs, including metadata parsing, text and image extraction, and OCR for scanned documents. Built in two variants: pdf-y (full-featured) and pdf-y-lite (lightweight, optimized). This keeps in mind that many LLM's have 40-tool limits for their MCP server support, allowing users to keep their favorite servers active. Includes comprehensive Pytest suites for reliability and can be easily deployed in Docker containers for portability and scalability.",

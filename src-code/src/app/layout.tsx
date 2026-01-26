@@ -1,5 +1,6 @@
 
 import { Inter, JetBrains_Mono, Outfit } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import AnimatedBackground from "@/components/ui/AnimatedBackground";
@@ -50,6 +51,7 @@ export default function RootLayout({
           </main>
           <Footer />
         </SmoothScrollProvider>
+        <Analytics />
       </body>
     </html>
   );

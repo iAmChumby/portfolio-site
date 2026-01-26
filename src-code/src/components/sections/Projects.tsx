@@ -6,6 +6,7 @@ import { ArrowTopRightOnSquareIcon, CodeBracketIcon, ChevronUpIcon, ChevronDownI
 import { getProjectsContent } from '@/lib/content-loader';
 import ProjectGraph from '@/components/ui/ProjectGraph';
 import ProjectModal from '@/components/ui/ProjectModal';
+import { ProjectItem } from '@/types/content';
 
 export default function Projects() {
   const projectsContent = getProjectsContent();
@@ -14,7 +15,7 @@ export default function Projects() {
   
   // New State for View Mode and Selection
   const [viewMode, setViewMode] = useState<'grid' | 'graph'>('graph');
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const displayedProjects = showAllProjects ? projectsContent.items : projectsContent.items.slice(0, 3);
@@ -26,7 +27,7 @@ export default function Projects() {
     setTimeout(() => setIsAnimating(false), 600);
   };
 
-  const handleGraphNodeClick = useCallback((project: any) => {
+  const handleGraphNodeClick = useCallback((project: ProjectItem) => {
       setSelectedProject(project);
       setIsModalOpen(true);
   }, []);
@@ -137,6 +138,15 @@ export default function Projects() {
                             </div>
                             
                             <div className="flex gap-3 justify-center">
+                            {project.url && project.url !== '#' && (
+                                <button 
+                                onClick={() => window.open(project.url, '_blank')}
+                                className="neu-btn neu-btn-raised flex items-center gap-2 px-4 py-2 text-sm"
+                                >
+                                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                                Visit App
+                                </button>
+                            )}
                             {project.demo && project.demo !== '#' && (
                                 <button 
                                 onClick={() => window.open(project.demo, '_blank')}

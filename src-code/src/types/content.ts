@@ -35,8 +35,9 @@ export interface ProjectItem {
   longDescription?: string;
   image: string;
   technologies: string[];
-  demo: string;
-  code: string;
+  demo?: string;
+  code?: string;
+  url?: string;
 }
 
 export interface ProjectsContent {

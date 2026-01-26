@@ -60,7 +60,7 @@ function generateFingerprint(): string {
       ctx.fillText('Portfolio fingerprint', 2, 2);
       components.push(canvas.toDataURL());
     }
-  } catch (e) {
+  } catch {
     // Canvas fingerprinting not available
   }
 
@@ -86,7 +86,7 @@ export function getFingerprint(): string {
     if (stored) {
       return stored;
     }
-  } catch (e) {
+  } catch {
     // localStorage not available (private browsing, etc.)
   }
 
@@ -96,7 +96,7 @@ export function getFingerprint(): string {
   // Store in localStorage
   try {
     localStorage.setItem(FINGERPRINT_STORAGE_KEY, fingerprint);
-  } catch (e) {
+  } catch {
     // localStorage not available, but we can still use the fingerprint
   }
 

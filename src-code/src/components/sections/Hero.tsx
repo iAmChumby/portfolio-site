@@ -22,9 +22,9 @@ export default function Hero() {
           </div>
 
           {/* Main name in neumorphic inset container */}
-          <div className="neu-surface-inset p-6 sm:p-8 md:p-10 mb-6 sm:mb-8 animate-fade-in animation-delay-200">
+          <div className="neu-glass neu-texture p-6 sm:p-8 md:p-10 mb-6 sm:mb-8 animate-float rounded-2xl">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-neu-text-primary">
-            I&apos;m <span className="neu-text-gradient">{heroContent.name}</span>
+            <span className="text-neu-warm-neutral">I&apos;m</span> <span className="neu-text-gradient">{heroContent.name}</span>
             </h1>
           </div>
 
@@ -36,7 +36,7 @@ export default function Hero() {
           </div>
 
           {/* Description */}
-          <div className="neu-surface-inset p-6 mb-8 sm:mb-10 max-w-2xl mx-auto rounded-2xl">
+          <div className="neu-glass neu-texture p-6 mb-8 sm:mb-10 max-w-2xl mx-auto rounded-2xl animate-float-delayed">
             <p className="text-base sm:text-lg md:text-xl leading-relaxed text-neu-text-secondary animate-fade-in animation-delay-400">
               {heroContent.description}
             </p>

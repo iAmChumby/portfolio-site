@@ -63,6 +63,8 @@ const config: Config = {
           'text-secondary': '#a8c4b4',
           'text-muted': '#6b8a78',
           'text-platinum': '#e2e8f0',
+          'warm-neutral': '#F2EFE9',
+          'warm-neutral-muted': '#E5E2DC',
         },
       },
       boxShadow: {
@@ -107,6 +109,8 @@ const config: Config = {
         'slide-in-left': 'slideInLeft 200ms ease-out',
         'slide-in-right': 'slideInRight 200ms ease-out',
         'gradient': 'gradient 15s ease infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'float-delayed': 'float 6s ease-in-out 2s infinite',
       },
       keyframes: {
         fadeIn: {
@@ -161,6 +165,10 @@ const config: Config = {
           '0%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
           '100%': { backgroundPosition: '0% 50%' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-6px)' },
         },
       },
     },

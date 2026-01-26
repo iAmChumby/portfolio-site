@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { ArrowTopRightOnSquareIcon, CodeBracketIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { getProjectsContent } from '@/lib/content-loader';
 
@@ -48,11 +49,12 @@ export default function Projects() {
                   }}
                 >
                   <div className="aspect-video bg-neu-bg-dark flex items-center justify-center border-b border-[#234d35] overflow-hidden p-2">
-                    <div className="w-full h-full rounded-t-lg overflow-hidden">
-                      <img 
+                    <div className="relative w-full h-full rounded-t-lg overflow-hidden">
+                      <Image 
                         src={project.image} 
                         alt={project.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-all duration-300"
+                        fill
+                        className="object-cover group-hover:scale-110 transition-all duration-300"
                       />
                     </div>
                   </div>

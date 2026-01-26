@@ -1,8 +1,10 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Card } from '@/components/ui/Card';
 import { getAboutContent, getSiteConfig } from '@/lib/content-loader';
+
 
 
 export default function About() {
@@ -42,10 +44,11 @@ export default function About() {
                   <div className="neu-surface-inset relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full mx-auto mb-8 flex items-center justify-center overflow-hidden transition-all duration-500 ease-out transform-gpu group-hover:scale-105">
                     {aboutContent.profile.image ? (
                       <>
-                        <img 
+                      <Image 
                           src={aboutContent.profile.image} 
                           alt={siteConfig.site.author.name}
-                          className="w-full h-full object-cover p-1 rounded-full transition-all duration-500 ease-out group-hover:scale-110"
+                          fill
+                          className="object-cover p-1 rounded-full transition-all duration-500 ease-out group-hover:scale-110"
                         />
                       </>
                     ) : (

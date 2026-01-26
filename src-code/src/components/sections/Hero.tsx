@@ -24,7 +24,7 @@ export default function Hero() {
           {/* Main name in neumorphic inset container */}
           <div className="neu-surface-inset p-6 sm:p-8 md:p-10 mb-6 sm:mb-8 animate-fade-in animation-delay-200">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-neu-text-primary">
-              I'm <span className="neu-text-gradient">{heroContent.name}</span>
+            I&apos;m <span className="neu-text-gradient">{heroContent.name}</span>
             </h1>
           </div>
 

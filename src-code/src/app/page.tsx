@@ -1,6 +1,6 @@
 import { Hero } from "@/components/sections";
 import { Metadata } from 'next';
-import AnimatedBackgroundWrapper from '@/components/ui/AnimatedBackground';
+
 
 export const metadata: Metadata = {
   title: 'Portfolio - Full Stack Developer',

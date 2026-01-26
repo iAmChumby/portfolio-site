@@ -61,10 +61,10 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b',
         isScrolled
-          ? 'bg-[#0a1510]/95 backdrop-blur-md shadow-[8px_8px_16px_rgba(5,10,8,0.7)] border-b border-[#234d35]'
-          : 'bg-transparent'
+          ? 'bg-[#0a1510]/95 backdrop-blur-md shadow-[8px_8px_16px_rgba(5,10,8,0.7)] border-[#234d35]'
+          : 'bg-transparent border-transparent'
       )}
     >
       <div className="container h-20 px-6 mx-auto">

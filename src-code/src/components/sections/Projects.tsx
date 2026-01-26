@@ -2,13 +2,21 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { ArrowTopRightOnSquareIcon, CodeBracketIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon, CodeBracketIcon, ChevronUpIcon, ChevronDownIcon, Squares2X2Icon, ShareIcon } from '@heroicons/react/24/outline';
 import { getProjectsContent } from '@/lib/content-loader';
+import ProjectGraph from '@/components/ui/ProjectGraph';
+import ProjectModal from '@/components/ui/ProjectModal';
 
 export default function Projects() {
   const projectsContent = getProjectsContent();
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  // New State for View Mode and Selection
+  const [viewMode, setViewMode] = useState<'grid' | 'graph'>('graph');
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const displayedProjects = showAllProjects ? projectsContent.items : projectsContent.items.slice(0, 3);
 
   const handleToggleProjects = () => {
@@ -17,12 +25,18 @@ export default function Projects() {
     // Reset animation state after animation completes
     setTimeout(() => setIsAnimating(false), 600);
   };
+
+  const handleGraphNodeClick = (project: any) => {
+      setSelectedProject(project);
+      setIsModalOpen(true);
+  };
+
   return (
     <section id="projects" className="py-12">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="relative inline-block neu-surface p-8">
+          <div className="text-center mb-8">
+            <div className="relative inline-block neu-surface p-8 mb-8">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-neu-text-primary">
                 <span className="neu-text-gradient">{projectsContent.title}</span>
               </h2>
@@ -30,105 +44,161 @@ export default function Projects() {
                 {projectsContent.subtitle}
               </p>
             </div>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500 ease-in-out">
-            {displayedProjects.map((project, index) => {
-              const isNewProject = index >= 3;
-              const animationDelay = isNewProject ? `${(index - 3) * 150}ms` : '0ms';
-              
-              return (
-                <div 
-                  key={project.id}
-                  className={`group neu-surface overflow-hidden hover:scale-105 transition-all duration-300 ${
-                    isNewProject ? 'project-card-enter' : ''
-                  }`}
-                  style={{
-                    animationDelay: isNewProject ? animationDelay : undefined,
-                    animationFillMode: 'both'
-                  }}
-                >
-                  <div className="aspect-video bg-neu-bg-dark flex items-center justify-center border-b border-[#234d35] overflow-hidden p-2">
-                    <div className="relative w-full h-full rounded-t-lg overflow-hidden">
-                      <Image 
-                        src={project.image} 
-                        alt={project.title}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-all duration-300"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <h3 className="font-semibold text-neu-text-primary mb-3 text-xl">{project.title}</h3>
-                    <div className="neu-surface-inset p-4 rounded-lg mb-4">
-                      <p className="text-neu-text-secondary text-sm leading-relaxed">{project.description}</p>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2 mb-6 justify-center">
-                      {project.technologies.map((tech) => (
-                        <span 
-                          key={tech}
-                          className="neu-badge text-xs"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <div className="flex gap-3 justify-center">
-                      {project.demo && project.demo !== '#' && (
-                        <button 
-                          onClick={() => window.open(project.demo, '_blank')}
-                          className="neu-btn neu-btn-raised flex items-center gap-2 px-4 py-2 text-sm"
-                        >
-                          <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                          Live Demo
-                        </button>
-                      )}
-                      {project.code && project.code !== '#' && (
-                        <button 
-                          onClick={() => window.open(project.code, '_blank')}
-                          className="neu-btn neu-btn-outline flex items-center gap-2 px-4 py-2 text-sm"
-                        >
-                          <CodeBracketIcon className="w-4 h-4" />
-                          Code
-                        </button>
-                      )}
-                    </div>
-                  </div>
+
+            {/* View Toggle */}
+            <div className="flex justify-center mb-8">
+                <div className="p-1 bg-[#111] rounded-lg border border-[#333] inline-flex">
+                    <button
+                        onClick={() => setViewMode('grid')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-300 ${
+                            viewMode === 'grid' 
+                            ? 'bg-[#234d35] text-white shadow-lg' 
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                        aria-label="Grid View"
+                    >
+                        <Squares2X2Icon className="w-5 h-5" />
+                        <span className="font-medium">Grid</span>
+                    </button>
+                    <button
+                        onClick={() => setViewMode('graph')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-300 ${
+                            viewMode === 'graph' 
+                            ? 'bg-[#234d35] text-white shadow-lg' 
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                        aria-label="Graph View"
+                    >
+                        <ShareIcon className="w-5 h-5" />
+                        <span className="font-medium">Graph</span>
+                    </button>
                 </div>
-              );
-            })}
+            </div>
           </div>
           
-          <div className="text-center mt-12">
-            <button 
-              onClick={handleToggleProjects}
-              disabled={isAnimating}
-              className={`neu-btn flex items-center gap-2 px-6 py-3 transition-all duration-300 mx-auto transform-gpu ${
-                isAnimating 
-                  ? 'neu-surface-inset cursor-not-allowed opacity-80' 
-                  : 'neu-btn-raised'
-              }`}
-            >
-              <div className={`transition-transform duration-300 ${isAnimating ? 'rotate-180' : ''}`}>
-                {showAllProjects ? (
-                  <ChevronUpIcon className="w-5 h-5" />
-                ) : (
-                  <ChevronDownIcon className="w-5 h-5" />
-                )}
-              </div>
-              <span className="transition-all duration-300">
-                {isAnimating 
-                  ? (showAllProjects ? projectsContent.buttons.hiding : projectsContent.buttons.loading) 
-                  : (showAllProjects ? projectsContent.buttons.showLess : projectsContent.buttons.showMore)
-                }
-              </span>
-            </button>
+          {/* Content Area */}
+          <div className="min-h-[600px] transition-all duration-500">
+            {viewMode === 'graph' ? (
+                <div className="animate-in fade-in duration-500">
+                    <ProjectGraph 
+                        projects={projectsContent.items} 
+                        onNodeClick={handleGraphNodeClick} 
+                    />
+                    <p className="text-center text-neu-text-secondary mt-4 text-sm">
+                        Interactive Map: Click on nodes to explore projects and their relationships. 
+                        <br/>
+                        <span className="text-[#4fa36d] font-medium">Green</span> nodes are projects, <span className="text-[#e2e8f0] font-medium">Platinum</span> nodes are technologies.
+                    </p>
+                </div>
+            ) : (
+                <>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all ease-in-out animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {displayedProjects.map((project, index) => {
+                    const isNewProject = index >= 3;
+                    const animationDelay = isNewProject ? `${(index - 3) * 150}ms` : '0ms';
+                    
+                    return (
+                        <div 
+                        key={project.id}
+                        className={`group neu-surface overflow-hidden hover:scale-105 transition-all duration-300 ${
+                            isNewProject ? 'project-card-enter' : ''
+                        }`}
+                        style={{
+                            animationDelay: isNewProject ? animationDelay : undefined,
+                            animationFillMode: 'both'
+                        }}
+                        >
+                        <div className="aspect-video bg-neu-bg-dark flex items-center justify-center border-b border-[#234d35] overflow-hidden p-2">
+                            <div className="relative w-full h-full rounded-t-lg overflow-hidden">
+                            <Image 
+                                src={project.image} 
+                                alt={project.title}
+                                fill
+                                className="object-cover group-hover:scale-110 transition-all duration-300"
+                            />
+                            </div>
+                        </div>
+                        
+                        <div className="p-6">
+                            <h3 className="font-semibold text-neu-text-primary mb-3 text-xl">{project.title}</h3>
+                            <div className="neu-surface-inset p-4 rounded-lg mb-4">
+                            <p className="text-neu-text-secondary text-sm leading-relaxed">{project.description}</p>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                            {project.technologies.map((tech) => (
+                                <span 
+                                key={tech}
+                                className="neu-badge text-xs"
+                                >
+                                {tech}
+                                </span>
+                            ))}
+                            </div>
+                            
+                            <div className="flex gap-3 justify-center">
+                            {project.demo && project.demo !== '#' && (
+                                <button 
+                                onClick={() => window.open(project.demo, '_blank')}
+                                className="neu-btn neu-btn-raised flex items-center gap-2 px-4 py-2 text-sm"
+                                >
+                                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                                Live Demo
+                                </button>
+                            )}
+                            {project.code && project.code !== '#' && (
+                                <button 
+                                onClick={() => window.open(project.code, '_blank')}
+                                className="neu-btn neu-btn-outline flex items-center gap-2 px-4 py-2 text-sm"
+                                >
+                                <CodeBracketIcon className="w-4 h-4" />
+                                Code
+                                </button>
+                            )}
+                            </div>
+                        </div>
+                        </div>
+                    );
+                    })}
+                </div>
+                
+                <div className="text-center mt-12">
+                    <button 
+                    onClick={handleToggleProjects}
+                    disabled={isAnimating}
+                    className={`neu-btn flex items-center gap-2 px-6 py-3 transition-all duration-300 mx-auto transform-gpu ${
+                        isAnimating 
+                        ? 'neu-surface-inset cursor-not-allowed opacity-80' 
+                        : 'neu-btn-raised'
+                    }`}
+                    >
+                    <div className={`transition-transform duration-300 ${isAnimating ? 'rotate-180' : ''}`}>
+                        {showAllProjects ? (
+                        <ChevronUpIcon className="w-5 h-5" />
+                        ) : (
+                        <ChevronDownIcon className="w-5 h-5" />
+                        )}
+                    </div>
+                    <span className="transition-all duration-300">
+                        {isAnimating 
+                        ? (showAllProjects ? projectsContent.buttons.hiding : projectsContent.buttons.loading) 
+                        : (showAllProjects ? projectsContent.buttons.showLess : projectsContent.buttons.showMore)
+                        }
+                    </span>
+                    </button>
+                </div>
+                </>
+            )}
           </div>
         </div>
       </div>
+      
+      {/* Detail Modal */}
+      <ProjectModal 
+        project={selectedProject} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </section>
   );
 }

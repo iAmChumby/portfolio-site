@@ -32,6 +32,7 @@ export interface ProjectItem {
   id: number;
   title: string;
   description: string;
+  longDescription?: string;
   image: string;
   technologies: string[];
   demo: string;

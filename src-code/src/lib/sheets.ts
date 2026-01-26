@@ -20,6 +20,22 @@ async function getGoogleSheetsClient() {
 }
 
 /**
+ * Sanitize value to prevent Google Sheets formula injection
+ * Prefixes values starting with =, +, -, @ with single quote
+ */
+function sanitizeSheetValue(value: string): string {
+  if (!value || typeof value !== 'string') {
+    return value;
+  }
+  // Prefix formulas with single quote to force text interpretation
+  const trimmed = value.trim();
+  if (trimmed.startsWith('=') || trimmed.startsWith('+') || trimmed.startsWith('-') || trimmed.startsWith('@')) {
+    return `'${value}`;
+  }
+  return value;
+}
+
+/**
  * Log contact form submission to Google Sheets
  * Non-blocking: errors are logged but don't throw
  */
@@ -29,13 +45,14 @@ export async function logContactSubmission(
   const config = getContactEnvConfig();
   const sheets = await getGoogleSheetsClient();
 
+  // Sanitize all user-provided values to prevent formula injection
   const values = [[
     entry.timestamp,
-    entry.name,
-    entry.email,
-    entry.message,
-    entry.ipAddress,
-    entry.geolocation,
+    sanitizeSheetValue(entry.name),
+    sanitizeSheetValue(entry.email),
+    sanitizeSheetValue(entry.message),
+    sanitizeSheetValue(entry.ipAddress),
+    sanitizeSheetValue(entry.geolocation),
   ]];
 
   await sheets.spreadsheets.values.append({

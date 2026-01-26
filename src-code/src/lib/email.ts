@@ -2,6 +2,32 @@ import { ContactFormData, EmailResult } from '@/types/contact';
 import { getEmailConfig } from './env';
 
 /**
+ * Sanitize string for use in email headers (subject, from name)
+ * Removes newlines, carriage returns, and other control characters
+ */
+function sanitizeEmailHeader(value: string): string {
+  return value
+    .replace(/[\r\n]/g, ' ') // Replace newlines with spaces
+    .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
+    .trim()
+    .slice(0, 200); // Limit length for email headers
+}
+
+/**
+ * HTML entity encode string for safe use in HTML email context
+ */
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+  return text.replace(/[&<>"']/g, (char) => map[char]);
+}
+
+/**
  * Create Nodemailer SMTP transporter
  */
 async function createEmailTransporter() {
@@ -28,7 +54,9 @@ function generateNotificationEmail(
     timeStyle: 'long',
   });
 
-  const subject = `New Contact Form Submission from ${data.name}`;
+  // Sanitize name for email header to prevent header injection
+  const safeName = sanitizeEmailHeader(data.name);
+  const subject = `New Contact Form Submission from ${safeName}`;
 
   const text = `
 New Contact Form Submission
@@ -45,14 +73,15 @@ ${data.message}
 This message was sent via the contact form at lukeedwards.me
   `.trim();
 
+  // HTML entity encode all user input to prevent XSS
   const html = `
 <h2>New Contact Form Submission</h2>
-<p><strong>From:</strong> ${data.name} (${data.email})</p>
-<p><strong>Time:</strong> ${timestamp}</p>
-<p><strong>IP:</strong> ${ipAddress}</p>
+<p><strong>From:</strong> ${escapeHtml(data.name)} (${escapeHtml(data.email)})</p>
+<p><strong>Time:</strong> ${escapeHtml(timestamp)}</p>
+<p><strong>IP:</strong> ${escapeHtml(ipAddress)}</p>
 <hr>
 <h3>Message:</h3>
-<p style="white-space: pre-wrap;">${data.message}</p>
+<p style="white-space: pre-wrap;">${escapeHtml(data.message)}</p>
 <hr>
 <p style="color: #666; font-size: 12px;">
   This message was sent via the contact form at lukeedwards.me
@@ -115,7 +144,9 @@ export async function sendContactEmails(
 
     // Send confirmation email to user (BEST EFFORT)
     try {
-      const confirmationEmail = generateConfirmationEmail(data.name);
+      // Sanitize name for email header
+      const safeName = sanitizeEmailHeader(data.name);
+      const confirmationEmail = generateConfirmationEmail(safeName);
       await transporter.sendMail({
         from: `"Luke Edwards" <${config.smtp.auth.user}>`,
         to: data.email,

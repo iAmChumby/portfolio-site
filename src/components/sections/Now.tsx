@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SiSpotify, SiApplemusic } from 'react-icons/si';
 import WeatherCard from '@/components/ui/WeatherCard';
+import KnicksGameIndicator from '@/components/ui/KnicksGameIndicator';
 import NowPost from '@/components/ui/NowPost';
 import { LOCATIONS } from '@/lib/weather';
 import { NowData } from '@/types/now';
@@ -74,6 +75,9 @@ export default function Now() {
                   </div>
                 </div>
               </div>
+
+              {/* Knicks Game Indicator */}
+              <KnicksGameIndicator />
 
               {/* Weather Cards */}
               <div className="neu-surface p-6">

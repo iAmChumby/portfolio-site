@@ -88,11 +88,14 @@ export default function Projects() {
                         projects={projectsContent.items} 
                         onNodeClick={handleGraphNodeClick} 
                     />
-                    <p className="text-center text-neu-text-secondary mt-4 text-sm">
-                        Interactive Map: Click on nodes to explore projects and their relationships. 
-                        <br/>
-                        <span className="text-[#4fa36d] font-medium">Green</span> nodes are projects, <span className="text-[#e2e8f0] font-medium">Platinum</span> nodes are technologies.
-                    </p>
+                    <div className="flex justify-center mt-6">
+                        <ProximityCard className="neu-surface-inset py-3 px-6 rounded-lg inline-block">
+                            <p className="text-center text-neu-text-secondary text-sm">
+                                <span className="font-semibold block mb-1">Interactive Map</span>
+                                Click nodes to explore. <span className="text-[#4fa36d] font-medium">Green</span> = projects, <span className="text-[#e2e8f0] font-medium">Platinum</span> = technologies.
+                            </p>
+                        </ProximityCard>
+                    </div>
                 </div>
             ) : (
                 <>

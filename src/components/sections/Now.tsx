@@ -34,13 +34,15 @@ export default function Now() {
         <div className="max-w-6xl mx-auto">
           {/* Header - matching Contact/Projects pattern */}
           <div className="text-center mb-16">
-            <div className="relative inline-block neu-surface p-8">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4">
-                <span className="neu-text-gradient">What I&apos;m Doing Now</span>
-              </h2>
-              <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-neu-text-secondary">
-                A snapshot of what&apos;s currently on my radar
-              </p>
+            <div className="relative inline-block">
+              <ProximityCard className="neu-surface p-8">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4">
+                  <span className="neu-text-gradient">What I&apos;m Doing Now</span>
+                </h2>
+                <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-neu-text-secondary">
+                  A snapshot of what&apos;s currently on my radar
+                </p>
+              </ProximityCard>
             </div>
           </div>
 

@@ -33,6 +33,8 @@ const iconMap = {
   email: EmailIcon,
 } as const;
 
+import ProximityCard from '@/components/ui/ProximityCard';
+
 const Header: React.FC<HeaderProps> = ({
   navigation = defaultNavigation,
   logo,
@@ -116,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({
                 {logo ? (
                   <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
                 ) : (
-                  <div className={cn(
+                  <ProximityCard className={cn(
                     'flex items-center gap-2 px-4 py-2 rounded-xl group/logo',
                     'transition-all duration-150',
                     'shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] bg-[#132e1f]',
@@ -130,7 +132,7 @@ const Header: React.FC<HeaderProps> = ({
                     <span className="neu-text-gradient text-2xl font-bold tracking-tight transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                       {siteName}
                     </span>
-                  </div>
+                  </ProximityCard>
                 )}
               </Link>
             </div>

@@ -72,7 +72,7 @@
         "title": "wheredoieat (2025)",
         "description": "An application meant to intelligently recommend restaurants to users. Users' tastes get profile based on their interactions with the site. wheredoieat features a gamified, Tinder-like interface that allows users to swipe on restaurants as they encounter them.",
         "image": "/images/wheredoieat.png",
-        "technologies": ["Python", "FastAPI", "Next.js", "React", "PostgreSQL", "Railway", "Vercel", "Supabase", "Tailwind CSS", "Machine Learning", "TypeScript"],
+        "technologies": ["Python", "FastAPI", "Next.js", "React", "PostgreSQL", "Railway", "Vercel", "Supabase", "Tailwind CSS", "UI/UX Design", "Machine Learning", "TypeScript"],
         "url": "https://wheredoieat.at/"
       },
       {
@@ -80,7 +80,7 @@
         "title": "Portfolio Site (2025)",
         "description": "My personal developer portfolio featuring a custom neumorphic dark green design system, smooth animations with Framer Motion, and interactive elements like swipe-to-contact gestures. Built with Next.js 16 and TypeScript, it includes a dynamic 'Now' page pulling live data, SEO optimization with OpenGraph tags, and a glassmorphism UI aesthetic. Deployed on Vercel with analytics integration.",
         "image": "/images/portfolio-site.png",
-        "technologies": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Vercel", "DNS Management", "CI/CD", "GitHub Actions", "SEO"],
+        "technologies": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Vercel", "DNS Management", "CI/CD", "GitHub Actions", "SEO", "UI/UX Design"],
         "url": "https://lukeedwards.me"
       },
       {

@@ -5,15 +5,7 @@ import { getContactContent, getSiteConfig } from '@/lib/content-loader';
 import ProximityCard from '@/components/ui/ProximityCard';
 import ContactForm from '@/components/ui/ContactForm';
 
-declare global {
-  interface Window {
-    turnstile?: {
-      reset: (widgetId?: string) => void;
-      render: (selector: HTMLElement, options: { sitekey: string; callback: (token: string) => void; theme: string }) => string;
-      getResponse: (widgetId?: string) => string | undefined;
-    };
-  }
-}
+
 
 export default function Contact() {
   const contactContent = getContactContent();

@@ -12,21 +12,7 @@ interface ContactFormProps {
   autoFocus?: boolean;
 }
 
-declare global {
-  interface Window {
-    turnstile?: {
-      reset: (widgetId?: string) => void;
-      render: (selector: HTMLElement, options: { 
-        sitekey: string; 
-        callback: (token: string) => void; 
-        theme: string;
-        'expire-callback'?: () => void;
-      }) => string;
-      getResponse: (widgetId?: string) => string | undefined;
-      remove: (widgetId: string) => void;
-    };
-  }
-}
+
 
 export default function ContactForm({ onSuccess, onCancel, className = '', autoFocus = false }: ContactFormProps) {
   const contactContent = getContactContent();

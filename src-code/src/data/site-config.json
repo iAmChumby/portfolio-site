@@ -30,6 +30,11 @@
         "external": false
       },
       {
+        "label": "Now",
+        "href": "/now",
+        "external": false
+      },
+      {
         "label": "Projects",
         "href": "/projects",
         "external": false

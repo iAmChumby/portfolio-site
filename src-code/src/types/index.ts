@@ -77,3 +77,6 @@ export interface SEOData {
   ogImage?: string;
   canonical?: string;
 }
+
+// Now page types
+export * from './now';

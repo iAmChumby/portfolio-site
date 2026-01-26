@@ -1,0 +1,30 @@
+{
+  "availability": {
+    "status": "open",
+    "message": "Open to freelance and co-op opportunities or just to chat"
+  },
+  "currentlyPlaying": {
+    "name": "Read Dead Redemption 2",
+    "imageUrl": "https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/header.jpg"
+  },
+  "onRepeat": {
+    "album": {
+      "name": "sankofa",
+      "artist": "redveil",
+      "imageUrl": "https://i.scdn.co/image/ab67616d00001e028648311de5860568d5e23895"
+    },
+    "song": {
+      "name": "Excuse Me",
+      "artist": "A$AP Rocky",
+      "imageUrl": "https://i.scdn.co/image/ab67616d0000b27396657f1fbb7539575be55ecb"
+    }
+  },
+  "posts": [
+    {
+      "id": "post-001",
+      "date": "2026-01-26",
+      "title": "My New Now Page!",
+      "body": "I'ts a new year, a new semester, and with that, I figure I'd update my site and put the final layer of polish on it. I figure a little lens into my life with this page would be the perfect thing to add. Anyways, as I keep updating this I hope that you'll enjoy it and get to know me a little better."
+    }
+  ]
+}

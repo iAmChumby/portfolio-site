@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EnvelopeIcon, PhoneIcon, MapPinIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { getContactContent, getSiteConfig } from '@/lib/content-loader';
+import { reverseGeocode } from '@/lib/geolocation';
 
 declare global {
   interface Window {
@@ -25,9 +26,76 @@ export default function Contact() {
 
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
+  const [geolocation, setGeolocation] = useState<string | null>(null);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileTokenRef = useRef<string>('');
   const turnstileWidgetIdRef = useRef<string | null>(null);
+  const geolocationRequestedRef = useRef<boolean>(false);
+
+  /**
+   * Get browser geolocation and reverse geocode to human-readable format
+   * Only attempts if permission is already granted (doesn't prompt user)
+   */
+  const getBrowserGeolocation = async (): Promise<void> => {
+    // Skip if already requested or geolocation not available
+    if (geolocationRequestedRef.current || !navigator.geolocation) {
+      return;
+    }
+
+    geolocationRequestedRef.current = true;
+
+    try {
+      // Check if geolocation permission is already granted
+      // Only proceed if permission is granted, don't prompt
+      let permissionGranted = false;
+      
+      if ('permissions' in navigator) {
+        try {
+          const permissionStatus = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+          permissionGranted = permissionStatus.state === 'granted';
+        } catch (permError) {
+          // Permissions API not supported or failed
+          // If Permissions API isn't available, we can't safely check, so skip to avoid prompts
+          return;
+        }
+      } else {
+        // Permissions API not available - skip to avoid any potential prompts
+        return;
+      }
+
+      // Only proceed if permission is already granted
+      if (!permissionGranted) {
+        // Permission not granted, skip silently - will use IP-based geolocation
+        return;
+      }
+
+      // Permission is granted, safe to request position
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          {
+            timeout: 5000, // Reasonable timeout
+            maximumAge: 300000, // Accept cached position up to 5 minutes old
+            enableHighAccuracy: false, // Use less accurate but faster method
+          }
+        );
+      });
+
+      // Reverse geocode coordinates to human-readable format
+      const location = await reverseGeocode(
+        position.coords.latitude,
+        position.coords.longitude
+      );
+
+      if (location) {
+        setGeolocation(location);
+      }
+    } catch (error) {
+      // Silently fail - will fallback to IP-based geolocation on server
+      // This includes permission denied, timeout, or other errors
+    }
+  };
 
   useEffect(() => {
     if (!turnstileRef.current) return;
@@ -89,6 +157,27 @@ export default function Contact() {
     }
   }, []);
 
+  // Silently check for geolocation when form is focused or component mounts
+  // Only uses location if permission already granted (no prompt)
+  useEffect(() => {
+    const formElement = document.querySelector('form');
+    if (!formElement) return;
+
+    const handleFormFocus = () => {
+      getBrowserGeolocation();
+    };
+
+    // Check geolocation on form focus (only if permission already granted)
+    formElement.addEventListener('focusin', handleFormFocus, { once: true });
+    
+    // Also try on mount (only if permission already granted)
+    getBrowserGeolocation();
+
+    return () => {
+      formElement.removeEventListener('focusin', handleFormFocus);
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -124,6 +213,7 @@ export default function Contact() {
           email: formData.email,
           message: formData.message,
           turnstileToken: token,
+          geolocation: geolocation || undefined,
         }),
       });
 

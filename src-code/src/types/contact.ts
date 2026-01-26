@@ -3,6 +3,7 @@ export interface ContactFormInput {
   email: string;
   message: string;
   turnstileToken: string;
+  geolocation?: string;
 }
 
 export interface ContactFormData {

@@ -4,6 +4,7 @@ import { verifyTurnstileToken } from '@/lib/turnstile';
 import { validateContactForm } from '@/lib/validation';
 import { sendContactEmails } from '@/lib/email';
 import { logContactSubmission } from '@/lib/sheets';
+import { getIPGeolocation } from '@/lib/geolocation';
 import type { ContactAPIResponse, ContactAPIError } from '@/types/contact';
 
 const RATE_LIMIT_SUBMISSIONS = 3; // Max submissions per hour
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { name, email, message, turnstileToken } = body;
+    const { name, email, message, turnstileToken, geolocation: clientGeolocation } = body;
 
     // Validate Turnstile token
     if (!turnstileToken) {
@@ -90,6 +91,18 @@ export async function POST(request: NextRequest) {
       throw new Error(`Email send failed: ${emailResult.error}`);
     }
 
+    // Determine geolocation: use client-provided or fallback to IP-based lookup
+    let finalGeolocation = clientGeolocation || null;
+    
+    // If no client geolocation, try IP-based geolocation
+    if (!finalGeolocation || finalGeolocation.trim() === '') {
+      try {
+        finalGeolocation = await getIPGeolocation(ip);
+      } catch (error) {
+        console.error('IP geolocation lookup failed:', error);
+      }
+    }
+
     // Log to Google Sheets (REQUIRED)
     await logContactSubmission({
       timestamp: new Date().toISOString(),
@@ -97,7 +110,7 @@ export async function POST(request: NextRequest) {
       email: validationResult.data.email,
       message: validationResult.data.message,
       ipAddress: ip,
-      geolocation: 'N/A',
+      geolocation: finalGeolocation || 'N/A',
     });
 
     // Return success

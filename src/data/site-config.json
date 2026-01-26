@@ -1,0 +1,82 @@
+{
+  "site": {
+    "name": "Luke Edwards",
+    "title": "Full Stack Developer & Designer",
+    "description": "Passionate full-stack developer creating innovative web solutions with modern technologies.",
+    "url": "https://lukeedwards.me",
+    "author": {
+      "name": "Luke Edwards",
+      "email": "edwards.lukec@gmail.com",
+      "bio": "Full-stack developer with expertise in React, Node.js, Python, Java, and modern web technologies.",
+      "location": "Utica, New York",
+      "phone": "+1 (315) 725-1833",
+      "avatar": "/images/avatar.jpg"
+    },
+    "social": {
+      "github": "https://github.com/iAmChumby",
+      "linkedin": "https://www.linkedin.com/in/lukeedwards2004/",
+      "twitter": "https://twitter.com/yourusername",
+      "email": "edwards.lukec@gmail.com"
+    },
+    "navigation": [
+      {
+        "label": "Home",
+        "href": "/",
+        "external": false
+      },
+      {
+        "label": "About",
+        "href": "/about",
+        "external": false
+      },
+      {
+        "label": "Now",
+        "href": "/now",
+        "external": false
+      },
+      {
+        "label": "Projects",
+        "href": "/projects",
+        "external": false
+      },
+      {
+        "label": "Contact",
+        "href": "/contact",
+        "external": false
+      }
+    ],
+    "features": {
+      "analytics": true,
+      "blog": true,
+      "contact": true,
+      "projects": true,
+      "resume": true
+    }
+  },
+  "seo": {
+    "defaultTitle": "Luke Edwards - Full Stack Developer",
+    "titleTemplate": "%s | Luke Edwards",
+    "defaultDescription": "Passionate full-stack developer creating innovative web solutions with modern technologies.",
+    "keywords": [
+      "full-stack developer",
+      "web development",
+      "React",
+      "Next.js",
+      "TypeScript",
+      "Node.js",
+      "portfolio"
+    ],
+    "ogImage": "/images/og-image.png",
+    "twitterHandle": "@yourusername"
+  },
+  "analytics": {
+    "googleAnalytics": "",
+    "vercelAnalytics": true
+  },
+  "contact": {
+    "email": "edwards.lukec@gmail.com",
+    "phone": "+1 (315) 725-1833",
+    "location": "Utica, New York",
+    "availability": "Available for freelance work"
+  }
+}

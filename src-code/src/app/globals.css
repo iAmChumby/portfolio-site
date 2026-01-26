@@ -26,50 +26,40 @@
   --neu-accent-glow: #5dbd7f;
   --neu-accent-muted: #2d6b45;
 
+  /* Platinum Accent (Secondary) */
+  --neu-accent-secondary: #e2e8f0;
+
   /* Neumorphic Text Colors */
   --neu-text-primary: #e8f0eb;
   --neu-text-secondary: #a8c4b4;
   --neu-text-muted: #6b8a78;
+  --neu-text-platinum: #e2e8f0;
 
-  /* Neumorphic Shadows */
-  --neu-shadow-dark: rgba(5, 10, 8, 0.7);
-  --neu-shadow-light: rgba(35, 77, 53, 0.4);
-  --neu-shadow-glow: rgba(61, 139, 90, 0.3);
-
-  /* Neumorphic Shadow Presets */
-  --neu-shadow-outset: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
-  --neu-shadow-outset-sm: 4px 4px 8px var(--neu-shadow-dark), -4px -4px 8px var(--neu-shadow-light);
-  --neu-shadow-outset-lg: 12px 12px 24px var(--neu-shadow-dark), -12px -12px 24px var(--neu-shadow-light);
-  --neu-shadow-inset: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light);
-  --neu-shadow-inset-sm: inset 2px 2px 4px var(--neu-shadow-dark), inset -2px -2px 4px var(--neu-shadow-light);
-  --neu-shadow-pressed: inset 6px 6px 12px var(--neu-shadow-dark), inset -6px -6px 12px var(--neu-shadow-light);
-
-  /* Neumorphic Border Radius */
+  /* Border Radii */
   --neu-radius-sm: 12px;
   --neu-radius-md: 16px;
   --neu-radius-lg: 24px;
   --neu-radius-xl: 32px;
+
+  /* ... shadows ... */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #202125;
-    --foreground: #ffffff;
-    --primary: #ffffff;
-    --secondary: #000000;
-    --accent: #10b981;
-    --accent-hover: #059669;
-    --accent-light: #34d399;
-    --muted: #1a1a1a;
-    --border: #333333;
-  }
-}
+/* ... dark mode overrides ... */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-inter), sans-serif;
 }
 
 /* Enhanced Button Styles */
@@ -233,30 +223,31 @@ body {
 /* Mobile-specific enhancements */
 @media (max-width: 640px) {
   .btn {
-    @apply min-h-[44px]; /* iOS/Android recommended touch target */
+    @apply min-h-[44px];
+    /* iOS/Android recommended touch target */
     transition: all 0.2s ease;
   }
-  
+
   .btn:hover {
     transform: translateY(-1px) scale(1.02);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
   }
-  
+
   .btn:active {
     transform: scale(0.96);
     transition-duration: 0.1s;
   }
-  
+
   .btn-mobile-full {
     @apply w-full;
     justify-content: center;
     padding: 1rem 2rem;
   }
-  
+
   .btn-mobile-compact {
     @apply px-3 py-2 text-sm;
   }
-  
+
   /* Enhanced mobile CTA animations */
   .btn-cta:hover {
     transform: translateY(-2px) scale(1.03);
@@ -266,13 +257,14 @@ body {
 
 /* Accessibility and reduced motion */
 @media (prefers-reduced-motion: reduce) {
+
   .btn,
   .btn::before,
   .btn::after {
     transition: none;
     animation: none;
   }
-  
+
   .btn:hover {
     transform: none;
   }
@@ -283,7 +275,7 @@ body {
     @apply border-2;
     font-weight: 700;
   }
-  
+
   .btn:focus-visible {
     outline-width: 4px;
     outline-offset: 4px;
@@ -452,6 +444,7 @@ body {
 
 /* Reduced motion for neumorphic elements */
 @media (prefers-reduced-motion: reduce) {
+
   .neu-btn,
   .neu-surface,
   .neu-badge,

@@ -11,9 +11,9 @@ export default function ProjectsPage() {
   return (
     <main className="min-h-screen pt-20 relative overflow-hidden">
       <div className="relative z-10">
-        <Technologies />
-        <SectionDivider variant="gradient" />
         <Projects />
+        <SectionDivider variant="gradient" />
+        <Technologies />
       </div>
     </main>
   );

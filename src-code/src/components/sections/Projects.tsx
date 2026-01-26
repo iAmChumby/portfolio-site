@@ -17,13 +17,15 @@ export default function Projects() {
     setTimeout(() => setIsAnimating(false), 600);
   };
   return (
-    <section id="projects" className="py-20 bg-muted/30">
+    <section id="projects" className="py-12">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="relative inline-block bg-black/30 backdrop-blur-md border border-white/20 rounded-lg p-8">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-white">{projectsContent.title}</h2>
-              <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-white">
+            <div className="relative inline-block neu-surface p-8">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-neu-text-primary">
+                <span className="neu-text-gradient">{projectsContent.title}</span>
+              </h2>
+              <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-neu-text-secondary">
                 {projectsContent.subtitle}
               </p>
             </div>
@@ -37,7 +39,7 @@ export default function Projects() {
               return (
                 <div 
                   key={project.id}
-                  className={`group bg-black/30 backdrop-blur-md border border-white/20 rounded-lg overflow-hidden hover:bg-black/40 hover:border-accent/50 hover:scale-105 transition-all duration-300 ${
+                  className={`group neu-surface overflow-hidden hover:scale-105 transition-all duration-300 ${
                     isNewProject ? 'project-card-enter' : ''
                   }`}
                   style={{
@@ -45,34 +47,38 @@ export default function Projects() {
                     animationFillMode: 'both'
                   }}
                 >
-                  <div className="aspect-video bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center border-b border-white/10 overflow-hidden">
-                    <img 
-                      src={project.image} 
-                      alt={project.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-all duration-300"
-                    />
+                  <div className="aspect-video bg-neu-bg-dark flex items-center justify-center border-b border-[#234d35] overflow-hidden p-2">
+                    <div className="w-full h-full rounded-t-lg overflow-hidden">
+                      <img 
+                        src={project.image} 
+                        alt={project.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-all duration-300"
+                      />
+                    </div>
                   </div>
                   
                   <div className="p-6">
-                    <h3 className="font-semibold text-white mb-3 text-xl">{project.title}</h3>
-                    <p className="text-white/80 mb-4 text-sm leading-relaxed">{project.description}</p>
+                    <h3 className="font-semibold text-neu-text-primary mb-3 text-xl">{project.title}</h3>
+                    <div className="neu-surface-inset p-4 rounded-lg mb-4">
+                      <p className="text-neu-text-secondary text-sm leading-relaxed">{project.description}</p>
+                    </div>
                     
-                    <div className="flex flex-wrap gap-3 mb-6 justify-center">
+                    <div className="flex flex-wrap gap-2 mb-6 justify-center">
                       {project.technologies.map((tech) => (
                         <span 
                           key={tech}
-                          className="relative px-4 py-2 rounded-full text-sm font-medium border cursor-pointer transition-all duration-300 ease-out transform-gpu bg-accent/20 text-white border-accent/30 hover:bg-accent/40 hover:border-accent/60 hover:scale-110 hover:shadow-lg hover:shadow-accent/25"
+                          className="neu-badge text-xs"
                         >
                           {tech}
                         </span>
                       ))}
                     </div>
                     
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 justify-center">
                       {project.demo && project.demo !== '#' && (
                         <button 
                           onClick={() => window.open(project.demo, '_blank')}
-                          className="flex items-center gap-2 px-4 py-2 bg-accent/20 text-accent border border-accent/30 rounded-lg text-sm font-medium hover:bg-accent hover:text-white transition-all duration-300"
+                          className="neu-btn neu-btn-raised flex items-center gap-2 px-4 py-2 text-sm"
                         >
                           <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                           Live Demo
@@ -81,7 +87,7 @@ export default function Projects() {
                       {project.code && project.code !== '#' && (
                         <button 
                           onClick={() => window.open(project.code, '_blank')}
-                          className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg text-sm font-medium hover:bg-white/20 hover:border-white/40 transition-all duration-300"
+                          className="neu-btn neu-btn-outline flex items-center gap-2 px-4 py-2 text-sm"
                         >
                           <CodeBracketIcon className="w-4 h-4" />
                           Code
@@ -98,10 +104,10 @@ export default function Projects() {
             <button 
               onClick={handleToggleProjects}
               disabled={isAnimating}
-              className={`flex items-center gap-2 px-6 py-3 bg-white/10 text-white border border-white/20 rounded-lg font-medium transition-all duration-300 mx-auto transform-gpu ${
+              className={`neu-btn flex items-center gap-2 px-6 py-3 transition-all duration-300 mx-auto transform-gpu ${
                 isAnimating 
-                  ? 'scale-95 bg-white/5 cursor-not-allowed opacity-80' 
-                  : 'hover:bg-white/20 hover:border-white/40 hover:scale-105 active:scale-95 active:bg-white/30'
+                  ? 'neu-surface-inset cursor-not-allowed opacity-80' 
+                  : 'neu-btn-raised'
               }`}
             >
               <div className={`transition-transform duration-300 ${isAnimating ? 'rotate-180' : ''}`}>

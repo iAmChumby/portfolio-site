@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import AnimatedBackground from "@/components/ui/AnimatedBackground";
@@ -14,42 +14,18 @@ const inter = Inter({
   display: "swap",
 });
 
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   display: "swap",
 });
-
-export const metadata: Metadata = {
-  title: siteConfig.seo.defaultTitle,
-  description: siteConfig.seo.defaultDescription,
-  keywords: siteConfig.seo.keywords,
-  authors: [{ name: siteConfig.site.author.name, url: siteConfig.site.url }],
-  creator: siteConfig.site.author.name,
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: siteConfig.site.url,
-    title: siteConfig.seo.defaultTitle,
-    description: siteConfig.seo.defaultDescription,
-    siteName: siteConfig.site.name,
-    images: [
-      {
-        url: siteConfig.seo.ogImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.site.name,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.seo.defaultTitle,
-    description: siteConfig.seo.defaultDescription,
-    creator: siteConfig.seo.twitterHandle,
-    images: [siteConfig.seo.ogImage],
-  },
-};
+// ... metadata ...
 
 export default function RootLayout({
   children,
@@ -59,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <SmoothScrollProvider>
           <AnimatedBackground />

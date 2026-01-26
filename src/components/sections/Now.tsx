@@ -7,6 +7,7 @@ import { SiSpotify, SiApplemusic } from 'react-icons/si';
 import WeatherCard from '@/components/ui/WeatherCard';
 import KnicksGameIndicator from '@/components/ui/KnicksGameIndicator';
 import NowPost from '@/components/ui/NowPost';
+import ProximityCard from '@/components/ui/ProximityCard';
 import { LOCATIONS } from '@/lib/weather';
 import { NowData } from '@/types/now';
 import nowData from '@/data/now.json';
@@ -47,7 +48,7 @@ export default function Now() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12">
             {/* Left Column - Posts */}
             <div className="order-2 lg:order-1 space-y-8">
-              <div className="neu-surface p-6">
+              <ProximityCard className="neu-surface p-6">
                 <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-neu-text-primary">
                   Recent Updates
                 </h3>
@@ -56,183 +57,190 @@ export default function Now() {
                     <NowPost key={post.id} post={post} />
                   ))}
                 </div>
-              </div>
+              </ProximityCard>
             </div>
 
-            {/* Right Column - Asymmetric Grid */}
-            <div className="order-1 lg:order-2 space-y-8">
-              {/* Availability Card */}
-              <div className="neu-surface p-6">
-                <div className="flex items-center gap-4">
-                  <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center">
-                    <div className={`w-3 h-3 rounded-full ${statusDotColors[data.availability.status]} animate-pulse`}></div>
-                  </div>
-                  <div>
-                    <p className="font-medium text-neu-text-primary">Status</p>
-                    <p className={`text-sm ${statusColors[data.availability.status]}`}>
-                      {data.availability.message}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Knicks Game Indicator */}
-              <KnicksGameIndicator />
-
-              {/* Weather Cards */}
-              <div className="neu-surface p-6">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-neu-text-primary">
-                  Weather
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <WeatherCard
-                    location={LOCATIONS.utica.name}
-                    latitude={LOCATIONS.utica.latitude}
-                    longitude={LOCATIONS.utica.longitude}
-                  />
-                  <WeatherCard
-                    location={LOCATIONS.rochester.name}
-                    latitude={LOCATIONS.rochester.latitude}
-                    longitude={LOCATIONS.rochester.longitude}
-                  />
-                </div>
-              </div>
-
-              {/* On Repeat - Music */}
-              <div className="neu-surface p-6">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-neu-text-primary">
-                  On Repeat
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Album */}
-                  <div className="neu-surface-inset p-4 rounded-lg">
-                    <p className="text-xs text-neu-text-muted uppercase tracking-wide mb-3">Album</p>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image
-                          src={data.onRepeat.album.imageUrl}
-                          alt={data.onRepeat.album.name}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-neu-text-primary truncate">
-                          {data.onRepeat.album.name}
-                        </p>
-                        <p className="text-xs text-neu-text-secondary truncate">
-                          {data.onRepeat.album.artist}
-                        </p>
-                      </div>
+            {/* Right Column - Reorganized Layout */}
+            <div className="order-1 lg:order-2 space-y-6">
+              {/* Top Row: Status + Knicks side by side */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Availability Card */}
+                <ProximityCard className="neu-surface p-6 h-full transition-all duration-300">
+                  <div className="flex items-center gap-4">
+                    {/* Status Dot Container */}
+                    <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className={`w-3 h-3 rounded-full ${statusDotColors[data.availability.status]} animate-pulse`}></div>
                     </div>
-                    {(data.onRepeat.album.spotifyURL || data.onRepeat.album.appleMusicURL) && (
-                      <div className="flex items-center gap-2">
-                        {data.onRepeat.album.spotifyURL && (
-                          <Link
-                            href={data.onRepeat.album.spotifyURL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={cn(
-                              'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
-                              'flex items-center justify-center',
-                              'hover:scale-105 active:scale-95',
-                              'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
-                              'text-neu-text-secondary hover:text-[#1DB954]'
-                            )}
-                            aria-label="Open album on Spotify"
-                          >
-                            <SiSpotify className="w-5 h-5" />
-                          </Link>
-                        )}
-                        {data.onRepeat.album.appleMusicURL && (
-                          <Link
-                            href={data.onRepeat.album.appleMusicURL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={cn(
-                              'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
-                              'flex items-center justify-center',
-                              'hover:scale-105 active:scale-95',
-                              'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
-                              'text-neu-text-secondary hover:text-[#FA243C]'
-                            )}
-                            aria-label="Open album on Apple Music"
-                          >
-                            <SiApplemusic className="w-5 h-5" />
-                          </Link>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Song */}
-                  <div className="neu-surface-inset p-4 rounded-lg">
-                    <p className="text-xs text-neu-text-muted uppercase tracking-wide mb-3">Song</p>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image
-                          src={data.onRepeat.song.imageUrl}
-                          alt={data.onRepeat.song.name}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-neu-text-primary truncate">
-                          {data.onRepeat.song.name}
-                        </p>
-                        <p className="text-xs text-neu-text-secondary truncate">
-                          {data.onRepeat.song.artist}
-                        </p>
-                      </div>
+                    
+                    {/* Text Info */}
+                    <div>
+                      <p className="font-medium text-neu-text-primary">Status</p>
+                      <p className={`text-sm ${statusColors[data.availability.status]}`}>
+                        {data.availability.message}
+                      </p>
                     </div>
-                    {(data.onRepeat.song.spotifyURL || data.onRepeat.song.appleMusicURL) && (
-                      <div className="flex items-center gap-2">
-                        {data.onRepeat.song.spotifyURL && (
-                          <Link
-                            href={data.onRepeat.song.spotifyURL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={cn(
-                              'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
-                              'flex items-center justify-center',
-                              'hover:scale-105 active:scale-95',
-                              'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
-                              'text-neu-text-secondary hover:text-[#1DB954]'
-                            )}
-                            aria-label="Open song on Spotify"
-                          >
-                            <SiSpotify className="w-5 h-5" />
-                          </Link>
-                        )}
-                        {data.onRepeat.song.appleMusicURL && (
-                          <Link
-                            href={data.onRepeat.song.appleMusicURL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={cn(
-                              'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
-                              'flex items-center justify-center',
-                              'hover:scale-105 active:scale-95',
-                              'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
-                              'text-neu-text-secondary hover:text-[#FA243C]'
-                            )}
-                            aria-label="Open song on Apple Music"
-                          >
-                            <SiApplemusic className="w-5 h-5" />
-                          </Link>
-                        )}
-                      </div>
-                    )}
                   </div>
-                </div>
+                </ProximityCard>
+
+                {/* Knicks Game Indicator */}
+                <KnicksGameIndicator />
               </div>
 
-              {/* Currently Playing - Game */}
-              <div className="neu-surface p-6">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-neu-text-primary">
+              {/* Middle: Songs + Weather side by side in cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Songs Card */}
+                <ProximityCard className="neu-surface p-6 h-full flex flex-col">
+                  <h3 className="text-xl font-bold mb-6 text-neu-text-primary">On Repeat</h3>
+                  <div className="flex flex-col gap-4 flex-1">
+                    {/* Album Card */}
+                    <div className="neu-surface-inset p-4 rounded-lg transition-all duration-300 hover:scale-[1.02] flex-1">
+                      <p className="text-xs text-neu-text-muted uppercase tracking-wide mb-3">Album</p>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                          <Image
+                            src={data.onRepeat.album.imageUrl}
+                            alt={data.onRepeat.album.name}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-neu-text-primary truncate">
+                            {data.onRepeat.album.name}
+                          </p>
+                          <p className="text-xs text-neu-text-secondary truncate">
+                            {data.onRepeat.album.artist}
+                          </p>
+                        </div>
+                      </div>
+                      {(data.onRepeat.album.spotifyURL || data.onRepeat.album.appleMusicURL) && (
+                        <div className="flex items-center gap-2">
+                          {data.onRepeat.album.spotifyURL && (
+                            <Link
+                              href={data.onRepeat.album.spotifyURL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
+                                'flex items-center justify-center',
+                                'hover:scale-105 active:scale-95',
+                                'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
+                                'text-neu-text-secondary hover:text-[#1DB954]'
+                              )}
+                              aria-label="Open album on Spotify"
+                            >
+                              <SiSpotify className="w-5 h-5" />
+                            </Link>
+                          )}
+                          {data.onRepeat.album.appleMusicURL && (
+                            <Link
+                              href={data.onRepeat.album.appleMusicURL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
+                                'flex items-center justify-center',
+                                'hover:scale-105 active:scale-95',
+                                'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
+                                'text-neu-text-secondary hover:text-[#FA243C]'
+                              )}
+                              aria-label="Open album on Apple Music"
+                            >
+                              <SiApplemusic className="w-5 h-5" />
+                            </Link>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Song Card */}
+                    <div className="neu-surface-inset p-4 rounded-lg transition-all duration-300 hover:scale-[1.02] flex-1">
+                      <p className="text-xs text-neu-text-muted uppercase tracking-wide mb-3">Song</p>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                          <Image
+                            src={data.onRepeat.song.imageUrl}
+                            alt={data.onRepeat.song.name}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-neu-text-primary truncate">
+                            {data.onRepeat.song.name}
+                          </p>
+                          <p className="text-xs text-neu-text-secondary truncate">
+                            {data.onRepeat.song.artist}
+                          </p>
+                        </div>
+                      </div>
+                      {(data.onRepeat.song.spotifyURL || data.onRepeat.song.appleMusicURL) && (
+                        <div className="flex items-center gap-2">
+                          {data.onRepeat.song.spotifyURL && (
+                            <Link
+                              href={data.onRepeat.song.spotifyURL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
+                                'flex items-center justify-center',
+                                'hover:scale-105 active:scale-95',
+                                'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
+                                'text-neu-text-secondary hover:text-[#1DB954]'
+                              )}
+                              aria-label="Open song on Spotify"
+                            >
+                              <SiSpotify className="w-5 h-5" />
+                            </Link>
+                          )}
+                          {data.onRepeat.song.appleMusicURL && (
+                            <Link
+                              href={data.onRepeat.song.appleMusicURL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
+                                'flex items-center justify-center',
+                                'hover:scale-105 active:scale-95',
+                                'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
+                                'text-neu-text-secondary hover:text-[#FA243C]'
+                              )}
+                              aria-label="Open song on Apple Music"
+                            >
+                              <SiApplemusic className="w-5 h-5" />
+                            </Link>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </ProximityCard>
+
+                {/* Weather Card */}
+                <ProximityCard className="neu-surface p-6 h-full flex flex-col">
+                  <h3 className="text-xl font-bold mb-6 text-neu-text-primary">Weather</h3>
+                  <div className="flex flex-col gap-4 flex-1">
+                    <WeatherCard
+                      location={LOCATIONS.utica.name}
+                      latitude={LOCATIONS.utica.latitude}
+                      longitude={LOCATIONS.utica.longitude}
+                      className="flex-1"
+                    />
+                    <WeatherCard
+                      location={LOCATIONS.rochester.name}
+                      latitude={LOCATIONS.rochester.latitude}
+                      longitude={LOCATIONS.rochester.longitude}
+                      className="flex-1"
+                    />
+                  </div>
+                </ProximityCard>
+              </div>
+
+              {/* Bottom: Currently Playing - Game */}
+              <ProximityCard className="neu-surface p-6">
+                <h3 className="text-lg font-bold mb-4 text-neu-text-primary">
                   Currently Playing
                 </h3>
                 <div className="flex items-center gap-4">
@@ -252,7 +260,7 @@ export default function Now() {
                     <p className="text-sm text-neu-text-secondary">Gaming</p>
                   </div>
                 </div>
-              </div>
+              </ProximityCard>
             </div>
           </div>
         </div>

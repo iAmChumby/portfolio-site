@@ -1,6 +1,7 @@
 'use client';
 
 import siteConfig from '@/data/site-config.json';
+import ProximityCard from '@/components/ui/ProximityCard';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -13,17 +14,17 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {/* Brand Section */}
-          <div className="neu-surface p-6 sm:p-8 space-y-4 text-center md:text-left">
+          <ProximityCard className="neu-surface p-6 sm:p-8 space-y-4 text-center md:text-left">
             <h3 className="text-xl font-bold neu-text-gradient">
               {siteConfig.site.author.name}
             </h3>
             <p className="text-base text-neu-text-secondary max-w-sm mx-auto md:mx-0">
               Full-stack developer passionate about creating innovative web solutions and beautiful user experiences.
             </p>
-          </div>
+          </ProximityCard>
 
           {/* Quick Links */}
-          <div className="neu-surface p-6 sm:p-8 space-y-4 text-center md:text-left">
+          <ProximityCard className="neu-surface p-6 sm:p-8 space-y-4 text-center md:text-left">
             <h4 className="text-lg font-semibold text-neu-text-primary">Quick Links</h4>
             <nav className="flex flex-col space-y-3">
               {siteConfig.site.navigation.map((item: { label: string; href: string }) => (
@@ -37,36 +38,39 @@ export default function Footer() {
                 </a>
               ))}
             </nav>
-          </div>
+          </ProximityCard>
 
           {/* Contact Info */}
-          <div className="neu-surface p-6 sm:p-8 space-y-4 text-center md:text-left">
+          <ProximityCard className="neu-surface p-6 sm:p-8 space-y-4 text-center md:text-left">
             <h4 className="text-lg font-semibold text-neu-text-primary">Connect</h4>
             <div className="flex flex-col space-y-3">
               <a
                 href={`mailto:${siteConfig.site.author.email}`}
-                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200"
+                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200 flex items-center justify-center md:justify-start group"
               >
+                <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 mr-0 group-hover:mr-2 h-[2px] bg-neu-accent"></span>
                 {siteConfig.site.author.email}
               </a>
               <a
                 href={siteConfig.site.social.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200"
+                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200 flex items-center justify-center md:justify-start group"
               >
+                 <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 mr-0 group-hover:mr-2 h-[2px] bg-neu-accent"></span>
                 GitHub
               </a>
               <a
                 href={siteConfig.site.social.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200"
+                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200 flex items-center justify-center md:justify-start group"
               >
+                 <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 mr-0 group-hover:mr-2 h-[2px] bg-neu-accent"></span>
                 LinkedIn
               </a>
             </div>
-          </div>
+          </ProximityCard>
         </div>
 
         {/* Bottom Section */}

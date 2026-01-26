@@ -7,11 +7,13 @@ import {
   getWeatherDescription,
   getWeatherEmoji,
 } from '@/lib/weather';
+import { cn } from '@/lib/utils';
 
 interface WeatherCardProps {
   location: string;
   latitude: number;
   longitude: number;
+  className?: string;
 }
 
 /**
@@ -43,6 +45,7 @@ export default function WeatherCard({
   location,
   latitude,
   longitude,
+  className,
 }: WeatherCardProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,7 +77,7 @@ export default function WeatherCard({
 
   if (loading) {
     return (
-      <div className="neu-surface-inset p-4 rounded-lg animate-pulse">
+      <div className={cn("neu-surface-inset p-4 rounded-lg animate-pulse", className)}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-neu-bg-dark/50" />
           <div className="flex-1">
@@ -88,7 +91,7 @@ export default function WeatherCard({
 
   if (error || !weather) {
     return (
-      <div className="neu-surface-inset p-4 rounded-lg">
+      <div className={cn("neu-surface-inset p-4 rounded-lg", className)}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-neu-bg-dark/30 flex items-center justify-center">
             <span className="text-lg">⚠️</span>
@@ -103,7 +106,7 @@ export default function WeatherCard({
   }
 
   return (
-    <div className="neu-surface-inset p-4 rounded-lg transition-all duration-300 hover:scale-[1.02]">
+    <div className={cn("neu-surface-inset p-4 rounded-lg transition-all duration-300 hover:scale-[1.02] flex flex-col justify-center", className)}>
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-neu-bg-dark/30 flex items-center justify-center">
           <span className="text-xl">

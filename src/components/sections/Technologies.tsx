@@ -19,6 +19,8 @@ import {
   SiAngular
 } from 'react-icons/si';
 
+import ProximityCard from '@/components/ui/ProximityCard';
+
 const Technologies: React.FC = () => {
   const technologies = [
     { name: 'React', icon: FaReact, category: 'Frontend' },
@@ -41,25 +43,25 @@ const Technologies: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="relative inline-block">
-              <div className="neu-surface p-8 mb-4">
+              <ProximityCard className="neu-surface p-8 mb-4">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 neu-text-gradient">Technologies & Skills</h2>
                 <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-neu-text-secondary">
                   Here are the technologies and tools I work with regularly
                 </p>
-              </div>
+              </ProximityCard>
             </div>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
             {technologies.map((tech, index) => (
               <ScrollReveal key={tech.name} delay={index * 100} direction="up">
-                <div className="group neu-surface p-6 text-center hover:scale-105 transition-transform duration-300">
+                <ProximityCard className="group neu-surface p-6 text-center hover:scale-105 transition-transform duration-300">
                   <div className="flex justify-center mb-4">
                     <tech.icon className="w-12 h-12 text-neu-accent group-hover:scale-110 group-hover:text-neu-accent-light transition-all duration-300" />
                   </div>
                   <h3 className="font-semibold text-neu-text-primary mb-2">{tech.name}</h3>
                   <p className="text-sm text-neu-text-muted">{tech.category}</p>
-                </div>
+                </ProximityCard>
               </ScrollReveal>
             ))}
           </div>

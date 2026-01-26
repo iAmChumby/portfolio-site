@@ -11,9 +11,9 @@
         "variant": "raised"
       },
       {
-        "text": "Let's chat",
-        "href": "/contact",
-        "variant": "outline"
+        "text": "See what I'm up to",
+        "href": "/now",
+        "variant": "raised"
       }
     ]
   },

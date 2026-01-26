@@ -7,6 +7,7 @@ import { getProjectsContent } from '@/lib/content-loader';
 import ProjectGraph from '@/components/ui/ProjectGraph';
 import ProjectModal from '@/components/ui/ProjectModal';
 import { ProjectItem } from '@/types/content';
+import ProximityCard from '@/components/ui/ProximityCard';
 
 export default function Projects() {
   const projectsContent = getProjectsContent();
@@ -37,13 +38,15 @@ export default function Projects() {
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
-            <div className="relative inline-block neu-surface p-8 mb-8">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-neu-text-primary">
-                <span className="neu-text-gradient">{projectsContent.title}</span>
-              </h2>
-              <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-neu-text-secondary">
-                {projectsContent.subtitle}
-              </p>
+            <div className="relative inline-block mb-8">
+              <ProximityCard className="neu-surface p-8">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4 text-neu-text-primary">
+                  <span className="neu-text-gradient">{projectsContent.title}</span>
+                </h2>
+                <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-neu-text-secondary">
+                  {projectsContent.subtitle}
+                </p>
+              </ProximityCard>
             </div>
 
             {/* View Toggle */}
@@ -99,9 +102,9 @@ export default function Projects() {
                     const animationDelay = isNewProject ? `${(index - 3) * 150}ms` : '0ms';
                     
                     return (
-                        <div 
+                        <ProximityCard 
                         key={project.id}
-                        className={`group neu-surface overflow-hidden hover:scale-105 transition-all duration-300 ${
+                        className={`group neu-surface hover:scale-105 transition-all duration-300 ${
                             isNewProject ? 'project-card-enter' : ''
                         }`}
                         style={{
@@ -167,7 +170,7 @@ export default function Projects() {
                             )}
                             </div>
                         </div>
-                        </div>
+                        </ProximityCard>
                     );
                     })}
                 </div>

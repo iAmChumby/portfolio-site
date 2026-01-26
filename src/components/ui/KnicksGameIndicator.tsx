@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import ProximityCard from './ProximityCard';
 
 interface KnicksGameData {
   isPlaying: boolean;
@@ -28,6 +29,7 @@ export default function KnicksGameIndicator() {
   const [gameData, setGameData] = useState<KnicksGameData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isBouncing, setIsBouncing] = useState(false);
 
   useEffect(() => {
     const fetchGameData = async () => {
@@ -49,21 +51,25 @@ export default function KnicksGameIndicator() {
     fetchGameData();
 
     // Refresh every 30 seconds while the game is live, every 5 minutes otherwise
-    const getRefreshInterval = () => {
-      if (gameData?.gameStatus === 'in') return 30000; // 30 seconds during live games
-      return 300000; // 5 minutes otherwise
-    };
-    
-    const interval = setInterval(fetchGameData, getRefreshInterval());
+    const refreshInterval = gameData?.gameStatus === 'in' ? 30000 : 300000;
+    const interval = setInterval(fetchGameData, refreshInterval);
     return () => clearInterval(interval);
   }, [gameData?.gameStatus]);
+
+  // Handle bouncing ball easter egg
+  const handleBallClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsBouncing(true);
+    setTimeout(() => setIsBouncing(false), 600);
+  }, []);
 
   // Loading state
   if (isLoading) {
     return (
-      <div className="neu-surface p-4 animate-pulse">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-neu-surface-inset rounded-lg" />
+      <div className="neu-surface p-6">
+        <div className="flex items-center gap-4 animate-pulse">
+          <div className="neu-surface-inset w-12 h-12 rounded-lg gap-2" />
           <div className="flex-1">
             <div className="h-4 bg-neu-surface-inset rounded w-32 mb-2" />
             <div className="h-3 bg-neu-surface-inset rounded w-24" />
@@ -73,104 +79,61 @@ export default function KnicksGameIndicator() {
     );
   }
 
-  // Error state - hide the component
+  // Error state or no data - hide the component
   if (error || !gameData) {
     return null;
   }
 
-  // No games scheduled (off-season) but still show team info if we have record
-  if (gameData.gameStatus === null && !gameData.opponentName) {
-    if (!gameData.teamRecord) return null;
-    
-    return (
-      <Link
-        href="https://www.espn.com/nba/team/_/name/ny/new-york-knicks"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <div
-          className={cn(
-            'neu-surface p-4 transition-all duration-300',
-            'hover:scale-[1.02] cursor-pointer',
-            'border-l-4 border-l-[#F58426]'
-          )}
-        >
-          <div className="flex items-center gap-4">
-            <div className="relative w-12 h-12 flex-shrink-0">
-              <Image
-                src={KNICKS_LOGO}
-                alt="New York Knicks"
-                fill
-                className="object-contain"
-                unoptimized
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-neu-text-primary">
-                New York Knicks
-              </p>
-              <p className="text-sm text-neu-text-secondary">
-                {gameData.teamRecord}
-              </p>
-            </div>
-            <div className="flex-shrink-0 text-2xl" role="img" aria-label="basketball">
-              🏀
-            </div>
-          </div>
-        </div>
-      </Link>
-    );
-  }
-
-  const getMoodEmoji = () => {
-    if (gameData.gameStatus === 'pre') {
-      return '🏀'; // Game hasn't started
+  const getStatusDotColor = () => {
+    if (gameData.gameStatus === 'in') {
+      if (gameData.isWinning) return 'bg-green-400';
+      if (gameData.isTied) return 'bg-yellow-400';
+      return 'bg-red-400';
     }
-    if (gameData.isTied) {
-      return '😬'; // Tied
+    if (gameData.gameStatus === 'post') {
+      return gameData.isWinning ? 'bg-green-400' : 'bg-red-400';
     }
-    if (gameData.isWinning === true) {
-      return '😊'; // Winning
-    }
-    if (gameData.isWinning === false) {
-      return '😢'; // Losing
-    }
-    return '🏀';
+    return 'bg-[#F58426]'; // Knicks orange for upcoming/off-season
   };
 
-  const getStatusColor = () => {
-    if (gameData.gameStatus === 'pre') {
-      return 'text-neu-text-muted';
+  const getStatusText = () => {
+    // Off-season / No scheduled game found
+    if (gameData.gameStatus === null && !gameData.opponentName) {
+      return gameData.teamRecord || '';
     }
+
     if (gameData.gameStatus === 'in') {
-      if (gameData.isTied) return 'text-yellow-400';
+      const score = `${gameData.knicksScore} - ${gameData.opponentScore}`;
+      const timeInfo = `${gameData.period} ${gameData.clock}`;
+      return `${score} • ${timeInfo}`;
+    }
+    if (gameData.gameStatus === 'post') {
+      const score = `${gameData.knicksScore} - ${gameData.opponentScore}`;
+      const result = gameData.isWinning ? 'W' : 'L';
+      return `${result} ${score}`;
+    }
+    return formatGameTime();
+  };
+
+  const getStatusTextColor = () => {
+    if (gameData.gameStatus === 'in') {
       if (gameData.isWinning) return 'text-green-400';
+      if (gameData.isTied) return 'text-yellow-400';
       return 'text-red-400';
     }
-    // Post game
-    if (gameData.isWinning) return 'text-green-400';
-    return 'text-red-400';
-  };
-
-  const getBorderColor = () => {
-    if (gameData.gameStatus === 'in') {
-      if (gameData.isWinning) return 'border-l-green-400';
-      if (gameData.isTied) return 'border-l-yellow-400';
-      return 'border-l-red-400';
+    if (gameData.gameStatus === 'post') {
+      return gameData.isWinning ? 'text-green-400' : 'text-red-400';
     }
-    return 'border-l-[#F58426]'; // Knicks orange for pre/upcoming games
+    return 'text-neu-text-secondary';
   };
 
-  const formatGameTime = () => {
-    if (!gameData.gameTime) return null;
+  function formatGameTime(): string {
+    if (!gameData?.gameTime) return '';
     const date = new Date(gameData.gameTime);
     const now = new Date();
     
-    // Check if game is today
     const isToday = date.toDateString() === now.toDateString();
     
-    // Check if game is tomorrow
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const isTomorrow = date.toDateString() === tomorrow.toDateString();
@@ -181,34 +144,33 @@ export default function KnicksGameIndicator() {
       hour12: true,
     });
     
-    if (isToday) {
-      return `Today at ${timeStr}`;
-    }
+    if (isToday) return `Today ${timeStr}`;
+    if (isTomorrow) return `Tomorrow ${timeStr}`;
     
-    if (isTomorrow) {
-      return `Tomorrow at ${timeStr}`;
-    }
-    
-    // Show day of week for games within the next 7 days
     const daysUntil = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     if (daysUntil <= 7) {
       const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-      return `${dayName} at ${timeStr}`;
+      return `${dayName} ${timeStr}`;
     }
     
-    // Show full date for games further out
-    const dateStr = date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-    return `${dateStr} at ${timeStr}`;
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `${dateStr} ${timeStr}`;
+  }
+
+  const getHeadlineText = () => {
+    if (gameData.gameStatus === null && !gameData.opponentName) {
+      return 'Knicks';
+    }
+    const prefix = gameData.isHome ? 'vs' : '@';
+    return `Knicks ${prefix} ${gameData.opponentName}`;
   };
 
-  const getMatchupText = () => {
-    if (gameData.isHome) {
-      return `vs ${gameData.opponentName}`;
-    }
-    return `@ ${gameData.opponentName}`;
+  const getMoodEmoji = () => {
+    if (gameData.gameStatus === 'pre' || gameData.gameStatus === null) return '🏀';
+    if (gameData.isTied) return '😬';
+    if (gameData.isWinning === true) return '😊';
+    if (gameData.isWinning === false) return '😢';
+    return '🏀';
   };
 
   return (
@@ -216,18 +178,22 @@ export default function KnicksGameIndicator() {
       href="https://www.espn.com/nba/team/_/name/ny/new-york-knicks"
       target="_blank"
       rel="noopener noreferrer"
-      className="block"
+      className="block h-full"
     >
-      <div
-        className={cn(
-          'neu-surface p-4 transition-all duration-300',
-          'hover:scale-[1.02] cursor-pointer',
-          'border-l-4',
-          getBorderColor()
-        )}
-      >
+      <ProximityCard className="neu-surface p-6 h-full transition-all duration-300">
         <div className="flex items-center gap-4">
-          {/* Knicks Logo */}
+          {/* Status Indicator Circle */}
+          <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div 
+              className={cn(
+                'w-3 h-3 rounded-full',
+                getStatusDotColor(),
+                gameData.gameStatus === 'in' && 'animate-pulse'
+              )}
+            />
+          </div>
+
+          {/* Knicks Logo - Directly on card */}
           <div className="relative w-12 h-12 flex-shrink-0">
             <Image
               src={KNICKS_LOGO}
@@ -237,79 +203,30 @@ export default function KnicksGameIndicator() {
               unoptimized
             />
           </div>
-
+          
           {/* Game Info */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              {gameData.gameStatus === 'in' && (
-                <span className="flex items-center gap-1">
-                  <span
-                    className="w-2 h-2 rounded-full bg-red-500 animate-pulse"
-                  />
-                  <span className="text-xs font-semibold text-red-400 uppercase">
-                    Live
-                  </span>
-                </span>
-              )}
-              <span className="text-sm font-medium text-neu-text-primary truncate">
-                Knicks {getMatchupText()}
-              </span>
-            </div>
-
-            {/* Score or Time */}
-            <div className="flex items-center gap-3">
-              {gameData.gameStatus === 'pre' ? (
-                <span className="text-sm text-neu-text-secondary">
-                  {formatGameTime()}
-                </span>
-              ) : (
-                <>
-                  <span className={cn('text-lg font-bold', getStatusColor())}>
-                    {gameData.knicksScore} - {gameData.opponentScore}
-                  </span>
-                  {gameData.gameStatus === 'in' && (
-                    <span className="text-xs text-neu-text-muted">
-                      {gameData.period} • {gameData.clock}
-                    </span>
-                  )}
-                  {gameData.gameStatus === 'post' && (
-                    <span className="text-xs text-neu-text-muted">Final</span>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Team record */}
-            {gameData.teamRecord && gameData.gameStatus === 'pre' && (
-              <p className="text-xs text-neu-text-muted mt-1">
-                Record: {gameData.teamRecord}
-              </p>
+            <p className="font-medium text-neu-text-primary">
+              {getHeadlineText()}
+            </p>
+            <p className={cn('text-sm', getStatusTextColor())}>
+              {getStatusText()}
+            </p>
+          </div>
+          
+          {/* Mood Emoji - Clickable Easter Egg */}
+          <button
+            onClick={handleBallClick}
+            className={cn(
+              'text-2xl cursor-pointer transition-transform select-none hover:scale-110',
+              isBouncing && 'animate-bounce-ball'
             )}
-          </div>
-
-          {/* Mood Indicator */}
-          <div className="flex-shrink-0 text-3xl" role="img" aria-label={
-            gameData.gameStatus === 'pre' ? 'basketball' :
-            gameData.isWinning ? 'happy' : 
-            gameData.isTied ? 'nervous' : 'sad'
-          }>
+            aria-label="Bounce basketball"
+          >
             {getMoodEmoji()}
-          </div>
-
-          {/* Opponent Logo */}
-          {gameData.opponentLogo && (
-            <div className="relative w-10 h-10 flex-shrink-0 opacity-60">
-              <Image
-                src={gameData.opponentLogo}
-                alt={gameData.opponentName || 'Opponent'}
-                fill
-                className="object-contain"
-                unoptimized
-              />
-            </div>
-          )}
+          </button>
         </div>
-      </div>
+      </ProximityCard>
     </Link>
   );
 }

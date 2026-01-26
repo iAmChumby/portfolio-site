@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getHeroContent } from '@/lib/content-loader';
+import ProximityCard from '@/components/ui/ProximityCard';
 
 export default function Hero() {
   const heroContent = getHeroContent();
@@ -106,7 +107,7 @@ export default function Hero() {
           </div>
 
           {/* Main name in neumorphic inset container - with swipe functionality */}
-          <div 
+          <ProximityCard 
             ref={containerRef}
             className="neu-glass neu-texture p-6 sm:p-8 md:p-10 mb-6 sm:mb-8 animate-float rounded-2xl relative overflow-hidden cursor-grab active:cursor-grabbing select-none"
             onTouchStart={handleTouchStart}
@@ -147,7 +148,7 @@ export default function Hero() {
                 </div>
               </div>
             </div>
-          </div>
+          </ProximityCard>
 
           {/* Tagline pill */}
           <div className="mb-6 sm:mb-8 animate-fade-in animation-delay-400">
@@ -157,11 +158,11 @@ export default function Hero() {
           </div>
 
           {/* Description */}
-          <div className="neu-glass neu-texture p-6 mb-8 sm:mb-10 max-w-2xl mx-auto rounded-2xl animate-float-delayed">
+          <ProximityCard className="neu-glass neu-texture p-6 mb-8 sm:mb-10 max-w-2xl mx-auto rounded-2xl animate-float-delayed">
             <p className="text-base sm:text-lg md:text-xl leading-relaxed text-neu-text-secondary animate-fade-in animation-delay-400">
               {heroContent.description}
             </p>
-          </div>
+          </ProximityCard>
 
           {/* Neumorphic buttons */}
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-in animation-delay-600">

@@ -16,7 +16,6 @@ export default function ProjectsPage() {
     <main className="min-h-screen pt-20 relative overflow-hidden">
       <div className="relative z-10">
         <Projects />
-        <SectionDivider variant="gradient" />
         <Technologies />
       </div>
     </main>

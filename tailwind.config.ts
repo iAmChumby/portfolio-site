@@ -111,6 +111,7 @@ const config: Config = {
         'gradient': 'gradient 15s ease infinite',
         'float': 'float 6s ease-in-out infinite',
         'float-delayed': 'float 6s ease-in-out 2s infinite',
+        'bounce-ball': 'bounceBall 0.6s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -169,6 +170,15 @@ const config: Config = {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-6px)' },
+        },
+        bounceBall: {
+          '0%': { transform: 'translateY(0) scale(1, 1)' },
+          '15%': { transform: 'translateY(-20px) scale(0.95, 1.05)' },
+          '30%': { transform: 'translateY(0) scale(1.1, 0.9)' },
+          '45%': { transform: 'translateY(-10px) scale(0.97, 1.03)' },
+          '60%': { transform: 'translateY(0) scale(1.05, 0.95)' },
+          '75%': { transform: 'translateY(-4px) scale(0.99, 1.01)' },
+          '100%': { transform: 'translateY(0) scale(1, 1)' },
         },
       },
     },

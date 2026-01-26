@@ -1,8 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EnvelopeIcon, PhoneIcon, MapPinIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { getContactContent, getSiteConfig } from '@/lib/content-loader';
+
+declare global {
+  interface Window {
+    turnstile?: {
+      reset: () => void;
+    };
+  }
+}
 
 export default function Contact() {
   const contactContent = getContactContent();
@@ -12,33 +20,92 @@ export default function Contact() {
     email: '',
     message: ''
   });
-  
+
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus('loading');
-    
+
     try {
-      // Simulate form submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Handle form submission
+      if (!turnstileToken) {
+        setFormStatus('error');
+        setStatusMessage('Please complete the CAPTCHA verification.');
+        setTimeout(() => {
+          setFormStatus('idle');
+          setStatusMessage('');
+        }, 3000);
+        return;
+      }
+
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          turnstileToken,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          setFormStatus('error');
+          setStatusMessage('Too many submissions. Please try again later.');
+        } else {
+          setFormStatus('error');
+          setStatusMessage(data.error || 'Failed to send message. Please try again.');
+        }
+
+        // Reset Turnstile
+        setTurnstileToken('');
+        if (window.turnstile) {
+          window.turnstile.reset();
+        }
+
+        setTimeout(() => {
+          setFormStatus('idle');
+          setStatusMessage('');
+        }, 5000);
+        return;
+      }
+
       setFormStatus('success');
-      setStatusMessage('Thank you! Your message has been sent successfully.');
-      
-      // Reset form after success
+      setStatusMessage(data.message || 'Thank you! Your message has been sent successfully.');
+
       setTimeout(() => {
         setFormData({ name: '', email: '', message: '' });
+        setTurnstileToken('');
         setFormStatus('idle');
         setStatusMessage('');
+        if (window.turnstile) {
+          window.turnstile.reset();
+        }
       }, 3000);
-      
-    } catch {
+    } catch (error) {
+      console.error('Form submission error:', error);
       setFormStatus('error');
-      setStatusMessage('Sorry, there was an error sending your message. Please try again.');
-      
+      setStatusMessage('An error occurred. Please try again.');
+
       setTimeout(() => {
         setFormStatus('idle');
         setStatusMessage('');
@@ -184,8 +251,8 @@ export default function Contact() {
                 
                 {statusMessage && (
                   <div className={`neu-surface-inset flex items-center gap-2 p-4 rounded-lg ${
-                    formStatus === 'success' 
-                      ? 'text-neu-accent-light' 
+                    formStatus === 'success'
+                      ? 'text-neu-accent-light'
                       : 'text-red-400'
                   }`}>
                     {formStatus === 'success' ? (
@@ -196,7 +263,17 @@ export default function Contact() {
                     <span className="text-sm">{statusMessage}</span>
                   </div>
                 )}
-                
+
+                {/* Turnstile CAPTCHA Widget */}
+                <div className="flex justify-center">
+                  <div
+                    className="cf-turnstile"
+                    data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_KEY}
+                    data-callback={(token: string) => setTurnstileToken(token)}
+                    data-theme="light"
+                  />
+                </div>
+
                 <button 
                   type="submit" 
                   disabled={formStatus === 'loading'}

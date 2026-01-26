@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import * as d3Force from 'd3-force';
-import { select } from 'd3-selection';
+import { select, Selection } from 'd3-selection';
+import 'd3-transition';
 import { zoom, zoomIdentity, ZoomBehavior } from 'd3-zoom';
 
 import { ProjectItem } from '@/types/content';
@@ -127,10 +128,11 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
     simulationRef.current = simulation;
 
     // Create links
+    // After simulation starts, links will have GraphNode objects (d3 mutates them)
     const link = zoomContainer.append('g')
       .attr('class', 'links')
-      .selectAll('line')
-      .data(graphData.links)
+      .selectAll<SVGLineElement, GraphLink>('line')
+      .data(linksForSimulation)
       .join('line')
       .attr('stroke', 'rgba(255, 255, 255, 0.15)')
       .attr('stroke-width', 1.5);
@@ -157,23 +159,23 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
     // Add main circles with proper sizing and styling
     node.append('circle')
       .attr('class', 'node-circle')
-      .attr('r', (d) => d.type === 'project' ? 16 : 8)
-      .attr('fill', (d) => d.color)
-      .attr('stroke', (d) => d.type === 'project' ? '#2a4a35' : 'none')
-      .attr('stroke-width', (d) => d.type === 'project' ? 2 : 0);
+      .attr('r', (d: GraphNode) => d.type === 'project' ? 16 : 8)
+      .attr('fill', (d: GraphNode) => d.color)
+      .attr('stroke', (d: GraphNode) => d.type === 'project' ? '#2a4a35' : 'none')
+      .attr('stroke-width', (d: GraphNode) => d.type === 'project' ? 2 : 0);
 
     // Add labels with conditional visibility
     node.append('text')
       .attr('class', 'node-label')
-      .text((d) => d.label)
-      .attr('font-size', (d) => d.type === 'project' ? 42 : 14)
-      .attr('font-weight', (d) => d.type === 'project' ? 700 : 400)
+      .text((d: GraphNode) => d.label)
+      .attr('font-size', (d: GraphNode) => d.type === 'project' ? 42 : 14)
+      .attr('font-weight', (d: GraphNode) => d.type === 'project' ? 700 : 400)
       .attr('fill', '#ffffff')
       .attr('text-anchor', 'middle')
-      .attr('dy', (d) => (d.type === 'project' ? 16 : 8) + 28)
-      .style('opacity', (d) => d.type === 'project' ? 1 : 0)
+      .attr('dy', (d: GraphNode) => (d.type === 'project' ? 16 : 8) + 28)
+      .style('opacity', (d: GraphNode) => d.type === 'project' ? 1 : 0)
       .style('transition', 'opacity 0.3s ease')
-      .style('text-shadow', (d) => d.type === 'project' ? '0 2px 8px rgba(0,0,0,0.8)' : 'none');
+      .style('text-shadow', (d: GraphNode) => d.type === 'project' ? '0 2px 8px rgba(0,0,0,0.8)' : 'none');
 
     // Setup zoom behavior
     const zoomBehavior = zoom<SVGSVGElement, unknown>()
@@ -183,7 +185,7 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         
         // Update tech label visibility based on zoom level
         node.selectAll<SVGTextElement, GraphNode>('.node-label')
-          .style('opacity', function(d) {
+          .style('opacity', function(d: GraphNode) {
             if (d.type === 'project') return '1';
             return event.transform.k > 1.2 ? '1' : '0';
           });
@@ -196,23 +198,23 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
     svg.style('cursor', 'move');
 
     // Node interaction handlers
-    node.on('mouseenter', function() {
-      select<SVGCircleElement, GraphNode>(this).select<SVGCircleElement, GraphNode>('.node-circle')
+    (node as any).on('mouseenter', function(this: SVGGElement) {
+      (select(this).select<SVGCircleElement>('.node-circle') as any)
         .transition()
         .duration(200)
-        .attr('r', function(d) {
+        .attr('r', function(d: GraphNode) {
           return (d.type === 'project' ? 16 : 8) * 1.2;
         });
       svg.style('cursor', 'pointer');
     })
-    .on('mouseleave', function() {
-      select<SVGCircleElement, GraphNode>(this).select<SVGCircleElement, GraphNode>('.node-circle')
+    .on('mouseleave', function(this: SVGGElement) {
+      (select(this).select<SVGCircleElement>('.node-circle') as any)
         .transition()
         .duration(200)
-        .attr('r', (d) => d.type === 'project' ? 16 : 8);
+        .attr('r', (d: GraphNode) => d.type === 'project' ? 16 : 8);
       svg.style('cursor', 'move');
     })
-    .on('click', (_event, d) => {
+    .on('click', (_event: any, d: GraphNode) => {
       _event.stopPropagation();
       if (d.type === 'project') {
         const project = projects.find(p => p.id === d.id);
@@ -222,9 +224,10 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         const transform = zoomIdentity
           .translate(width / 2, height / 2)
           .scale(2.5)
-          .translate(-d.x!, -d.y!);
+          .translate(-(d.x ?? 0), -(d.y ?? 0));
         
-        svg.transition()
+        (svg as any)
+          .transition()
           .duration(1000)
           .call(zoomBehavior.transform, transform);
       }
@@ -234,15 +237,25 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
     // At this point, d3-force has mutated links to have GraphNode objects
     simulation.on('tick', () => {
       // Type assertion: d3-force mutates links to have GraphNode objects
-      const processedLinks = linksForSimulation as unknown as GraphLink[];
       link
-        .data(processedLinks)
-        .attr('x1', (d) => d.source.x ?? 0)
-        .attr('y1', (d) => d.source.y ?? 0)
-        .attr('x2', (d) => d.target.x ?? 0)
-        .attr('y2', (d) => d.target.y ?? 0);
+        .attr('x1', (d) => {
+          const source = (d as unknown as GraphLink).source;
+          return source.x ?? 0;
+        })
+        .attr('y1', (d) => {
+          const source = (d as unknown as GraphLink).source;
+          return source.y ?? 0;
+        })
+        .attr('x2', (d) => {
+          const target = (d as unknown as GraphLink).target;
+          return target.x ?? 0;
+        })
+        .attr('y2', (d) => {
+          const target = (d as unknown as GraphLink).target;
+          return target.y ?? 0;
+        });
 
-      node.attr('transform', (d) => `translate(${d.x ?? 0},${d.y ?? 0})`);
+      node.attr('transform', (d: GraphNode) => `translate(${d.x ?? 0},${d.y ?? 0})`);
     });
 
     return () => {
@@ -286,7 +299,7 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
       .translate(-graphCenterX, -graphCenterY);
 
     // Animate to fit
-    select<SVGSVGElement, unknown>(svg.node()!)
+    (svg as any)
       .transition()
       .duration(1000)
       .call(zoomBehaviorRef.current.transform, transform);

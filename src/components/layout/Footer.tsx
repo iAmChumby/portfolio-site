@@ -50,20 +50,20 @@ export default function Footer() {
                 {siteConfig.site.author.email}
               </a>
               <a
-                href={siteConfig.site.social.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200"
-              >
-                LinkedIn
-              </a>
-              <a
                 href={siteConfig.site.social.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200"
               >
                 GitHub
+              </a>
+              <a
+                href={siteConfig.site.social.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200"
+              >
+                LinkedIn
               </a>
             </div>
           </div>

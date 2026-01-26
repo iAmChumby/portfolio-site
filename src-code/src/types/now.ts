@@ -45,6 +45,23 @@ export interface NowPost {
   date: string;
   title: string;
   body: string;
+  likeCount?: number; // Optional like count for SSR optimization
+}
+
+/**
+ * Response from like toggle endpoint
+ */
+export interface LikeResponse {
+  liked: boolean;
+  count: number;
+}
+
+/**
+ * Response from get likes endpoint
+ */
+export interface LikesResponse {
+  count: number;
+  liked: boolean;
 }
 
 /**
@@ -70,6 +87,8 @@ export interface MediaItem {
   name: string;
   artist: string;
   imageUrl: string;
+  spotifyURL?: string;
+  appleMusicURL?: string;
 }
 
 /**

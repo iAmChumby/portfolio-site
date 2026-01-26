@@ -3,6 +3,7 @@
 import React from 'react';
 import { NowPost as NowPostType } from '@/types/now';
 import { formatDate } from '@/lib/utils';
+import LikeButton from './LikeButton';
 
 interface NowPostProps {
   post: NowPostType;
@@ -20,6 +21,11 @@ export default function NowPost({ post }: NowPostProps) {
       <p className="text-sm text-neu-text-secondary leading-relaxed">
         {post.body}
       </p>
+      <LikeButton
+        postId={post.id}
+        initialCount={post.likeCount}
+        initialLiked={false}
+      />
     </article>
   );
 }

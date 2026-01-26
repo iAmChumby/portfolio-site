@@ -2,11 +2,14 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { SiSpotify, SiApplemusic } from 'react-icons/si';
 import WeatherCard from '@/components/ui/WeatherCard';
 import NowPost from '@/components/ui/NowPost';
 import { LOCATIONS } from '@/lib/weather';
 import { NowData } from '@/types/now';
 import nowData from '@/data/now.json';
+import { cn } from '@/lib/utils';
 
 const data = nowData as NowData;
 
@@ -91,6 +94,138 @@ export default function Now() {
                 </div>
               </div>
 
+              {/* On Repeat - Music */}
+              <div className="neu-surface p-6">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-neu-text-primary">
+                  On Repeat
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Album */}
+                  <div className="neu-surface-inset p-4 rounded-lg">
+                    <p className="text-xs text-neu-text-muted uppercase tracking-wide mb-3">Album</p>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                        <Image
+                          src={data.onRepeat.album.imageUrl}
+                          alt={data.onRepeat.album.name}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-neu-text-primary truncate">
+                          {data.onRepeat.album.name}
+                        </p>
+                        <p className="text-xs text-neu-text-secondary truncate">
+                          {data.onRepeat.album.artist}
+                        </p>
+                      </div>
+                    </div>
+                    {(data.onRepeat.album.spotifyURL || data.onRepeat.album.appleMusicURL) && (
+                      <div className="flex items-center gap-2">
+                        {data.onRepeat.album.spotifyURL && (
+                          <Link
+                            href={data.onRepeat.album.spotifyURL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
+                              'flex items-center justify-center',
+                              'hover:scale-105 active:scale-95',
+                              'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
+                              'text-neu-text-secondary hover:text-[#1DB954]'
+                            )}
+                            aria-label="Open album on Spotify"
+                          >
+                            <SiSpotify className="w-5 h-5" />
+                          </Link>
+                        )}
+                        {data.onRepeat.album.appleMusicURL && (
+                          <Link
+                            href={data.onRepeat.album.appleMusicURL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
+                              'flex items-center justify-center',
+                              'hover:scale-105 active:scale-95',
+                              'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
+                              'text-neu-text-secondary hover:text-[#FA243C]'
+                            )}
+                            aria-label="Open album on Apple Music"
+                          >
+                            <SiApplemusic className="w-5 h-5" />
+                          </Link>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Song */}
+                  <div className="neu-surface-inset p-4 rounded-lg">
+                    <p className="text-xs text-neu-text-muted uppercase tracking-wide mb-3">Song</p>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                        <Image
+                          src={data.onRepeat.song.imageUrl}
+                          alt={data.onRepeat.song.name}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-neu-text-primary truncate">
+                          {data.onRepeat.song.name}
+                        </p>
+                        <p className="text-xs text-neu-text-secondary truncate">
+                          {data.onRepeat.song.artist}
+                        </p>
+                      </div>
+                    </div>
+                    {(data.onRepeat.song.spotifyURL || data.onRepeat.song.appleMusicURL) && (
+                      <div className="flex items-center gap-2">
+                        {data.onRepeat.song.spotifyURL && (
+                          <Link
+                            href={data.onRepeat.song.spotifyURL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
+                              'flex items-center justify-center',
+                              'hover:scale-105 active:scale-95',
+                              'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
+                              'text-neu-text-secondary hover:text-[#1DB954]'
+                            )}
+                            aria-label="Open song on Spotify"
+                          >
+                            <SiSpotify className="w-5 h-5" />
+                          </Link>
+                        )}
+                        {data.onRepeat.song.appleMusicURL && (
+                          <Link
+                            href={data.onRepeat.song.appleMusicURL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              'neu-surface-inset-sm p-2 rounded-lg transition-all duration-300',
+                              'flex items-center justify-center',
+                              'hover:scale-105 active:scale-95',
+                              'focus:outline-none focus:ring-2 focus:ring-neu-accent-light focus:ring-offset-2',
+                              'text-neu-text-secondary hover:text-[#FA243C]'
+                            )}
+                            aria-label="Open song on Apple Music"
+                          >
+                            <SiApplemusic className="w-5 h-5" />
+                          </Link>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Currently Playing - Game */}
               <div className="neu-surface p-6">
                 <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-neu-text-primary">
@@ -111,62 +246,6 @@ export default function Now() {
                       {data.currentlyPlaying.name}
                     </p>
                     <p className="text-sm text-neu-text-secondary">Gaming</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* On Repeat - Music */}
-              <div className="neu-surface p-6">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-neu-text-primary">
-                  On Repeat
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Album */}
-                  <div className="neu-surface-inset p-4 rounded-lg">
-                    <p className="text-xs text-neu-text-muted uppercase tracking-wide mb-3">Album</p>
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image
-                          src={data.onRepeat.album.imageUrl}
-                          alt={data.onRepeat.album.name}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-neu-text-primary truncate">
-                          {data.onRepeat.album.name}
-                        </p>
-                        <p className="text-xs text-neu-text-secondary truncate">
-                          {data.onRepeat.album.artist}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Song */}
-                  <div className="neu-surface-inset p-4 rounded-lg">
-                    <p className="text-xs text-neu-text-muted uppercase tracking-wide mb-3">Song</p>
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image
-                          src={data.onRepeat.song.imageUrl}
-                          alt={data.onRepeat.song.name}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-neu-text-primary truncate">
-                          {data.onRepeat.song.name}
-                        </p>
-                        <p className="text-xs text-neu-text-secondary truncate">
-                          {data.onRepeat.song.artist}
-                        </p>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>

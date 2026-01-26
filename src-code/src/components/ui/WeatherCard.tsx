@@ -14,6 +14,31 @@ interface WeatherCardProps {
   longitude: number;
 }
 
+/**
+ * Format timestamp as relative or absolute time
+ */
+function formatLastUpdated(timestamp: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - timestamp.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+
+  if (diffMins < 1) {
+    return 'Updated just now';
+  } else if (diffMins < 60) {
+    return `Updated ${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+  } else if (diffHours < 24) {
+    return `Updated ${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+  } else {
+    // Use absolute time format for older updates
+    return `Updated at ${timestamp.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })}`;
+  }
+}
+
 export default function WeatherCard({
   location,
   latitude,
@@ -22,6 +47,7 @@ export default function WeatherCard({
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const loadWeather = useCallback(async () => {
     try {
@@ -29,6 +55,7 @@ export default function WeatherCard({
       setError(null);
       const data = await fetchWeather(latitude, longitude);
       setWeather(data);
+      setLastUpdated(new Date());
     } catch (err) {
       setError('Unable to load weather');
       console.error('Weather fetch error:', err);
@@ -94,6 +121,11 @@ export default function WeatherCard({
         <span>{getWeatherDescription(weather.weatherCode)}</span>
         <span>💧 {weather.humidity}%</span>
       </div>
+      {lastUpdated && (
+        <div className="mt-2 text-xs text-neu-text-muted">
+          {formatLastUpdated(lastUpdated)}
+        </div>
+      )}
     </div>
   );
 }

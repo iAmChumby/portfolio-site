@@ -3,8 +3,12 @@ import SectionDivider from '@/components/ui/SectionDivider';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Projects - Portfolio',
-  description: 'Explore my portfolio of web development projects and technical skills.',
+  title: 'Projects',
+  description: 'Explore Luke Edwards\' portfolio of web development projects including React, Next.js, and full-stack applications. View technical skills and project details.',
+  openGraph: {
+    title: 'Projects by Luke Edwards | Web Development Portfolio',
+    description: 'Explore Luke Edwards\' portfolio of web development projects and technical skills.',
+  },
 };
 
 export default function ProjectsPage() {

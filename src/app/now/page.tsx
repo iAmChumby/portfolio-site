@@ -2,8 +2,12 @@ import { Now } from "@/components/sections";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Now - Portfolio',
-  description: 'What I am currently working on, playing, and listening to.',
+  title: 'Now',
+  description: 'See what Luke Edwards is currently working on, playing, and listening to. Stay updated on current projects and activities.',
+  openGraph: {
+    title: 'What Luke Edwards Is Working On Now',
+    description: 'See what Luke Edwards is currently working on, playing, and listening to.',
+  },
 };
 
 export default function NowPage() {

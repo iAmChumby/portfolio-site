@@ -1,10 +1,13 @@
 import { Hero } from "@/components/sections";
 import { Metadata } from 'next';
 
-
 export const metadata: Metadata = {
-  title: 'Portfolio - Full Stack Developer',
-  description: 'Welcome to my portfolio. I create beautiful, functional, and user-centered digital experiences.',
+  title: 'Luke Edwards - Full Stack Developer & Designer',
+  description: 'Luke Edwards is a passionate full-stack developer creating beautiful, functional, and user-centered digital experiences with React, Next.js, and modern web technologies.',
+  openGraph: {
+    title: 'Luke Edwards - Full Stack Developer & Designer',
+    description: 'Passionate full-stack developer creating beautiful, functional, and user-centered digital experiences.',
+  },
 };
 
 export default function Home() {

@@ -2,8 +2,12 @@ import { Contact } from "@/components/sections";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Contact - Portfolio',
-  description: 'Get in touch with me for collaboration opportunities or project inquiries.',
+  title: 'Contact',
+  description: 'Get in touch with Luke Edwards for collaboration opportunities, freelance projects, or full-time positions. Available for hire in Utica, New York.',
+  openGraph: {
+    title: 'Contact Luke Edwards | Hire a Full Stack Developer',
+    description: 'Get in touch with Luke Edwards for collaboration opportunities or project inquiries.',
+  },
 };
 
 export default function ContactPage() {

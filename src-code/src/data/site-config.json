@@ -18,12 +18,6 @@
       "twitter": "https://twitter.com/yourusername",
       "email": "edwards.lukec@gmail.com"
     },
-    "github": {
-      "username": "iAmChumby",
-      "showActivity": true,
-      "showStats": true,
-      "featuredRepos": 6
-    },
     "navigation": [
       {
         "label": "Home",
@@ -43,11 +37,6 @@
       {
         "label": "Contact",
         "href": "/contact",
-        "external": false
-      },
-      {
-        "label": "Live Feed",
-        "href": "/github",
         "external": false
       }
     ],
@@ -84,11 +73,5 @@
     "phone": "+1 (315) 725-1833",
     "location": "Utica, New York",
     "availability": "Available for freelance work"
-  },
-  "github": {
-    "username": "iAmChumby",
-    "showActivity": true,
-    "showStats": true,
-    "featuredRepos": 6
   }
 }

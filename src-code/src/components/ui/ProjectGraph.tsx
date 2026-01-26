@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 import { ProjectItem } from '@/types/content';
 
@@ -110,17 +111,37 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
   return (
     <div 
         ref={containerRef} 
-        className="w-full h-[600px] relative" 
+        className="w-full h-[600px] relative border border-[#234d35] rounded-xl bg-neu-bg-dark/50 overflow-hidden" 
         style={{ cursor: 'move' }}
     >
-      <div className="absolute top-4 left-4 z-10 p-2 text-xs text-neu-text-secondary pointer-events-none">
-        <div className="flex items-center gap-2 mb-1">
-            <span className="w-3 h-3 rounded-full bg-[#4fa36d] shadow-[0_0_10px_rgba(79,163,109,0.5)]"></span> Projects
+      <div className="absolute top-4 left-4 z-10 p-4 bg-neu-surface/90 backdrop-blur-sm rounded-lg border border-neu-border shadow-lg text-xs text-neu-text-secondary pointer-events-none select-none">
+        <div className="flex items-center gap-2 mb-2">
+            <span className="w-3 h-3 rounded-full bg-[#4fa36d] shadow-[0_0_10px_rgba(79,163,109,0.5)]"></span> 
+            <span className="font-medium text-neu-text-primary">Projects</span>
         </div>
-        <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#e2e8f0] shadow-[0_0_10px_rgba(226,232,240,0.5)]"></span> Technologies
+        <div className="flex items-center gap-2 mb-3">
+            <span className="w-3 h-3 rounded-full bg-[#e2e8f0] shadow-[0_0_10px_rgba(226,232,240,0.5)]"></span> 
+            <span className="font-medium text-neu-text-primary">Technologies</span>
+        </div>
+        <div className="h-px bg-neu-border mb-3"></div>
+        <div className="space-y-1 text-[10px] uppercase tracking-wider opacity-80">
+            <p>• Scroll to Zoom</p>
+            <p>• Drag to Pan</p>
+            <p>• Click to Expand</p>
         </div>
       </div>
+      
+      <button
+        onClick={() => {
+            fgRef.current?.zoomToFit(1000, 50);
+            fgRef.current?.d3ReheatSimulation(); // Ensure physics settle if needed
+        }}
+        className="absolute bottom-4 right-4 bg-neu-surface/90 backdrop-blur-sm border border-neu-border text-neu-text-primary px-3 py-2 rounded-lg shadow-lg hover:bg-[#234d35] hover:text-white transition-colors text-xs font-medium z-10 flex items-center gap-2"
+        aria-label="Reset View"
+      >
+        <ArrowPathIcon className="w-4 h-4" />
+        Reset View
+      </button>
       
       <ForceGraph2D
         ref={fgRef}
@@ -134,53 +155,62 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         backgroundColor="rgba(0,0,0,0)"
 
         // Custom Rendering for Persistent Labels and controlled size
-        nodeCanvasObject={(node: any, ctx, globalScale) => {
+        nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
             const label = node.name;
             const isProject = node.type === 'project';
-            // Manual radius: Projects Big (12), Tech Small (6)
             const radius = isProject ? 12 : 6;
-            const fontSize = isProject ? 14/globalScale : 10/globalScale; // Scale text so it remains readable but zoom-aware
-            
-            // Limit min font size for readability
+            const fontSize = isProject ? 14/globalScale : 10/globalScale;
             const finalFontSize = Math.max(fontSize, 4); 
 
-            // Draw Node
+            // Animated Pulse for Projects
+            if (isProject) {
+              const time = Date.now();
+              const pulse = (Math.sin(time / 400) + 1) / 2; // 0 to 1 oscillating
+              const pulseSize = radius + 4 + (pulse * 3); // Ring expands
+              const pulseOpacity = 0.5 - (pulse * 0.3); // Fades out as expanding
+
+              // Pulse Ring
+              ctx.beginPath();
+              ctx.arc(node.x, node.y, pulseSize, 0, 2 * Math.PI, false);
+              ctx.strokeStyle = `rgba(79, 163, 109, ${pulseOpacity})`;
+              ctx.lineWidth = 2;
+              ctx.stroke();
+            }
+
+            // Draw Node Body
             ctx.beginPath();
             ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
             ctx.fillStyle = isProject ? '#4fa36d' : '#e2e8f0';
             ctx.fill();
             
-            // Draw Glow for Projects
+            // Inner Solid Border for Project
             if (isProject) {
-              ctx.shadowColor = 'rgba(79, 163, 109, 0.4)';
-              ctx.shadowBlur = 15;
-              ctx.strokeStyle = '#4fa36d';
-              ctx.stroke();
-              ctx.shadowBlur = 0;
+                ctx.strokeStyle = '#2a4a35';
+                ctx.lineWidth = 1;
+                ctx.stroke();
             }
 
-            // Draw Label Logic
-            // Project: Always visible.
-            // Tech: Visible if zoomed in (globalScale > 1.2) - adjusted threshold for feel
+            // Draw Label Logic (Semantic Zoom)
             const showLabel = isProject || (globalScale > 1.2);
 
             if (showLabel) {
                 ctx.font = `${finalFontSize}px Sans-Serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillStyle = isProject ? '#ffffff' : 'rgba(255,255,255,0.8)';
+                const textAlpha = isProject ? 1 : Math.min(1, (globalScale - 1.2) * 2); // Fade in tech labels
+                ctx.fillStyle = isProject ? '#ffffff' : `rgba(255,255,255,${textAlpha})`;
                 
                 // Draw text below the node
-                const textOffset = radius + finalFontSize; 
+                const textOffset = radius + finalFontSize + (isProject ? 4 : 2); 
                 ctx.fillText(label, node.x, node.y + textOffset);
             }
         }}
         
-        nodePointerAreaPaint={(node: any, color, ctx) => {
+        nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
              const isProject = node.type === 'project';
              const radius = isProject ? 12 : 6;
              ctx.beginPath();
-             ctx.arc(node.x, node.y, radius + 2, 0, 2 * Math.PI, false);
+             ctx.arc(node.x, node.y, radius + 8, 0, 2 * Math.PI, false); // Generous hit area for easy clicking
              ctx.fillStyle = color;
              ctx.fill();
         }}
@@ -188,7 +218,14 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         // Interaction Settings
         enableZoom={true}
         enablePan={true}
-        enableNodeDrag={true}
+        enableNodeDrag={false} // Disabled to prioritize clicking
+        enablePointerInteraction={true}
+        onNodeHover={(node: any) => {
+            if (containerRef.current) {
+                // Pointer for all nodes since they are all interactive (Click or Center)
+                containerRef.current.style.cursor = node ? 'pointer' : 'move'; 
+            }
+        }}
         onNodeClick={(node: any) => {
             if (node.type === 'project') {
                 const p = projects.find(p => p.id === node.id);
@@ -202,7 +239,17 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         cooldownTicks={100}
         d3VelocityDecay={0.3}
         onEngineStop={() => {
+            // 1. Fit the graph first
             fgRef.current?.zoomToFit(400, 50);
+            
+            // 2. Restart simulation at low alpha to keep the render loop active for animations
+            // waiting a tick prevents conflict with zoomToFit (sometimes)
+            setTimeout(() => {
+                if (fgRef.current) {
+                    fgRef.current.d3Force('charge').strength(-180); // Re-assert physics
+                    fgRef.current.d3AlphaTarget(0.01).restart(); // Keep-alive for animation
+                }
+            }, 500);
         }}
       />
     </div>

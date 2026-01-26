@@ -17,7 +17,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div 
-        className="relative w-full max-w-2xl bg-[#111111] border border-[#234d35] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-2xl bg-[#111111] border border-[#234d35] rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         <button 

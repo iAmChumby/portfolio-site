@@ -73,21 +73,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check rate limit
-    const redis = getRedisClient();
-    const withinLimit = await checkContactRateLimit(redis, ip);
-    if (!withinLimit) {
-      return NextResponse.json<ContactAPIError>(
-        {
-          error: 'Rate limit exceeded. Please try again later.',
-          details: 'You can submit 3 messages per hour',
-        },
-        {
-          status: 429,
-          headers: { 'Retry-After': '3600' },
-        }
-      );
-    }
+    // Rate limiting removed per user request
 
     // Validate and sanitize form data
     const validationResult = validateContactForm({ name, email, message });
@@ -104,16 +90,14 @@ export async function POST(request: NextRequest) {
       throw new Error(`Email send failed: ${emailResult.error}`);
     }
 
-    // Log to Google Sheets (NON-BLOCKING - fire and forget)
-    logContactSubmission({
+    // Log to Google Sheets (REQUIRED)
+    await logContactSubmission({
       timestamp: new Date().toISOString(),
       name: validationResult.data.name,
       email: validationResult.data.email,
       message: validationResult.data.message,
       ipAddress: ip,
-      geolocation: 'N/A', // Future: integrate IP geolocation API
-    }).catch((error) => {
-      console.error('Failed to log to Sheets (non-blocking):', error);
+      geolocation: 'N/A',
     });
 
     // Return success

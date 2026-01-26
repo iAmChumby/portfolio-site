@@ -1,11 +1,11 @@
-import { google } from 'googleapis';
 import { SheetsLogEntry } from '@/types/contact';
 import { getContactEnvConfig } from './env';
 
 /**
  * Get authenticated Google Sheets client
  */
-function getGoogleSheetsClient() {
+async function getGoogleSheetsClient() {
+  const { google } = await import('googleapis');
   const config = getContactEnvConfig();
 
   const auth = new google.auth.GoogleAuth({
@@ -26,29 +26,24 @@ function getGoogleSheetsClient() {
 export async function logContactSubmission(
   entry: SheetsLogEntry
 ): Promise<void> {
-  try {
-    const config = getContactEnvConfig();
-    const sheets = getGoogleSheetsClient();
+  const config = getContactEnvConfig();
+  const sheets = await getGoogleSheetsClient();
 
-    const values = [[
-      entry.timestamp,
-      entry.name,
-      entry.email,
-      entry.message,
-      entry.ipAddress,
-      entry.geolocation,
-    ]];
+  const values = [[
+    entry.timestamp,
+    entry.name,
+    entry.email,
+    entry.message,
+    entry.ipAddress,
+    entry.geolocation,
+  ]];
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: config.google.sheetId,
-      range: 'Sheet1!A:F',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: { values },
-    });
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: config.google.sheetId,
+    range: 'Sheet1!A:F',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values },
+  });
 
-    console.log('Successfully logged to Google Sheets');
-  } catch (error) {
-    console.error('Failed to log to Google Sheets (non-blocking):', error);
-    // Don't throw - this is non-blocking
-  }
+  console.log('Successfully logged to Google Sheets');
 }

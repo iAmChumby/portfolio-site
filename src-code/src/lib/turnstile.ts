@@ -1,5 +1,5 @@
 import { TurnstileResponse } from '@/types/contact';
-import { getContactEnvConfig } from './env';
+import { getTurnstileConfig } from './env';
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
@@ -13,10 +13,10 @@ export async function verifyTurnstileToken(
   ip?: string
 ): Promise<boolean> {
   try {
-    const config = getContactEnvConfig();
+    const config = getTurnstileConfig();
 
     const formData = new URLSearchParams();
-    formData.append('secret', config.turnstile.secretKey);
+    formData.append('secret', config.secretKey);
     formData.append('response', token);
     if (ip) {
       formData.append('remoteip', ip);

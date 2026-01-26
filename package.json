@@ -40,5 +40,9 @@
     "nextjs"
   ],
   "author": "Your Name",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "googleapis": "^170.1.0",
+    "nodemailer": "^7.0.12"
+  }
 }

@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EnvelopeIcon, PhoneIcon, MapPinIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { getContactContent, getSiteConfig } from '@/lib/content-loader';
 
 declare global {
   interface Window {
     turnstile?: {
-      reset: () => void;
+      reset: (widgetId?: string) => void;
+      render: (selector: HTMLElement, options: { sitekey: string; callback: (token: string) => void; theme: string }) => string;
+      getResponse: (widgetId?: string) => string | undefined;
     };
   }
 }
@@ -23,35 +25,95 @@ export default function Contact() {
 
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileTokenRef = useRef<string>('');
+  const turnstileWidgetIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
+    if (!turnstileRef.current) return;
+    
+    // Check if widget already exists in DOM
+    if (turnstileRef.current.querySelector('[id^="cf-chl-widget"]')) return;
+    
+    // Check if script already exists
+    const existingScript = document.querySelector('script[src*="turnstile"]');
+    
+    if (existingScript && window.turnstile) {
+      // Script loaded, render widget
+      const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_KEY;
+      if (siteKey && typeof siteKey === 'string') {
+        try {
+          const widgetId = window.turnstile.render(turnstileRef.current, {
+            sitekey: siteKey,
+            callback: (token: string) => {
+              turnstileTokenRef.current = token;
+            },
+            theme: 'light'
+          });
+          turnstileWidgetIdRef.current = widgetId;
+        } catch (error) {
+          console.error('Turnstile render error:', error);
+        }
+      }
+      return;
+    }
 
-    return () => {
-      document.head.removeChild(script);
-    };
+    // Only add script if it doesn't exist
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        if (turnstileRef.current && window.turnstile && !turnstileRef.current.querySelector('[id^="cf-chl-widget"]')) {
+          const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_KEY;
+          if (!siteKey || typeof siteKey !== 'string') {
+            console.error('NEXT_PUBLIC_TURNSTILE_KEY is missing or invalid');
+            return;
+          }
+          try {
+            const widgetId = window.turnstile.render(turnstileRef.current, {
+              sitekey: siteKey,
+              callback: (token: string) => {
+                turnstileTokenRef.current = token;
+              },
+              theme: 'light'
+            });
+            turnstileWidgetIdRef.current = widgetId;
+          } catch (error) {
+            console.error('Turnstile render error:', error);
+          }
+        }
+      };
+      document.head.appendChild(script);
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Get token BEFORE changing state
+    let token = '';
+    if (window.turnstile && turnstileWidgetIdRef.current) {
+      token = window.turnstile.getResponse(turnstileWidgetIdRef.current) || '';
+    }
+    if (!token) {
+      token = turnstileTokenRef.current;
+    }
+    
+    if (!token) {
+      setFormStatus('error');
+      setStatusMessage('Please complete the CAPTCHA verification.');
+      setTimeout(() => {
+        setFormStatus('idle');
+        setStatusMessage('');
+      }, 3000);
+      return;
+    }
+    
     setFormStatus('loading');
 
     try {
-      if (!turnstileToken) {
-        setFormStatus('error');
-        setStatusMessage('Please complete the CAPTCHA verification.');
-        setTimeout(() => {
-          setFormStatus('idle');
-          setStatusMessage('');
-        }, 3000);
-        return;
-      }
-
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
@@ -61,25 +123,20 @@ export default function Contact() {
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          turnstileToken,
+          turnstileToken: token,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 429) {
-          setFormStatus('error');
-          setStatusMessage('Too many submissions. Please try again later.');
-        } else {
-          setFormStatus('error');
-          setStatusMessage(data.error || 'Failed to send message. Please try again.');
-        }
+        setFormStatus('error');
+        setStatusMessage(data.error || 'Failed to send message. Please try again.');
 
         // Reset Turnstile
-        setTurnstileToken('');
-        if (window.turnstile) {
-          window.turnstile.reset();
+        if (window.turnstile && turnstileWidgetIdRef.current) {
+          window.turnstile.reset(turnstileWidgetIdRef.current);
+          turnstileTokenRef.current = '';
         }
 
         setTimeout(() => {
@@ -94,11 +151,11 @@ export default function Contact() {
 
       setTimeout(() => {
         setFormData({ name: '', email: '', message: '' });
-        setTurnstileToken('');
         setFormStatus('idle');
         setStatusMessage('');
-        if (window.turnstile) {
-          window.turnstile.reset();
+        if (window.turnstile && turnstileWidgetIdRef.current) {
+          window.turnstile.reset(turnstileWidgetIdRef.current);
+          turnstileTokenRef.current = '';
         }
       }, 3000);
     } catch (error) {
@@ -267,10 +324,9 @@ export default function Contact() {
                 {/* Turnstile CAPTCHA Widget */}
                 <div className="flex justify-center">
                   <div
+                    ref={turnstileRef}
                     className="cf-turnstile"
-                    data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_KEY}
-                    data-callback={(token: string) => setTurnstileToken(token)}
-                    data-theme="light"
+                    key="turnstile-widget"
                   />
                 </div>
 

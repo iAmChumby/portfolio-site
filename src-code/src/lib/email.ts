@@ -1,14 +1,14 @@
-import nodemailer from 'nodemailer';
 import { ContactFormData, EmailResult } from '@/types/contact';
-import { getContactEnvConfig } from './env';
+import { getEmailConfig } from './env';
 
 /**
  * Create Nodemailer SMTP transporter
  */
-function createEmailTransporter() {
-  const config = getContactEnvConfig();
+async function createEmailTransporter() {
+  const nodemailer = await import('nodemailer');
+  const config = getEmailConfig();
 
-  return nodemailer.createTransport({
+  return nodemailer.default.createTransport({
     host: config.smtp.host,
     port: config.smtp.port,
     secure: false, // TLS on port 587
@@ -94,8 +94,8 @@ export async function sendContactEmails(
   data: ContactFormData,
   ipAddress: string = 'unknown'
 ): Promise<EmailResult> {
-  const config = getContactEnvConfig();
-  const transporter = createEmailTransporter();
+  const config = getEmailConfig();
+  const transporter = await createEmailTransporter();
 
   let notificationSent = false;
   let confirmationSent = false;

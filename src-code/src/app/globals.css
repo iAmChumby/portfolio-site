@@ -47,7 +47,7 @@
 /* ... dark mode overrides ... */
 
 body {
-  background: var(--background);
+  background: transparent;
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -456,4 +456,35 @@ h6 {
   .neu-btn-raised:hover {
     transform: none;
   }
+}
+
+/* Neumorphic Form Inputs */
+.neu-input {
+  padding: 0.75rem 1rem;
+  background: var(--neu-bg-dark);
+  border-radius: var(--neu-radius-md);
+  box-shadow: inset 2px 2px 4px rgba(5, 10, 8, 0.7), inset -2px -2px 4px rgba(35, 77, 53, 0.4);
+  border: none;
+  outline: none;
+  color: var(--neu-text-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.neu-input::placeholder {
+  color: var(--neu-text-muted);
+}
+
+.neu-input:focus {
+  box-shadow: inset 3px 3px 6px rgba(5, 10, 8, 0.8), inset -3px -3px 6px rgba(35, 77, 53, 0.5), 0 0 0 2px var(--neu-accent-muted);
+}
+
+.neu-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.neu-textarea {
+  resize: none;
+  min-height: 120px;
 }

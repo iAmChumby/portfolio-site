@@ -7,6 +7,7 @@ import { ReactNode, useState, useEffect } from 'react'
 interface PageTransitionProps {
   children: ReactNode
   className?: string
+  style?: React.CSSProperties
 }
 
 // Hook to detect reduced motion preference
@@ -136,9 +137,9 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
   return (
     <MotionConfig reducedMotion={prefersReducedMotion ? 'always' : 'never'}>
-      <div className="relative w-full overflow-hidden">
+      <div className="relative w-full min-h-screen grid grid-cols-1 grid-rows-1">
         <AnimatePresence 
-          mode="wait" 
+          mode="popLayout" 
           initial={false}
           onExitComplete={() => {
             scrollToTop()
@@ -161,7 +162,9 @@ export default function PageTransition({ children }: PageTransitionProps) {
               backfaceVisibility: 'hidden',
               perspective: 1000,
               WebkitFontSmoothing: 'antialiased',
-              MozOsxFontSmoothing: 'grayscale'
+              MozOsxFontSmoothing: 'grayscale',
+              gridColumn: '1 / -1',
+              gridRow: '1 / -1'
             }}
           >
             <motion.div

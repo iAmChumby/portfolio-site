@@ -5,12 +5,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui';
+import { HomeIcon, FolderIcon, EmailIcon, GitHubIcon, LinkedInIcon, CodeIcon } from '@/components/ui/icons';
+import siteConfig from '@/data/site-config.json';
 
 interface NavigationItem {
   label: string;
   href: string;
   external?: boolean;
+  icon?: 'home' | 'folder' | 'email';
 }
 
 interface HeaderProps {
@@ -20,19 +22,25 @@ interface HeaderProps {
 }
 
 const defaultNavigation: NavigationItem[] = [
-  { label: 'Home', href: '/' },
-  { label: 'Projects', href: '/projects' },
-  { label: 'GitHub', href: '/github' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Home', href: '/', icon: 'home' },
+  { label: 'Projects', href: '/projects', icon: 'folder' },
+  { label: 'Contact', href: '/contact', icon: 'email' },
 ];
+
+const iconMap = {
+  home: HomeIcon,
+  folder: FolderIcon,
+  email: EmailIcon,
+} as const;
 
 const Header: React.FC<HeaderProps> = ({
   navigation = defaultNavigation,
   logo,
-  siteName = 'Portfolio',
+  siteName = 'Luke Edwards',
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [pressedItem, setPressedItem] = useState<string | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -59,90 +67,195 @@ const Header: React.FC<HeaderProps> = ({
     return pathname.startsWith(href);
   };
 
+  const handlePressStart = (id: string) => {
+    setPressedItem(id);
+  };
+
+  const handlePressEnd = () => {
+    setPressedItem(null);
+  };
+
+  // Social links configuration
+  const socialLinks = [
+    {
+      name: 'GitHub',
+      href: siteConfig.site.social.github,
+      icon: GitHubIcon,
+      ariaLabel: 'Visit GitHub profile',
+    },
+    {
+      name: 'LinkedIn',
+      href: siteConfig.site.social.linkedin,
+      icon: LinkedInIcon,
+      ariaLabel: 'Visit LinkedIn profile',
+    },
+  ];
+
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b',
         isScrolled
-          ? 'bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:bg-black/95 dark:border-gray-800'
-          : 'bg-transparent'
+          ? 'bg-[#0a1510]/95 backdrop-blur-md shadow-[8px_8px_16px_rgba(5,10,8,0.7)] border-[#234d35]'
+          : 'bg-transparent border-transparent'
       )}
     >
       <div className="container h-20 px-6 mx-auto">
-        {/* Desktop Layout - Centered Content */}
+        {/* Desktop Layout */}
         <div className="hidden md:flex md:items-center md:justify-center md:h-full md:max-w-6xl md:mx-auto">
           <div className="flex items-center w-full max-w-5xl">
-          {/* Left Column - Logo */}
-          <div className="flex justify-start flex-1">
-            <Link
-              href="/"
-              className="flex items-center space-x-2 text-xl font-bold text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors whitespace-nowrap"
-            >
-              {logo ? (
-                <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
-              ) : (
-                <span>Luke Edwards Portfolio</span>
-              )}
-            </Link>
-          </div>
-
-          {/* Center Column - Navigation */}
-          <nav className="flex items-center justify-center space-x-6 lg:space-x-8 px-12 lg:px-16">
-            {navigation.map((item) => (
+            {/* Left Column - Brand/Logo */}
+            <div className="flex justify-start flex-1">
               <Link
-                key={item.href}
-                href={item.href}
-                target={item.external ? '_blank' : undefined}
-                rel={item.external ? 'noopener noreferrer' : undefined}
-                className={cn(
-                  'relative px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg border-2 border-transparent whitespace-nowrap',
-                  'hover:border-[var(--accent-light)] hover:shadow-[0_0_10px_rgba(16,185,129,0.4)] hover:text-[var(--accent-light)]',
-                  'active:border-[var(--accent-hover)] active:shadow-[0_0_15px_rgba(5,150,105,0.6)]',
-                  isActiveLink(item.href)
-                    ? 'border-[var(--accent)] shadow-[0_0_8px_rgba(16,185,129,0.5)] text-[var(--accent)] bg-[var(--accent)]/5'
-                    : 'text-gray-700 dark:text-gray-300'
+                href="/"
+                className="group flex items-center space-x-2"
+                onMouseDown={() => handlePressStart('logo')}
+                onMouseUp={handlePressEnd}
+                onMouseLeave={handlePressEnd}
+              >
+                {logo ? (
+                  <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
+                ) : (
+                  <div className={cn(
+                    'flex items-center gap-2 px-4 py-2 rounded-xl group/logo',
+                    'transition-all duration-150',
+                    'shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] bg-[#132e1f]',
+                    'hover:shadow-[6px_6px_12px_rgba(5,10,8,0.8),-6px_-6px_12px_rgba(35,77,53,0.5)]',
+                    pressedItem === 'logo' && 'shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] scale-[0.98] bg-[#0d1f17]'
+                  )}>
+                    <CodeIcon
+                      size={24}
+                      className="text-neu-accent transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                    />
+                    <span className="neu-text-gradient text-2xl font-bold tracking-tight transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                      {siteName}
+                    </span>
+                  </div>
                 )}
-              >
-                {item.label}
               </Link>
-            ))}
-          </nav>
+            </div>
 
-          {/* Right Column - CTA Button */}
-          <div className="flex justify-end flex-1">
-            <Link href="/contact">
-              <Button 
-                variant="cta" 
-                size="md"
-                responsive={true}
-                touchOptimized={true}
-                className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap"
-              >
-                Get In Touch
-              </Button>
-            </Link>
-          </div>
+            {/* Center Column - Navigation */}
+            <nav className="flex items-center justify-center space-x-2 lg:space-x-3 px-4">
+              {navigation.map((item) => {
+                const IconComponent = item.icon ? iconMap[item.icon] : null;
+                const isPressed = pressedItem === item.href;
+                const isActive = isActiveLink(item.href);
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                    onMouseDown={() => handlePressStart(item.href)}
+                    onMouseUp={handlePressEnd}
+                    onMouseLeave={handlePressEnd}
+                    className={cn(
+                      'relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl whitespace-nowrap',
+                      'transition-all duration-150',
+                      isActive
+                        ? 'text-neu-accent shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] bg-[#0d1f17]'
+                        : 'text-neu-text-secondary hover:text-neu-text-primary hover:shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] hover:bg-[#132e1f]',
+                      isPressed && !isActive && 'shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] scale-[0.98] bg-[#0d1f17]',
+                      isPressed && isActive && 'shadow-[inset_6px_6px_12px_rgba(5,10,8,0.7),inset_-6px_-6px_12px_rgba(35,77,53,0.4)] scale-[0.97]'
+                    )}
+                  >
+                    {IconComponent && (
+                      <IconComponent
+                        size={16}
+                        className={cn(
+                          'transition-colors duration-150',
+                          isActive ? 'text-neu-accent' : 'text-neu-text-muted'
+                        )}
+                      />
+                    )}
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Right Column - Social Icons */}
+            <div className="flex justify-end flex-1">
+              <div className="flex items-center space-x-3">
+                {socialLinks.map((social) => {
+                  const SocialIcon = social.icon;
+                  const isPressed = pressedItem === social.href;
+
+                  return (
+                    <a
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.ariaLabel}
+                      onMouseDown={() => handlePressStart(social.href)}
+                      onMouseUp={handlePressEnd}
+                      onMouseLeave={handlePressEnd}
+                      className={cn(
+                        'p-2.5 rounded-xl transition-all duration-150',
+                        'text-neu-text-secondary hover:text-neu-text-primary',
+                        'hover:shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] hover:bg-[#132e1f]',
+                        isPressed && 'shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] scale-[0.95] bg-[#0d1f17]'
+                      )}
+                    >
+                      <SocialIcon size={20} />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Mobile Layout - Original Flexbox */}
+        {/* Mobile Layout */}
         <div className="flex md:hidden items-center justify-between h-full">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 text-xl font-bold text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="flex items-center space-x-2"
+            onMouseDown={() => handlePressStart('logo')}
+            onMouseUp={handlePressEnd}
+            onMouseLeave={handlePressEnd}
+            onTouchStart={() => handlePressStart('logo')}
+            onTouchEnd={handlePressEnd}
           >
             {logo ? (
               <Image src={logo} alt={siteName} width={32} height={32} className="h-8 w-auto" />
             ) : (
-              <span>{siteName}</span>
+              <div className={cn(
+                'flex items-center gap-2 px-4 py-2 rounded-xl group/logo',
+                'transition-all duration-150',
+                'shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] bg-[#132e1f]',
+                'hover:shadow-[6px_6px_12px_rgba(5,10,8,0.8),-6px_-6px_12px_rgba(35,77,53,0.5)]',
+                pressedItem === 'logo' && 'shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] scale-[0.98] bg-[#0d1f17]'
+              )}>
+                <CodeIcon
+                  size={20}
+                  className="text-neu-accent transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                />
+                <span className="neu-text-gradient text-xl font-bold transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                  {siteName}
+                </span>
+              </div>
             )}
           </Link>
 
           {/* Mobile Menu Button */}
           <button
             onClick={toggleMenu}
-            className="md:hidden p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            onMouseDown={() => handlePressStart('menu-toggle')}
+            onMouseUp={handlePressEnd}
+            onMouseLeave={handlePressEnd}
+            onTouchStart={() => handlePressStart('menu-toggle')}
+            onTouchEnd={handlePressEnd}
+            className={cn(
+              'md:hidden p-2 rounded-xl transition-all duration-150',
+              'text-neu-text-secondary hover:text-neu-text-primary',
+              'hover:shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] hover:bg-[#132e1f]',
+              pressedItem === 'menu-toggle' && 'shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] scale-[0.95] bg-[#0d1f17]'
+            )}
             aria-label="Toggle menu"
           >
             <svg
@@ -164,45 +277,85 @@ const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-4 pt-4 pb-6 space-y-2 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 shadow-lg">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    target={item.external ? '_blank' : undefined}
-                    rel={item.external ? 'noopener noreferrer' : undefined}
-                    className={cn(
-                      'block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 border-2 border-transparent',
-                      'hover:border-[var(--accent)] hover:shadow-[0_0_8px_rgba(16,185,129,0.4)] hover:text-[var(--accent)]',
-                      'active:border-[var(--accent-hover)] active:shadow-[0_0_12px_rgba(5,150,105,0.6)]',
-                      isActiveLink(item.href)
-                        ? 'border-[var(--accent)] shadow-[0_0_6px_rgba(16,185,129,0.5)] text-[var(--accent)] bg-[var(--accent)]/5'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900'
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <div className="px-4 py-3 flex items-center justify-center border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
-                  <Link href="/contact">
-                    <Button 
-                      variant="cta" 
-                      size="lg"
-                      mobileFullWidth={true}
-                      responsive={true}
-                      touchOptimized={true}
-                      className="font-semibold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 min-h-[48px]"
+      {/* Mobile Navigation */}
+      {isMenuOpen && (
+        <div className="md:hidden">
+          <div className="px-4 pt-4 pb-6 space-y-3 bg-[#0a1510] border-t border-[#234d35] shadow-lg">
+            {navigation.map((item) => {
+              const IconComponent = item.icon ? iconMap[item.icon] : null;
+              const isPressed = pressedItem === item.href;
+              const isActive = isActiveLink(item.href);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
+                  onMouseDown={() => handlePressStart(item.href)}
+                  onMouseUp={handlePressEnd}
+                  onMouseLeave={handlePressEnd}
+                  onTouchStart={() => handlePressStart(item.href)}
+                  onTouchEnd={handlePressEnd}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium',
+                    'transition-all duration-150',
+                    isActive
+                      ? 'text-neu-accent shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] bg-[#0d1f17]'
+                      : 'text-neu-text-secondary hover:text-neu-text-primary hover:shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] hover:bg-[#132e1f]',
+                    isPressed && !isActive && 'shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] scale-[0.98] bg-[#0d1f17]',
+                    isPressed && isActive && 'shadow-[inset_6px_6px_12px_rgba(5,10,8,0.7),inset_-6px_-6px_12px_rgba(35,77,53,0.4)] scale-[0.97]'
+                  )}
+                >
+                  {IconComponent && (
+                    <IconComponent
+                      size={20}
+                      className={cn(
+                        'transition-colors duration-150',
+                        isActive ? 'text-neu-accent' : 'text-neu-text-muted'
+                      )}
+                    />
+                  )}
+                  {item.label}
+                </Link>
+              );
+            })}
+
+            {/* Mobile Social Links */}
+            <div className="pt-4 mt-4 border-t border-[#234d35]">
+              <div className="flex items-center justify-center gap-4">
+                {socialLinks.map((social) => {
+                  const SocialIcon = social.icon;
+                  const isPressed = pressedItem === social.href;
+
+                  return (
+                    <a
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.ariaLabel}
+                      onMouseDown={() => handlePressStart(social.href)}
+                      onMouseUp={handlePressEnd}
+                      onMouseLeave={handlePressEnd}
+                      onTouchStart={() => handlePressStart(social.href)}
+                      onTouchEnd={handlePressEnd}
+                      className={cn(
+                        'p-3 rounded-xl transition-all duration-150',
+                        'text-neu-text-secondary hover:text-neu-text-primary',
+                        'shadow-[4px_4px_8px_rgba(5,10,8,0.7),-4px_-4px_8px_rgba(35,77,53,0.4)] bg-[#132e1f]',
+                        isPressed && 'shadow-[inset_4px_4px_8px_rgba(5,10,8,0.7),inset_-4px_-4px_8px_rgba(35,77,53,0.4)] scale-[0.95] bg-[#0d1f17]'
+                      )}
                     >
-                      Get In Touch
-                    </Button>
-                  </Link>
-                </div>
+                      <SocialIcon size={24} />
+                    </a>
+                  );
+                })}
               </div>
+            </div>
           </div>
-        )}
+        </div>
+      )}
     </header>
   );
 };

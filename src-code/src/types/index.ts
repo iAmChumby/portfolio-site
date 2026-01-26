@@ -54,19 +54,7 @@ export interface ContactForm {
   projectType?: string;
 }
 
-export interface GitHubRepo {
-  id: number;
-  name: string;
-  full_name: string;
-  description: string | null;
-  html_url: string;
-  homepage: string | null;
-  language: string | null;
-  stargazers_count: number;
-  forks_count: number;
-  updated_at: string;
-  topics: string[];
-}
+
 
 export interface Analytics {
   pageViews: number;
@@ -89,3 +77,6 @@ export interface SEOData {
   ogImage?: string;
   canonical?: string;
 }
+
+// Now page types
+export * from './now';

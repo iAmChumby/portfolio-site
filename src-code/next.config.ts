@@ -1,17 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-        os: false,
-      };
-    }
-    return config;
-  },
+  // Transpile react-d3-graph for better compatibility
+  transpilePackages: ['react-d3-graph'],
+  // Turbopack works well with most apps without special webpack config
+  // If you need webpack fallbacks, you may need to keep using webpack instead
 };
 
 export default nextConfig;

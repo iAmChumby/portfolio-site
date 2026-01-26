@@ -1,8 +1,10 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Card } from '@/components/ui/Card';
 import { getAboutContent, getSiteConfig } from '@/lib/content-loader';
+
 
 
 export default function About() {
@@ -13,20 +15,22 @@ export default function About() {
     <section id="about" className="py-12">
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-white">{aboutContent.title}</h2>
-            <p className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto text-white">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-neu-text-primary">
+              <span className="neu-text-gradient">{aboutContent.title}</span>
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto text-neu-text-secondary">
               {aboutContent.subtitle}
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div className="space-y-6">
-              <div className="bg-black/30 backdrop-blur-md rounded-lg p-6 border border-white/20">
+              <div className="neu-surface p-6 sm:p-8">
                 {aboutContent.bio.map((paragraph, index) => (
                   <p 
                     key={index}
-                    className={`text-base sm:text-lg ${index === 0 ? 'md:text-xl' : ''} text-center ${index === 0 ? 'text-white/90' : 'text-white/80'} leading-relaxed ${index > 0 ? 'mt-6' : ''}`}
+                    className={`text-base sm:text-lg ${index === 0 ? 'md:text-xl' : ''} text-center ${index === 0 ? 'text-neu-text-primary' : 'text-neu-text-secondary'} leading-relaxed ${index > 0 ? 'mt-6' : ''}`}
                   >
                     {paragraph}
                   </p>
@@ -35,24 +39,24 @@ export default function About() {
             </div>
             
             <div className="flex justify-center">
-              <div className="bg-black/30 backdrop-blur-md rounded-lg p-8 border border-white/20">
-                <Card className="p-10 text-center bg-transparent border-none shadow-none group cursor-pointer">
-                  <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-gradient-to-br from-accent to-secondary rounded-full mx-auto mb-8 flex items-center justify-center overflow-hidden transition-all duration-500 ease-out transform-gpu group-hover:scale-105 sm:group-hover:scale-110 group-hover:shadow-xl sm:group-hover:shadow-2xl group-hover:shadow-accent/20 sm:group-hover:shadow-accent/30 group-active:scale-95 sm:group-active:scale-100">
+              <div className="neu-surface p-8 w-full flex flex-col items-center">
+                <Card className="p-0 text-center bg-transparent border-none shadow-none group cursor-pointer w-full">
+                  <div className="neu-surface-inset relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full mx-auto mb-8 flex items-center justify-center overflow-hidden transition-all duration-500 ease-out transform-gpu group-hover:scale-105">
                     {aboutContent.profile.image ? (
                       <>
-                        <img 
+                      <Image 
                           src={aboutContent.profile.image} 
                           alt={siteConfig.site.author.name}
-                          className="w-full h-full object-cover transition-all duration-500 ease-out transform-gpu group-hover:scale-105 group-hover:brightness-110"
+                          fill
+                          className="object-cover p-1 rounded-full transition-all duration-500 ease-out group-hover:scale-110"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-accent/20 via-transparent to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out rounded-full"></div>
                       </>
                     ) : (
-                      <span className="text-3xl sm:text-4xl md:text-6xl font-bold text-white transition-all duration-500 ease-out group-hover:scale-110 group-hover:text-accent">{aboutContent.profile.initials}</span>
+                      <span className="text-3xl sm:text-4xl md:text-6xl font-bold text-neu-text-primary transition-all duration-500 ease-out group-hover:scale-110 group-hover:text-neu-accent">{aboutContent.profile.initials}</span>
                     )}
                   </div>
-                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-3 text-white transition-all duration-500 ease-out transform-gpu group-hover:scale-110 group-hover:text-accent group-hover:drop-shadow-2xl group-hover:shadow-accent/50 group-active:scale-95 group-hover:font-bold">{siteConfig.site.author.name}</h3>
-                  <p className="text-base sm:text-lg md:text-xl text-white/80 transition-all duration-500 ease-out transform-gpu group-hover:scale-110 group-hover:text-white group-hover:underline group-hover:decoration-accent group-hover:decoration-2 group-hover:underline-offset-8 group-active:scale-95 group-hover:font-semibold">{aboutContent.profile.jobTitle}</p>
+                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-3 neu-text-gradient transition-all duration-500 ease-out transform-gpu group-hover:scale-105">{siteConfig.site.author.name}</h3>
+                  <p className="text-base sm:text-lg md:text-xl text-neu-text-primary transition-all duration-500 ease-out transform-gpu group-hover:text-neu-accent">{aboutContent.profile.jobTitle}</p>
                 </Card>
               </div>
             </div>
@@ -60,13 +64,13 @@ export default function About() {
           
           {/* Skills & Technologies Section - Full Width */}
           <div className="mt-12">
-            <div className="bg-black/30 backdrop-blur-md rounded-lg p-8 border border-white/20">
-              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-center text-white mb-8">{aboutContent.skills.title}</h3>
-              <div className="flex flex-wrap gap-3 justify-center">
+            <div className="neu-surface p-8">
+              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-center text-neu-text-primary mb-8">{aboutContent.skills.title}</h3>
+              <div className="flex flex-wrap gap-4 justify-center">
                 {aboutContent.skills.items.map((skill, index) => (
                   <span
                     key={skill}
-                    className="relative px-4 py-2 rounded-full text-sm font-medium border cursor-pointer transition-all duration-300 ease-out transform-gpu bg-accent/20 text-white border-accent/30 hover:bg-accent/40 hover:border-accent/60 hover:scale-110 hover:shadow-lg hover:shadow-accent/25"
+                    className="neu-badge hover:text-neu-accent hover:scale-110 transition-transform duration-300 cursor-default"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     {skill}

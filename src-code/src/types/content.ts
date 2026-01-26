@@ -1,14 +1,14 @@
 export interface ButtonConfig {
   text: string;
   href: string;
-  variant: 'primary' | 'outline' | 'secondary';
-  size: 'sm' | 'md' | 'lg';
+  variant: 'primary' | 'outline' | 'secondary' | 'raised';
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export interface HeroContent {
-  title: string;
+  greeting: string;
   name: string;
-  subtitle: string;
+  tagline: string;
   description: string;
   buttons: ButtonConfig[];
 }
@@ -32,10 +32,12 @@ export interface ProjectItem {
   id: number;
   title: string;
   description: string;
+  longDescription?: string;
   image: string;
   technologies: string[];
-  demo: string;
-  code: string;
+  demo?: string;
+  code?: string;
+  url?: string;
 }
 
 export interface ProjectsContent {

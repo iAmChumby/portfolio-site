@@ -81,7 +81,7 @@ export class ContentLoader {
 
       // Validate hero section
       const hero = this.content.hero;
-      if (!hero.title || !hero.name || !hero.subtitle || !hero.description || !Array.isArray(hero.buttons)) {
+      if (!hero.greeting || !hero.name || !hero.tagline || !hero.description || !Array.isArray(hero.buttons)) {
         console.error('Invalid hero section structure');
         return false;
       }

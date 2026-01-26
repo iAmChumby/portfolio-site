@@ -1,6 +1,6 @@
 {
   "site": {
-    "name": "Luke Edwards' Portfolio",
+    "name": "Luke Edwards",
     "title": "Full Stack Developer & Designer",
     "description": "Passionate full-stack developer creating innovative web solutions with modern technologies.",
     "url": "https://lukeedwards.me",
@@ -14,15 +14,9 @@
     },
     "social": {
       "github": "https://github.com/iAmChumby",
-      "linkedin": "https://linkedin.com/in/yourprofile",
+      "linkedin": "https://www.linkedin.com/in/lukeedwards2004/",
       "twitter": "https://twitter.com/yourusername",
       "email": "edwards.lukec@gmail.com"
-    },
-    "github": {
-      "username": "iAmChumby",
-      "showActivity": true,
-      "showStats": true,
-      "featuredRepos": 6
     },
     "navigation": [
       {
@@ -36,6 +30,11 @@
         "external": false
       },
       {
+        "label": "Now",
+        "href": "/now",
+        "external": false
+      },
+      {
         "label": "Projects",
         "href": "/projects",
         "external": false
@@ -43,11 +42,6 @@
       {
         "label": "Contact",
         "href": "/contact",
-        "external": false
-      },
-      {
-        "label": "Live Feed",
-        "href": "/github",
         "external": false
       }
     ],
@@ -84,11 +78,5 @@
     "phone": "+1 (315) 725-1833",
     "location": "Utica, New York",
     "availability": "Available for freelance work"
-  },
-  "github": {
-    "username": "iAmChumby",
-    "showActivity": true,
-    "showStats": true,
-    "featuredRepos": 6
   }
 }

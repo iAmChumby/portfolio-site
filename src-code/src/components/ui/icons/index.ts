@@ -46,3 +46,6 @@ export { default as ForkIcon } from './ForkIcon';
 export { default as FolderIcon } from './FolderIcon';
 export { default as UsersIcon } from './UsersIcon';
 export { default as UserIcon } from './UserIcon';
+export { default as HomeIcon } from './HomeIcon';
+export { default as GitHubIcon } from './GitHubIcon';
+export { default as LinkedInIcon } from './LinkedInIcon';

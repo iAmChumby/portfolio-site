@@ -112,7 +112,6 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
     <div 
         ref={containerRef} 
         className="w-full h-[600px] relative border border-[#234d35] rounded-xl bg-neu-bg-dark/50 overflow-hidden" 
-        style={{ cursor: 'move' }}
     >
       <div className="absolute top-4 left-4 z-10 p-4 bg-neu-surface/90 backdrop-blur-sm rounded-lg border border-neu-border shadow-lg text-xs text-neu-text-secondary pointer-events-none select-none">
         <div className="flex items-center gap-2 mb-2">
@@ -209,10 +208,18 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
              const isProject = node.type === 'project';
              const radius = isProject ? 12 : 6;
-             ctx.beginPath();
-             ctx.arc(node.x, node.y, radius + 8, 0, 2 * Math.PI, false); // Generous hit area for easy clicking
              ctx.fillStyle = color;
+             
+             // 1. Draw Circle for Node
+             ctx.beginPath();
+             ctx.arc(node.x, node.y, radius + 8, 0, 2 * Math.PI, false); // Generous node hit area
              ctx.fill();
+             
+             // 2. Draw Rect for Label (Approximation)
+             // Allow hitting the text below the node
+             const labelHeight = isProject ? 20 : 15;
+             const labelWidth = isProject ? 100 : 60; // Rough estimate, but better than nothing
+             ctx.fillRect(node.x - labelWidth/2, node.y + radius, labelWidth, labelHeight + 10);
         }}
         
         // Interaction Settings
@@ -222,7 +229,7 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         enablePointerInteraction={true}
         onNodeHover={(node: any) => {
             if (containerRef.current) {
-                // Pointer for all nodes since they are all interactive (Click or Center)
+                // Pointer for all nodes, Move for background
                 containerRef.current.style.cursor = node ? 'pointer' : 'move'; 
             }
         }}

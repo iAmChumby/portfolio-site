@@ -125,9 +125,9 @@ const Header: React.FC<HeaderProps> = ({
                   )}>
                     <CodeIcon
                       size={24}
-                      className="text-neu-accent transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]"
+                      className="text-neu-accent transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
                     />
-                    <span className="neu-text-gradient text-2xl font-bold tracking-tight transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]">
+                    <span className="neu-text-gradient text-2xl font-bold tracking-tight transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                       {siteName}
                     </span>
                   </div>
@@ -233,9 +233,9 @@ const Header: React.FC<HeaderProps> = ({
               )}>
                 <CodeIcon
                   size={20}
-                  className="text-neu-accent transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]"
+                  className="text-neu-accent transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
                 />
-                <span className="neu-text-gradient text-xl font-bold transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]">
+                <span className="neu-text-gradient text-xl font-bold transition-all duration-150 group-hover/logo:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
                   {siteName}
                 </span>
               </div>

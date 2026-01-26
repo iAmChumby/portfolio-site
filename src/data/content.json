@@ -72,7 +72,7 @@
         "title": "wheredoieat (2025)",
         "description": "An application meant to intelligently recommend restaurants to users. Users' tastes get profile based on their interactions with the site. wheredoieat features a gamified, Tinder-like interface that allows users to swipe on restaurants as they encounter them.",
         "image": "/images/wheredoieat.png",
-        "technologies": ["Python", "FastAPI", "Next.js", "React", "PostgreSQL", "Railway", "Pytest", "Vercel", "Supabase", "Tailwind CSS", "UI/UX Design", "Machine Learning", "TypeScript", "Microservices", "Docker"],
+        "technologies": ["Python", "FastAPI", "Next.js", "React", "PostgreSQL", "Railway", "Pytest", "Vercel", "Supabase", "Tailwind CSS", "UI/UX Design", "Machine Learning", "TypeScript", "Microservices", "Docker", "CI/CD", "GitHub Actions", "DNS Management"],
         "url": "https://wheredoieat.at/"
       },
       {

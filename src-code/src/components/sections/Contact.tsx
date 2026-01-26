@@ -1,8 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EnvelopeIcon, PhoneIcon, MapPinIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { getContactContent, getSiteConfig } from '@/lib/content-loader';
+import { reverseGeocode } from '@/lib/geolocation';
+
+declare global {
+  interface Window {
+    turnstile?: {
+      reset: (widgetId?: string) => void;
+      render: (selector: HTMLElement, options: { sitekey: string; callback: (token: string) => void; theme: string }) => string;
+      getResponse: (widgetId?: string) => string | undefined;
+    };
+  }
+}
 
 export default function Contact() {
   const contactContent = getContactContent();
@@ -12,33 +23,236 @@ export default function Contact() {
     email: '',
     message: ''
   });
-  
+
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
+  const [geolocation, setGeolocation] = useState<string | null>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileTokenRef = useRef<string>('');
+  const turnstileWidgetIdRef = useRef<string | null>(null);
+  const geolocationRequestedRef = useRef<boolean>(false);
+
+  /**
+   * Get browser geolocation and reverse geocode to human-readable format
+   * Only attempts if permission is already granted (doesn't prompt user)
+   */
+  const getBrowserGeolocation = async (): Promise<void> => {
+    // Skip if already requested or geolocation not available
+    if (geolocationRequestedRef.current || !navigator.geolocation) {
+      return;
+    }
+
+    geolocationRequestedRef.current = true;
+
+    try {
+      // Check if geolocation permission is already granted
+      // Only proceed if permission is granted, don't prompt
+      let permissionGranted = false;
+      
+      if ('permissions' in navigator) {
+        try {
+          const permissionStatus = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+          permissionGranted = permissionStatus.state === 'granted';
+        } catch (permError) {
+          // Permissions API not supported or failed
+          // If Permissions API isn't available, we can't safely check, so skip to avoid prompts
+          return;
+        }
+      } else {
+        // Permissions API not available - skip to avoid any potential prompts
+        return;
+      }
+
+      // Only proceed if permission is already granted
+      if (!permissionGranted) {
+        // Permission not granted, skip silently - will use IP-based geolocation
+        return;
+      }
+
+      // Permission is granted, safe to request position
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          {
+            timeout: 5000, // Reasonable timeout
+            maximumAge: 300000, // Accept cached position up to 5 minutes old
+            enableHighAccuracy: false, // Use less accurate but faster method
+          }
+        );
+      });
+
+      // Reverse geocode coordinates to human-readable format
+      const location = await reverseGeocode(
+        position.coords.latitude,
+        position.coords.longitude
+      );
+
+      if (location) {
+        setGeolocation(location);
+      }
+    } catch (error) {
+      // Silently fail - will fallback to IP-based geolocation on server
+      // This includes permission denied, timeout, or other errors
+    }
+  };
+
+  useEffect(() => {
+    if (!turnstileRef.current) return;
+    
+    // Check if widget already exists in DOM
+    if (turnstileRef.current.querySelector('[id^="cf-chl-widget"]')) return;
+    
+    // Check if script already exists
+    const existingScript = document.querySelector('script[src*="turnstile"]');
+    
+    if (existingScript && window.turnstile) {
+      // Script loaded, render widget
+      const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_KEY;
+      if (siteKey && typeof siteKey === 'string') {
+        try {
+          const widgetId = window.turnstile.render(turnstileRef.current, {
+            sitekey: siteKey,
+            callback: (token: string) => {
+              turnstileTokenRef.current = token;
+            },
+            theme: 'light'
+          });
+          turnstileWidgetIdRef.current = widgetId;
+        } catch (error) {
+          console.error('Turnstile render error:', error);
+        }
+      }
+      return;
+    }
+
+    // Only add script if it doesn't exist
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        if (turnstileRef.current && window.turnstile && !turnstileRef.current.querySelector('[id^="cf-chl-widget"]')) {
+          const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_KEY;
+          if (!siteKey || typeof siteKey !== 'string') {
+            console.error('NEXT_PUBLIC_TURNSTILE_KEY is missing or invalid');
+            return;
+          }
+          try {
+            const widgetId = window.turnstile.render(turnstileRef.current, {
+              sitekey: siteKey,
+              callback: (token: string) => {
+                turnstileTokenRef.current = token;
+              },
+              theme: 'light'
+            });
+            turnstileWidgetIdRef.current = widgetId;
+          } catch (error) {
+            console.error('Turnstile render error:', error);
+          }
+        }
+      };
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  // Silently check for geolocation when form is focused or component mounts
+  // Only uses location if permission already granted (no prompt)
+  useEffect(() => {
+    const formElement = document.querySelector('form');
+    if (!formElement) return;
+
+    const handleFormFocus = () => {
+      getBrowserGeolocation();
+    };
+
+    // Check geolocation on form focus (only if permission already granted)
+    formElement.addEventListener('focusin', handleFormFocus, { once: true });
+    
+    // Also try on mount (only if permission already granted)
+    getBrowserGeolocation();
+
+    return () => {
+      formElement.removeEventListener('focusin', handleFormFocus);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormStatus('loading');
     
+    // Get token BEFORE changing state
+    let token = '';
+    if (window.turnstile && turnstileWidgetIdRef.current) {
+      token = window.turnstile.getResponse(turnstileWidgetIdRef.current) || '';
+    }
+    if (!token) {
+      token = turnstileTokenRef.current;
+    }
+    
+    if (!token) {
+      setFormStatus('error');
+      setStatusMessage('Please complete the CAPTCHA verification.');
+      setTimeout(() => {
+        setFormStatus('idle');
+        setStatusMessage('');
+      }, 3000);
+      return;
+    }
+    
+    setFormStatus('loading');
+
     try {
-      // Simulate form submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Handle form submission
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          turnstileToken: token,
+          geolocation: geolocation || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setFormStatus('error');
+        setStatusMessage(data.error || 'Failed to send message. Please try again.');
+
+        // Reset Turnstile
+        if (window.turnstile && turnstileWidgetIdRef.current) {
+          window.turnstile.reset(turnstileWidgetIdRef.current);
+          turnstileTokenRef.current = '';
+        }
+
+        setTimeout(() => {
+          setFormStatus('idle');
+          setStatusMessage('');
+        }, 5000);
+        return;
+      }
+
       setFormStatus('success');
-      setStatusMessage('Thank you! Your message has been sent successfully.');
-      
-      // Reset form after success
+      setStatusMessage(data.message || 'Thank you! Your message has been sent successfully.');
+
       setTimeout(() => {
         setFormData({ name: '', email: '', message: '' });
         setFormStatus('idle');
         setStatusMessage('');
+        if (window.turnstile && turnstileWidgetIdRef.current) {
+          window.turnstile.reset(turnstileWidgetIdRef.current);
+          turnstileTokenRef.current = '';
+        }
       }, 3000);
-      
-    } catch {
+    } catch (error) {
+      console.error('Form submission error:', error);
       setFormStatus('error');
-      setStatusMessage('Sorry, there was an error sending your message. Please try again.');
-      
+      setStatusMessage('An error occurred. Please try again.');
+
       setTimeout(() => {
         setFormStatus('idle');
         setStatusMessage('');
@@ -184,8 +398,8 @@ export default function Contact() {
                 
                 {statusMessage && (
                   <div className={`neu-surface-inset flex items-center gap-2 p-4 rounded-lg ${
-                    formStatus === 'success' 
-                      ? 'text-neu-accent-light' 
+                    formStatus === 'success'
+                      ? 'text-neu-accent-light'
                       : 'text-red-400'
                   }`}>
                     {formStatus === 'success' ? (
@@ -196,7 +410,16 @@ export default function Contact() {
                     <span className="text-sm">{statusMessage}</span>
                   </div>
                 )}
-                
+
+                {/* Turnstile CAPTCHA Widget */}
+                <div className="flex justify-center">
+                  <div
+                    ref={turnstileRef}
+                    className="cf-turnstile"
+                    key="turnstile-widget"
+                  />
+                </div>
+
                 <button 
                   type="submit" 
                   disabled={formStatus === 'loading'}

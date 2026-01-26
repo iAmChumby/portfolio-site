@@ -67,3 +67,14 @@ export const LikeKeys = {
    */
   rateLimit: (fingerprint: string) => `like:rate_limit:${fingerprint}`,
 };
+
+/**
+ * Redis key helpers for contact form functionality
+ */
+export const ContactKeys = {
+  /**
+   * Get Redis key for contact form rate limiting
+   * @param ip - Client IP address
+   */
+  contactRateLimit: (ip: string) => `contact:rate_limit:${ip}`,
+};

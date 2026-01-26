@@ -529,6 +529,25 @@ h6 {
   animation-delay: 2s;
 }
 
+/* Sliding chevron animation for swipe hint */
+@keyframes slide-right {
+
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translateX(8px);
+    opacity: 1;
+  }
+}
+
+.animate-slide-right {
+  animation: slide-right 1.5s ease-in-out infinite;
+}
+
 /* Noise texture overlay */
 .neu-texture {
   position: relative;

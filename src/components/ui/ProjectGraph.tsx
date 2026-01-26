@@ -167,13 +167,13 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
     // Add labels with conditional visibility
     node.append('text')
       .attr('class', 'node-label')
-      .text((d: GraphNode) => d.label)
-      .attr('font-size', (d: GraphNode) => d.type === 'project' ? 42 : 14)
+          .text((d: GraphNode) => d.label)
+      .attr('font-size', (d: GraphNode) => d.type === 'project' ? 24 : 14) // Reduced from 42
       .attr('font-weight', (d: GraphNode) => d.type === 'project' ? 700 : 400)
       .attr('fill', '#ffffff')
       .attr('text-anchor', 'middle')
       .attr('dy', (d: GraphNode) => (d.type === 'project' ? 16 : 8) + 28)
-      .style('opacity', (d: GraphNode) => d.type === 'project' ? 1 : 0)
+      .style('opacity', (d: GraphNode) => d.type === 'project' ? 0 : 0) // Hidden by default
       .style('transition', 'opacity 0.3s ease')
       .style('text-shadow', (d: GraphNode) => d.type === 'project' ? '0 2px 8px rgba(0,0,0,0.8)' : 'none');
 
@@ -186,7 +186,10 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         // Update tech label visibility based on zoom level
         node.selectAll<SVGTextElement, GraphNode>('.node-label')
           .style('opacity', function(d: GraphNode) {
-            if (d.type === 'project') return '1';
+            if (d.type === 'project') {
+               // Show project labels when zoomed in > 0.8
+               return event.transform.k > 0.8 ? '1' : '0';
+            }
             return event.transform.k > 1.2 ? '1' : '0';
           });
       });

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { ArrowTopRightOnSquareIcon, CodeBracketIcon, ChevronUpIcon, ChevronDownIcon, Squares2X2Icon, ShareIcon } from '@heroicons/react/24/outline';
 import { getProjectsContent } from '@/lib/content-loader';
@@ -26,10 +26,10 @@ export default function Projects() {
     setTimeout(() => setIsAnimating(false), 600);
   };
 
-  const handleGraphNodeClick = (project: any) => {
+  const handleGraphNodeClick = useCallback((project: any) => {
       setSelectedProject(project);
       setIsModalOpen(true);
-  };
+  }, []);
 
   return (
     <section id="projects" className="py-12">

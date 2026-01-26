@@ -10,8 +10,14 @@ const nextConfig: NextConfig = {
         os: false,
       };
     }
+    // Ensure D3 modules are resolved correctly
+    config.resolve.alias = {
+      ...config.resolve.alias,
+    };
     return config;
   },
+  // Transpile react-d3-graph for better compatibility
+  transpilePackages: ['react-d3-graph'],
 };
 
 export default nextConfig;

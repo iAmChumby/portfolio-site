@@ -1,25 +1,29 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
+import * as d3Force from 'd3-force';
+import { select } from 'd3-selection';
+import { zoom, zoomIdentity, ZoomBehavior } from 'd3-zoom';
 
 import { ProjectItem } from '@/types/content';
 
-// Dynamic import for client-side only rendering
-const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { 
-  ssr: false,
-  loading: () => <div className="w-full h-[500px] flex items-center justify-center text-gray-400">Loading Graph...</div>
-});
-
 interface GraphNode {
   id: string | number;
-  name: string;
+  label: string;
   type: 'project' | 'tech';
-  group: number;
-  val: number;
+  size: number;
+  color: string;
   x?: number;
   y?: number;
+  fx?: number | null;
+  fy?: number | null;
+}
+
+interface GraphLink {
+  source: string | number | GraphNode;
+  target: string | number | GraphNode;
+  type: string;
 }
 
 interface ProjectGraphProps {
@@ -29,25 +33,26 @@ interface ProjectGraphProps {
 
 export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const fgRef = useRef<any>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const simulationRef = useRef<any>(null);
+  const zoomBehaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
-  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+  const [zoomLevel, setZoomLevel] = useState(1);
 
-  useEffect(() => {
-    // Process data into nodes and links
-    const nodes: any[] = [];
-    const links: any[] = [];
-    const addedTechs = new Set();
+  // Convert projects data to react-d3-graph format
+  const graphData = useMemo(() => {
+    const nodes: GraphNode[] = [];
+    const links: GraphLink[] = [];
+    const addedTechs = new Set<string>();
 
     projects.forEach(project => {
       // Add Project Node
       nodes.push({
         id: project.id,
-        name: project.title,
+        label: project.title,
         type: 'project',
-        group: 1,
-        // Calculate size based on something? Or fixed.
-        val: 25
+        size: 400,
+        color: '#4fa36d'
       });
 
       project.technologies.forEach((tech: string) => {
@@ -55,10 +60,10 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         if (!addedTechs.has(tech)) {
           nodes.push({
             id: tech,
-            name: tech,
+            label: tech,
             type: 'tech',
-            group: 2,
-            val: 10
+            size: 200,
+            color: '#e2e8f0'
           });
           addedTechs.add(tech);
         }
@@ -67,74 +72,244 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         links.push({
           source: project.id,
           target: tech,
-          color: '#2a4a35' // subtle link color
+          type: 'project-tech'
         });
       });
     });
 
-    setGraphData({ nodes, links } as any);
+    return { nodes, links };
   }, [projects]);
 
-  // Adjust physics forces
-  useEffect(() => {
-    if (fgRef.current) {
-        // Strong repulsion to keep everything clear
-        fgRef.current.d3Force('charge').strength(-300);
-        
-        // LARGE link distance to separate tech nodes from projects
-        fgRef.current.d3Force('link').distance(100);
-        
-        // Center force to keep it in view
-        if (fgRef.current.d3Force('center')) {
-             fgRef.current.d3Force('center').strength(0.1); 
-        }
-    }
-  }, [graphData]);
-
+  // Handle resize
   useEffect(() => {
     const handleResize = () => {
-        if (containerRef.current) {
-            setDimensions({
-                width: containerRef.current.offsetWidth,
-                height: containerRef.current.offsetHeight
-            });
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth || 800;
+        const height = containerRef.current.offsetHeight || 500;
+        if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
+          setDimensions({ width, height });
         }
+      }
     };
-    
-    // Initial resize
-    handleResize();
 
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // D3 Force Simulation with Zoom and Pan
+  useEffect(() => {
+    if (!svgRef.current || graphData.nodes.length === 0) return;
+
+    const svg = select(svgRef.current);
+    svg.selectAll('*').remove();
+
+    const width = dimensions.width;
+    const height = dimensions.height;
+
+    // Create zoom container
+    const zoomContainer = svg.append('g').attr('class', 'zoom-container');
+
+    // Create simulation
+    const simulation = d3Force.forceSimulation(graphData.nodes as any)
+      .force('link', d3Force.forceLink(graphData.links).id((d: any) => d.id).distance(120))
+      .force('charge', d3Force.forceManyBody().strength(-400))
+      .force('center', d3Force.forceCenter(width / 2, height / 2))
+      .force('collision', d3Force.forceCollide().radius((d: any) => d.type === 'project' ? 60 : 25));
+
+    simulationRef.current = simulation;
+
+    // Create links
+    const link = zoomContainer.append('g')
+      .attr('class', 'links')
+      .selectAll('line')
+      .data(graphData.links)
+      .join('line')
+      .attr('stroke', 'rgba(255, 255, 255, 0.15)')
+      .attr('stroke-width', 1.5);
+
+    // Create nodes group
+    const node = zoomContainer.append('g')
+      .attr('class', 'nodes')
+      .selectAll('g')
+      .data(graphData.nodes)
+      .join('g')
+      .attr('class', 'node')
+      .style('cursor', 'pointer');
+
+    // Add animated pulse ring for project nodes
+    node.filter((d: GraphNode) => d.type === 'project')
+      .append('circle')
+      .attr('class', 'pulse-ring')
+      .attr('r', 20)
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(79, 163, 109, 0.6)')
+      .attr('stroke-width', 2)
+      .style('animation', 'pulse 2s ease-in-out infinite');
+
+    // Add main circles with proper sizing and styling
+    node.append('circle')
+      .attr('class', 'node-circle')
+      .attr('r', (d) => d.type === 'project' ? 16 : 8)
+      .attr('fill', (d) => d.color)
+      .attr('stroke', (d) => d.type === 'project' ? '#2a4a35' : 'none')
+      .attr('stroke-width', (d) => d.type === 'project' ? 2 : 0);
+
+    // Add labels with conditional visibility
+    node.append('text')
+      .attr('class', 'node-label')
+      .text((d) => d.label)
+      .attr('font-size', (d) => d.type === 'project' ? 42 : 14)
+      .attr('font-weight', (d) => d.type === 'project' ? 700 : 400)
+      .attr('fill', '#ffffff')
+      .attr('text-anchor', 'middle')
+      .attr('dy', (d) => (d.type === 'project' ? 16 : 8) + 28)
+      .style('opacity', (d) => d.type === 'project' ? 1 : 0)
+      .style('transition', 'opacity 0.3s ease')
+      .style('text-shadow', (d) => d.type === 'project' ? '0 2px 8px rgba(0,0,0,0.8)' : 'none');
+
+    // Setup zoom behavior
+    const zoomBehavior = zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 8])
+      .on('zoom', (event) => {
+        zoomContainer.attr('transform', event.transform);
+        setZoomLevel(event.transform.k);
+        
+        // Update tech label visibility based on zoom level
+        node.selectAll('.node-label')
+          .style('opacity', function(d: any) {
+            if (d.type === 'project') return 1;
+            return event.transform.k > 1.2 ? 1 : 0;
+          });
+      });
+
+    svg.call(zoomBehavior);
+    zoomBehaviorRef.current = zoomBehavior;
+
+    // Set initial cursor
+    svg.style('cursor', 'move');
+
+    // Node interaction handlers
+    node.on('mouseenter', function() {
+      select(this).select('.node-circle')
+        .transition()
+        .duration(200)
+        .attr('r', function(d: any) {
+          return (d.type === 'project' ? 16 : 8) * 1.2;
+        });
+      svg.style('cursor', 'pointer');
+    })
+    .on('mouseleave', function() {
+      select(this).select('.node-circle')
+        .transition()
+        .duration(200)
+        .attr('r', (d: any) => d.type === 'project' ? 16 : 8);
+      svg.style('cursor', 'move');
+    })
+    .on('click', (_event, d) => {
+      _event.stopPropagation();
+      if (d.type === 'project') {
+        const project = projects.find(p => p.id === d.id);
+        if (project) onNodeClick(project);
+      } else {
+        // Zoom to tech node
+        const transform = zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(2.5)
+          .translate(-d.x!, -d.y!);
+        
+        svg.transition()
+          .duration(1000)
+          .call(zoomBehavior.transform, transform);
+      }
+    });
+
+    // Update positions on each tick
+    simulation.on('tick', () => {
+      link
+        .attr('x1', (d: any) => d.source.x)
+        .attr('y1', (d: any) => d.source.y)
+        .attr('x2', (d: any) => d.target.x)
+        .attr('y2', (d: any) => d.target.y);
+
+      node.attr('transform', (d: any) => `translate(${d.x},${d.y})`);
+    });
+
+    return () => {
+      simulation.stop();
+    };
+  }, [graphData, dimensions, projects, onNodeClick]);
+
+  // Reset view function - fit graph to viewport
+  const handleResetView = () => {
+    if (!svgRef.current || !zoomBehaviorRef.current || graphData.nodes.length === 0) return;
+
+    const svg = select(svgRef.current);
+    
+    // Calculate bounding box of all nodes
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    graphData.nodes.forEach(node => {
+      if (node.x !== undefined && node.y !== undefined) {
+        const radius = node.type === 'project' ? 16 : 8;
+        minX = Math.min(minX, node.x - radius);
+        minY = Math.min(minY, node.y - radius);
+        maxX = Math.max(maxX, node.x + radius);
+        maxY = Math.max(maxY, node.y + radius);
+      }
+    });
+
+    const graphWidth = maxX - minX;
+    const graphHeight = maxY - minY;
+    const graphCenterX = (minX + maxX) / 2;
+    const graphCenterY = (minY + maxY) / 2;
+
+    // Calculate scale to fit with padding
+    const padding = 50;
+    const scaleX = (dimensions.width - padding * 2) / graphWidth;
+    const scaleY = (dimensions.height - padding * 2) / graphHeight;
+    const scale = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 1x
+
+    // Calculate transform to center and fit
+    const transform = zoomIdentity
+      .translate(dimensions.width / 2, dimensions.height / 2)
+      .scale(scale)
+      .translate(-graphCenterX, -graphCenterY);
+
+    // Animate to fit
+    svg.transition()
+      .duration(1000)
+      .call(zoomBehaviorRef.current.transform, transform);
+
+    // Restart simulation with low alpha to settle
+    if (simulationRef.current) {
+      simulationRef.current.alpha(0.3).restart();
+    }
+  };
+
   return (
     <div 
-        ref={containerRef} 
-        className="w-full h-[600px] relative border border-[#234d35] rounded-xl bg-neu-bg-dark/50 overflow-hidden" 
+      ref={containerRef} 
+      className="w-full h-[600px] relative border border-[#234d35] rounded-xl bg-neu-bg-dark/50 overflow-hidden" 
     >
       <div className="absolute top-4 left-4 z-10 p-4 bg-neu-surface/90 backdrop-blur-sm rounded-lg border border-neu-border shadow-lg text-xs text-neu-text-secondary pointer-events-none select-none">
         <div className="flex items-center gap-2 mb-2">
-            <span className="w-3 h-3 rounded-full bg-[#4fa36d] shadow-[0_0_10px_rgba(79,163,109,0.5)]"></span> 
-            <span className="font-medium text-neu-text-primary">Projects</span>
+          <span className="w-3 h-3 rounded-full bg-[#4fa36d] shadow-[0_0_10px_rgba(79,163,109,0.5)]"></span> 
+          <span className="font-medium text-neu-text-primary">Projects</span>
         </div>
         <div className="flex items-center gap-2 mb-3">
-            <span className="w-3 h-3 rounded-full bg-[#e2e8f0] shadow-[0_0_10px_rgba(226,232,240,0.5)]"></span> 
-            <span className="font-medium text-neu-text-primary">Technologies</span>
+          <span className="w-3 h-3 rounded-full bg-[#e2e8f0] shadow-[0_0_10px_rgba(226,232,240,0.5)]"></span> 
+          <span className="font-medium text-neu-text-primary">Technologies</span>
         </div>
         <div className="h-px bg-neu-border mb-3"></div>
         <div className="space-y-1 text-[10px] uppercase tracking-wider opacity-80">
-            <p>• Scroll to Zoom</p>
-            <p>• Drag to Pan</p>
-            <p>• Click to Expand</p>
+          <p>• Scroll to Zoom</p>
+          <p>• Drag to Pan</p>
+          <p>• Click to Expand</p>
         </div>
       </div>
       
       <button
-        onClick={() => {
-            fgRef.current?.zoomToFit(1000, 50);
-            fgRef.current?.d3ReheatSimulation(); // Ensure physics settle if needed
-        }}
+        onClick={handleResetView}
         className="absolute bottom-4 right-4 bg-neu-surface/90 backdrop-blur-sm border border-neu-border text-neu-text-primary px-3 py-2 rounded-lg shadow-lg hover:bg-[#234d35] hover:text-white transition-colors text-xs font-medium z-10 flex items-center gap-2"
         aria-label="Reset View"
       >
@@ -142,123 +317,24 @@ export default function ProjectGraph({ projects, onNodeClick }: ProjectGraphProp
         Reset View
       </button>
       
-      <ForceGraph2D
-        ref={fgRef}
+      <svg
+        ref={svgRef}
         width={dimensions.width}
         height={dimensions.height}
-        graphData={graphData}
-        linkColor={() => 'rgba(255, 255, 255, 0.15)'}
-        linkWidth={1.5}
-        linkDirectionalParticles={2}
-        linkDirectionalParticleSpeed={0.005}
-        backgroundColor="rgba(0,0,0,0)"
-
-        // Custom Rendering for Persistent Labels and controlled size
-        nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-            const label = node.name;
-            const isProject = node.type === 'project';
-            const radius = isProject ? 12 : 6;
-            const fontSize = isProject ? 14/globalScale : 10/globalScale;
-            const finalFontSize = Math.max(fontSize, 4); 
-
-            // Animated Pulse for Projects
-            if (isProject) {
-              const time = Date.now();
-              const pulse = (Math.sin(time / 400) + 1) / 2; // 0 to 1 oscillating
-              const pulseSize = radius + 4 + (pulse * 3); // Ring expands
-              const pulseOpacity = 0.5 - (pulse * 0.3); // Fades out as expanding
-
-              // Pulse Ring
-              ctx.beginPath();
-              ctx.arc(node.x, node.y, pulseSize, 0, 2 * Math.PI, false);
-              ctx.strokeStyle = `rgba(79, 163, 109, ${pulseOpacity})`;
-              ctx.lineWidth = 2;
-              ctx.stroke();
-            }
-
-            // Draw Node Body
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-            ctx.fillStyle = isProject ? '#4fa36d' : '#e2e8f0';
-            ctx.fill();
-            
-            // Inner Solid Border for Project
-            if (isProject) {
-                ctx.strokeStyle = '#2a4a35';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-
-            // Draw Label Logic (Semantic Zoom)
-            const showLabel = isProject || (globalScale > 1.2);
-
-            if (showLabel) {
-                ctx.font = `${finalFontSize}px Sans-Serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                const textAlpha = isProject ? 1 : Math.min(1, (globalScale - 1.2) * 2); // Fade in tech labels
-                ctx.fillStyle = isProject ? '#ffffff' : `rgba(255,255,255,${textAlpha})`;
-                
-                // Draw text below the node
-                const textOffset = radius + finalFontSize + (isProject ? 4 : 2); 
-                ctx.fillText(label, node.x, node.y + textOffset);
-            }
-        }}
-        
-        nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
-             const isProject = node.type === 'project';
-             const radius = isProject ? 12 : 6;
-             ctx.fillStyle = color;
-             
-             // 1. Draw Circle for Node
-             ctx.beginPath();
-             ctx.arc(node.x, node.y, radius + 8, 0, 2 * Math.PI, false); // Generous node hit area
-             ctx.fill();
-             
-             // 2. Draw Rect for Label (Approximation)
-             // Allow hitting the text below the node
-             const labelHeight = isProject ? 20 : 15;
-             const labelWidth = isProject ? 100 : 60; // Rough estimate, but better than nothing
-             ctx.fillRect(node.x - labelWidth/2, node.y + radius, labelWidth, labelHeight + 10);
-        }}
-        
-        // Interaction Settings
-        enableZoom={true}
-        enablePan={true}
-        enableNodeDrag={false} // Disabled to prioritize clicking
-        enablePointerInteraction={true}
-        onNodeHover={(node: any) => {
-            if (containerRef.current) {
-                // Pointer for all nodes, Move for background
-                containerRef.current.style.cursor = node ? 'pointer' : 'move'; 
-            }
-        }}
-        onNodeClick={(node: any) => {
-            if (node.type === 'project') {
-                const p = projects.find(p => p.id === node.id);
-                if (p) onNodeClick(p);
-            } else {
-                fgRef.current?.centerAt(node.x, node.y, 1000);
-                fgRef.current?.zoom(3, 1000);
-            }
-        }}
-
-        cooldownTicks={100}
-        d3VelocityDecay={0.3}
-        onEngineStop={() => {
-            // 1. Fit the graph first
-            fgRef.current?.zoomToFit(400, 50);
-            
-            // 2. Restart simulation at low alpha to keep the render loop active for animations
-            // waiting a tick prevents conflict with zoomToFit (sometimes)
-            setTimeout(() => {
-                if (fgRef.current) {
-                    fgRef.current.d3Force('charge').strength(-180); // Re-assert physics
-                    fgRef.current.d3AlphaTarget(0.01).restart(); // Keep-alive for animation
-                }
-            }, 500);
-        }}
+        className="w-full h-full"
       />
+      <style jsx global>{`
+        @keyframes pulse {
+          0%, 100% {
+            r: 20px;
+            opacity: 0.6;
+          }
+          50% {
+            r: 24px;
+            opacity: 0.3;
+          }
+        }
+      `}</style>
     </div>
   );
 }

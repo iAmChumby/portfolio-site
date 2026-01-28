@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 
 const ESPN_SCOREBOARD_URL = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard';
 const KNICKS_TEAM_ID = '18';
+const GAME_DURATION_HOURS = 3; // Conservative estimate for NBA game length
+const POST_GAME_DISPLAY_HOURS = 6; // Display finished games for 6 hours
 
 interface ESPNTeamLogo {
   href: string;
@@ -82,6 +84,7 @@ export interface KnicksGameData {
   isHome: boolean | null;
   gameDetail: string | null;
   teamRecord: string | null;
+  isRecentlyFinished?: boolean; // Flag for games in 6-hour window
 }
 
 function getScoreboardLogo(team: ESPNTeam): string | null {
@@ -100,7 +103,26 @@ function getScoreboardLogo(team: ESPNTeam): string | null {
   return null;
 }
 
-function findRelevantGame(events: ESPNEvent[]): { event: ESPNEvent; type: 'live' | 'upcoming' } | null {
+/**
+ * Check if a finished game is within the post-game display window
+ * Estimates game end time as start time + 3 hours
+ */
+function isWithinPostGameWindow(gameStartTime: string): boolean {
+  const now = new Date();
+  const gameStart = new Date(gameStartTime);
+
+  // Estimate game end (start + typical duration)
+  const estimatedGameEnd = new Date(
+    gameStart.getTime() + GAME_DURATION_HOURS * 60 * 60 * 1000
+  );
+
+  // Hours since estimated end
+  const hoursSinceEnd = (now.getTime() - estimatedGameEnd.getTime()) / (1000 * 60 * 60);
+
+  return hoursSinceEnd >= 0 && hoursSinceEnd <= POST_GAME_DISPLAY_HOURS;
+}
+
+function findRelevantGame(events: ESPNEvent[]): { event: ESPNEvent; type: 'live' | 'upcoming' | 'finished' } | null {
   const now = new Date();
 
   // Filter to only Knicks games
@@ -109,7 +131,7 @@ function findRelevantGame(events: ESPNEvent[]): { event: ESPNEvent; type: 'live'
     return competition?.competitors.some(c => c.team.id === KNICKS_TEAM_ID);
   });
 
-  // First, look for a live game (in progress)
+  // Priority 1: Look for a live game (in progress)
   for (const event of knicksEvents) {
     const competition = event.competitions[0];
     if (!competition) continue;
@@ -120,7 +142,32 @@ function findRelevantGame(events: ESPNEvent[]): { event: ESPNEvent; type: 'live'
     }
   }
 
-  // Next, look for the next upcoming game (pre-game, future date)
+  // Priority 2: Look for recently finished games (within 6-hour window)
+  let recentFinishedGame: ESPNEvent | null = null;
+  let recentFinishedTime: Date | null = null;
+
+  for (const event of knicksEvents) {
+    const competition = event.competitions[0];
+    if (!competition) continue;
+
+    const status = competition.status;
+    const gameDate = new Date(event.date);
+
+    // Check for finished games within the post-game display window
+    if (status.type.state === 'post' && isWithinPostGameWindow(event.date)) {
+      // If multiple finished games in window, select the most recent one
+      if (!recentFinishedGame || gameDate > recentFinishedTime!) {
+        recentFinishedGame = event;
+        recentFinishedTime = gameDate;
+      }
+    }
+  }
+
+  if (recentFinishedGame) {
+    return { event: recentFinishedGame, type: 'finished' };
+  }
+
+  // Priority 3: Look for the next upcoming game (pre-game, future date)
   let nextGame: ESPNEvent | null = null;
   let nextGameTime: Date | null = null;
 
@@ -253,7 +300,13 @@ export async function GET() {
 
     const gameData = parseGame(relevantGame.event, teamRecord);
 
-    return NextResponse.json(gameData);
+    // Add isRecentlyFinished flag for games in the 6-hour post-game window
+    const enhancedGameData = {
+      ...gameData,
+      isRecentlyFinished: relevantGame.type === 'finished'
+    };
+
+    return NextResponse.json(enhancedGameData);
   } catch (error) {
     console.error('Error fetching Knicks game data:', error);
     return NextResponse.json(

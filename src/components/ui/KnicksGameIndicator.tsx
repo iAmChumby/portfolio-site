@@ -21,6 +21,7 @@ interface KnicksGameData {
   isHome: boolean | null;
   gameDetail: string | null;
   teamRecord: string | null;
+  isRecentlyFinished?: boolean;
 }
 
 const KNICKS_LOGO = 'https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/ny.png';
@@ -129,7 +130,8 @@ export default function KnicksGameIndicator() {
     if (gameData.gameStatus === 'post') {
       const score = `${gameData.knicksScore} - ${gameData.opponentScore}`;
       const result = gameData.isWinning ? 'W' : 'L';
-      return `${result} ${score}`;
+      const recentIndicator = gameData.isRecentlyFinished ? ' (Recent)' : '';
+      return `${result} ${score}${recentIndicator}`;
     }
     return formatGameTime();
   };

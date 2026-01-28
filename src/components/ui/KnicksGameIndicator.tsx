@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -31,30 +31,35 @@ export default function KnicksGameIndicator() {
   const [error, setError] = useState<string | null>(null);
   const [isBouncing, setIsBouncing] = useState(false);
 
-  useEffect(() => {
-    const fetchGameData = async () => {
-      try {
-        const response = await fetch('/api/knicks');
-        if (!response.ok) {
-          throw new Error('Failed to fetch game data');
-        }
-        const data = await response.json();
-        setGameData(data);
-        setError(null);
-      } catch {
-        setError('Unable to load game data');
-      } finally {
-        setIsLoading(false);
+  // Memoize the fetch function with useCallback to prevent recreating on each render
+  const fetchGameData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/knicks');
+      if (!response.ok) {
+        throw new Error('Failed to fetch game data');
       }
-    };
+      const data = await response.json();
+      setGameData(data);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load Knicks game data:', err);
+      setError('Unable to load game data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
+  // Calculate refresh interval based on game status
+  const refreshInterval = useMemo(() => {
+    return gameData?.gameStatus === 'in' ? 30000 : 300000;
+  }, [gameData?.gameStatus]);
+
+  useEffect(() => {
     fetchGameData();
 
-    // Refresh every 30 seconds while the game is live, every 5 minutes otherwise
-    const refreshInterval = gameData?.gameStatus === 'in' ? 30000 : 300000;
     const interval = setInterval(fetchGameData, refreshInterval);
     return () => clearInterval(interval);
-  }, [gameData?.gameStatus]);
+  }, [fetchGameData, refreshInterval]);
 
   // Handle bouncing ball easter egg
   const handleBallClick = useCallback((e: React.MouseEvent) => {
@@ -79,8 +84,22 @@ export default function KnicksGameIndicator() {
     );
   }
 
-  // Error state or no data - hide the component
-  if (error || !gameData) {
+  // Error state - show error message
+  if (error) {
+    return (
+      <div className="neu-surface p-6">
+        <div className="flex items-center gap-4">
+          <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+            <span className="text-xl">⚠️</span>
+          </div>
+          <p className="text-sm text-neu-text-secondary">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // No data - hide the component (might be off-season)
+  if (!gameData) {
     return null;
   }
 

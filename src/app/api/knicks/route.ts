@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const ESPN_KNICKS_SCHEDULE_URL = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/18/schedule';
+const ESPN_SCOREBOARD_URL = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard';
 const KNICKS_TEAM_ID = '18';
 
 interface ESPNTeamLogo {
@@ -13,15 +13,24 @@ interface ESPNTeam {
   abbreviation: string;
   displayName: string;
   shortDisplayName: string;
-  logos: ESPNTeamLogo[];
+  logo?: string;
+  logos?: ESPNTeamLogo[];
+}
+
+interface ESPNRecord {
+  name: string;
+  abbreviation?: string;
+  type: string;
+  summary: string;
 }
 
 interface ESPNCompetitor {
   id: string;
   team: ESPNTeam;
-  score?: { value: number; displayValue: string };
+  score?: string; // Scoreboard endpoint uses string, not nested object
   homeAway: 'home' | 'away';
   winner?: boolean;
+  records?: ESPNRecord[];
 }
 
 interface ESPNStatus {
@@ -54,12 +63,7 @@ interface ESPNEvent {
   competitions: ESPNCompetition[];
 }
 
-interface ESPNScheduleResponse {
-  team: {
-    id: string;
-    displayName: string;
-    recordSummary: string;
-  };
+interface ESPNScoreboardResponse {
   events: ESPNEvent[];
 }
 
@@ -80,40 +84,53 @@ export interface KnicksGameData {
   teamRecord: string | null;
 }
 
-function getScoreboardLogo(logos: ESPNTeamLogo[]): string | null {
-  // Prefer scoreboard logo, fallback to default
-  const scoreboardLogo = logos.find(l => l.rel.includes('scoreboard') && !l.rel.includes('dark'));
-  if (scoreboardLogo) return scoreboardLogo.href;
-  
-  const defaultLogo = logos.find(l => l.rel.includes('default') && !l.rel.includes('dark'));
-  return defaultLogo?.href || logos[0]?.href || null;
+function getScoreboardLogo(team: ESPNTeam): string | null {
+  // Scoreboard endpoint provides logo directly on team object
+  if (team.logo) return team.logo;
+
+  // Fallback to logos array if available
+  if (team.logos) {
+    const scoreboardLogo = team.logos.find(l => l.rel.includes('scoreboard') && !l.rel.includes('dark'));
+    if (scoreboardLogo) return scoreboardLogo.href;
+
+    const defaultLogo = team.logos.find(l => l.rel.includes('default') && !l.rel.includes('dark'));
+    return defaultLogo?.href || team.logos[0]?.href || null;
+  }
+
+  return null;
 }
 
 function findRelevantGame(events: ESPNEvent[]): { event: ESPNEvent; type: 'live' | 'upcoming' } | null {
   const now = new Date();
-  
+
+  // Filter to only Knicks games
+  const knicksEvents = events.filter(event => {
+    const competition = event.competitions[0];
+    return competition?.competitors.some(c => c.team.id === KNICKS_TEAM_ID);
+  });
+
   // First, look for a live game (in progress)
-  for (const event of events) {
+  for (const event of knicksEvents) {
     const competition = event.competitions[0];
     if (!competition) continue;
-    
+
     const status = competition.status;
     if (status.type.state === 'in') {
       return { event, type: 'live' };
     }
   }
-  
+
   // Next, look for the next upcoming game (pre-game, future date)
   let nextGame: ESPNEvent | null = null;
   let nextGameTime: Date | null = null;
-  
-  for (const event of events) {
+
+  for (const event of knicksEvents) {
     const competition = event.competitions[0];
     if (!competition) continue;
-    
+
     const status = competition.status;
     const gameDate = new Date(event.date);
-    
+
     // Look for pre-game status or future games
     if (status.type.state === 'pre' && gameDate > now) {
       if (!nextGame || gameDate < nextGameTime!) {
@@ -122,11 +139,11 @@ function findRelevantGame(events: ESPNEvent[]): { event: ESPNEvent; type: 'live'
       }
     }
   }
-  
+
   if (nextGame) {
     return { event: nextGame, type: 'upcoming' };
   }
-  
+
   return null;
 }
 
@@ -142,8 +159,9 @@ function parseGame(event: ESPNEvent, teamRecord: string | null): KnicksGameData 
     (c) => c.team.id !== KNICKS_TEAM_ID
   )!;
   
-  const knicksScore = knicksCompetitor.score?.value ?? 0;
-  const opponentScore = opponentCompetitor.score?.value ?? 0;
+  // Scoreboard endpoint returns scores as strings
+  const knicksScore = parseInt(knicksCompetitor.score || '0', 10);
+  const opponentScore = parseInt(opponentCompetitor.score || '0', 10);
   
   const gameState = status.type.state;
   const isPlaying = gameState === 'in';
@@ -182,7 +200,7 @@ function parseGame(event: ESPNEvent, teamRecord: string | null): KnicksGameData 
     knicksScore: isPlaying || isFinished ? knicksScore : null,
     opponentScore: isPlaying || isFinished ? opponentScore : null,
     opponentName: opponentCompetitor.team.shortDisplayName,
-    opponentLogo: getScoreboardLogo(opponentCompetitor.team.logos),
+    opponentLogo: getScoreboardLogo(opponentCompetitor.team),
     gameTime: event.date,
     period,
     clock: status.displayClock,
@@ -194,19 +212,18 @@ function parseGame(event: ESPNEvent, teamRecord: string | null): KnicksGameData 
 
 export async function GET() {
   try {
-    const response = await fetch(ESPN_KNICKS_SCHEDULE_URL, {
+    const response = await fetch(ESPN_SCOREBOARD_URL, {
       next: { revalidate: 30 }, // Cache for 30 seconds
     });
-    
+
     if (!response.ok) {
       throw new Error(`ESPN API responded with status: ${response.status}`);
     }
-    
-    const data: ESPNScheduleResponse = await response.json();
-    
-    const teamRecord = data.team?.recordSummary || null;
+
+    const data: ESPNScoreboardResponse = await response.json();
+
     const relevantGame = findRelevantGame(data.events || []);
-    
+
     if (!relevantGame) {
       // No upcoming games found - might be off-season
       return NextResponse.json({
@@ -223,12 +240,19 @@ export async function GET() {
         clock: null,
         isHome: null,
         gameDetail: null,
-        teamRecord,
+        teamRecord: null,
       } as KnicksGameData);
     }
-    
+
+    // Extract team record from the Knicks competitor in the game
+    const competition = relevantGame.event.competitions[0];
+    const knicksCompetitor = competition.competitors.find(
+      (c) => c.team.id === KNICKS_TEAM_ID
+    );
+    const teamRecord = knicksCompetitor?.records?.find(r => r.type === 'total')?.summary || null;
+
     const gameData = parseGame(relevantGame.event, teamRecord);
-    
+
     return NextResponse.json(gameData);
   } catch (error) {
     console.error('Error fetching Knicks game data:', error);

@@ -19,7 +19,6 @@
     "@upstash/redis": "^1.36.1",
     "@vercel/analytics": "^1.6.1",
     "animated-backgrounds": "^2.0.0",
-    "canvas": "^3.2.1",
     "clsx": "^2.1.1",
     "d3-drag": "^3.0.0",
     "d3-force": "^3.0.0",

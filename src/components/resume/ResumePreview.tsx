@@ -2,9 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import * as pdfjsLib from 'pdfjs-dist';
 
 interface ResumePreviewProps {
   pdfUrl: string;
+}
+
+// Configure PDF.js worker for browser environment
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 }
 
 export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
@@ -13,45 +19,54 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch preview image from API route
-    const fetchPreview = async () => {
+    // Render PDF preview client-side
+    const renderPDFPreview = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await fetch('/api/resume/preview');
-        if (!response.ok) {
-          throw new Error('Failed to load preview');
+        // Load PDF document from public URL
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        const pdf = await loadingTask.promise;
+
+        // Get first page
+        const page = await pdf.getPage(1);
+
+        // Set scale for high-quality rendering (2x for retina displays)
+        const scale = 2.0;
+        const viewport = page.getViewport({ scale });
+
+        // Create canvas element for rendering
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        
+        if (!context) {
+          throw new Error('Failed to get canvas context');
         }
 
-        // Convert response to blob URL
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        setPreviewUrl(url);
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        // Render PDF page to canvas
+        await page.render({
+          canvasContext: context,
+          viewport: viewport,
+          canvas: canvas,
+        }).promise;
+
+        // Convert canvas to image data URL
+        const imageUrl = canvas.toDataURL('image/png');
+        setPreviewUrl(imageUrl);
       } catch (err) {
-        console.error('Error loading resume preview:', err);
+        console.error('Error rendering PDF preview:', err);
         setError('Failed to load preview');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPreview();
-
-    // Cleanup blob URL on unmount
-    return () => {
-      // Cleanup will happen in a separate effect that watches previewUrl
-    };
-  }, []);
-
-  // Cleanup blob URL when component unmounts or previewUrl changes
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
+    renderPDFPreview();
+  }, [pdfUrl]);
 
   const handleOpenPDF = () => {
     window.open(pdfUrl, '_blank', 'noopener,noreferrer');

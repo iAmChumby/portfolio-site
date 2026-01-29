@@ -12,7 +12,25 @@ export function cn(...inputs: ClassValue[]) {
  * Format date to readable string
  */
 export function formatDate(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  let dateObj: Date;
+  
+  if (typeof date === 'string') {
+    // Parse date string as local date to avoid timezone shift
+    // When date is in "YYYY-MM-DD" format, new Date() interprets it as UTC
+    // We need to parse it as local time instead
+    const dateMatch = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (dateMatch) {
+      const [, year, month, day] = dateMatch;
+      // Create date in local timezone (month is 0-indexed in Date constructor)
+      dateObj = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+    } else {
+      // Fallback to standard Date parsing for other formats
+      dateObj = new Date(date);
+    }
+  } else {
+    dateObj = date;
+  }
+  
   return dateObj.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

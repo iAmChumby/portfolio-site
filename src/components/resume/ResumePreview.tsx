@@ -39,8 +39,8 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
         // Get first page
         const page = await pdf.getPage(1);
 
-        // Set scale for rendering (reduced to 50% of original size)
-        const scale = 1.0;
+        // Set scale for high-quality rendering (2x for retina displays)
+        const scale = 2.0;
         const viewport = page.getViewport({ scale });
 
         // Create canvas element for rendering
@@ -112,14 +112,14 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
         )}
 
         {previewUrl && !loading && (
-          <div className="relative w-full">
+          <div className="relative w-full flex justify-center">
             {/* Clickable Preview Image */}
             <button
               onClick={handleOpenPDF}
-              className="w-full cursor-pointer hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-neu-accent focus:ring-offset-2 focus:ring-offset-neu-bg-base rounded-t-neu-lg overflow-hidden group"
+              className="w-full max-w-[50%] cursor-pointer hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-neu-accent focus:ring-offset-2 focus:ring-offset-neu-bg-base rounded-t-neu-lg overflow-hidden group"
               aria-label="Open resume PDF in new tab"
             >
-              <div className="relative w-full aspect-[8.5/11] bg-white flex items-center justify-center">
+              <div className="relative w-full max-w-[50%] mx-auto aspect-[8.5/11] bg-white flex items-center justify-center">
                 <img
                   src={previewUrl}
                   alt="Preview of Luke Edwards' resume"

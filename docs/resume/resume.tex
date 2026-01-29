@@ -1,7 +1,7 @@
 \documentclass[10pt,letterpaper]{article}
 
 % Required packages
-\usepackage[margin=0.4in]{geometry}
+\usepackage[margin=0.3in]{geometry}
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{xcolor}
@@ -17,30 +17,31 @@
     pdftitle={Luke Edwards - Resume}
 }
 
-% Section formatting
+% Section formatting - reduced spacing
 \titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
-\titlespacing{\section}{0pt}{8pt}{4pt}
+\titlespacing{\section}{0pt}{4pt}{2pt}
 
 % Remove page numbers
 \pagestyle{empty}
 
-% Custom list formatting
-\setlist[itemize]{leftmargin=*, topsep=0pt, itemsep=1pt, parsep=0pt}
+% Custom list formatting - tighter spacing
+\setlist[itemize]{leftmargin=*, topsep=0pt, itemsep=0.5pt, parsep=0pt}
 
 \begin{document}
 
-% Set default font size to 10.5pt for body text
+% Set default font size to 10.5pt for body text with appropriate line spacing
 \fontsize{10.5pt}{12.6pt}\selectfont
 
-% Header
+% Header - reduced spacing
 \begin{center}
-    \textbf{\Large Luke Edwards} \\[4pt]
+    \textbf{\Large Luke Edwards} \\[2pt]
     (315) 725-1833 $\mid$
     \href{mailto:edwards.lukec@gmail.com}{edwards.lukec@gmail.com} $\mid$
+    \href{https://lukeedwards.me}{lukeedwards.me} $\mid$
     \href{https://www.linkedin.com/in/LukeEdwards2004}{linkedin.com/in/LukeEdwards2004}
 \end{center}
 
-\vspace{3pt}
+\vspace{1pt}
 
 % Education Section
 \section*{EDUCATION}
@@ -48,55 +49,73 @@
 Bachelor of Science, Software Engineering \hfill Expected Graduation: May 2027 \\
 Dean's List: Spring 2025
 
-\vspace{2pt}
+\vspace{0.5pt}
 
-% Skills Section
+% Relevant Coursework Section - more compact
+\section*{RELEVANT COURSEWORK}
+\textbf{Current:} Engineering Secure Software, Engineering of Concurrent and Distributed Software Systems, Engineering Cloud Software Systems, Linear Algebra \\
+\textbf{Completed:} Web Engineering, Software Testing, Human Centered Requirements and Design, Software Process and Project Management, Engineering of Software Subsystems, Intro to Software Engineering
+
+\vspace{0.5pt}
+
+% Skills Section - more compact formatting
 \section*{SKILLS}
-\textbf{Languages:} TypeScript, JavaScript, Python, Java, C, HTML, CSS \\
-\textbf{Frontend:} React, Next.js, Angular, Tailwind CSS, Framer Motion \\
-\textbf{Backend:} Node.js, Express.js, FastAPI, Flask, Spring Boot \\
-\textbf{Tools \& Technologies:} Docker, PostgreSQL, SQLite, Git, GitHub Actions, Electron, Google Sheets API \\
-\textbf{Design:} Figma, UI/UX Design
+\textbf{Languages:} TypeScript, JavaScript, Python, Java, C, C++, HTML, CSS \quad
+\textbf{Frontend:} React, Next.js, Angular, Tailwind CSS, Framer Motion, D3.js, JavaFX \\
+\textbf{Backend:} Node.js, Express.js, FastAPI, Flask, Spring Boot \quad
+\textbf{DevOps:} Docker, Git, GitHub Actions, CI/CD, Railway, Supabase, Vercel, Vercel KV (Redis), DNS Management \\
+\textbf{Desktop:} Electron, Electron Builder \quad
+\textbf{APIs:} Google Sheets API, Google Places API, Spotify API, ESPN API, Nodemailer, Cloudflare Turnstile, Tesseract OCR, MCP \\
+\textbf{Databases:} PostgreSQL, PostGIS, SQLite \quad
+\textbf{Testing:} Jest, JUnit, Pytest \quad
+\textbf{Design:} Figma, UI/UX Design \quad
+\textbf{Other:} Machine Learning, Microservices, Object-Oriented Design, Backtracking Algorithms, Agile Methodologies, Scrum, SEO
 
-\vspace{2pt}
+\vspace{0.5pt}
 
 % Work Experience Section
 \section*{WORK EXPERIENCE}
 \textbf{Full-Stack Developer Co-op} $\mid$ \textbf{Autocoach LLC} \hfill August 2025 -- December 2025
 \begin{itemize}
-    \item Architected and launched \href{https://satispie.com}{satispie.com}, a B2B e-commerce platform with Clerk authentication, enabling streamlined ordering for distribution partners
+    \item Developed and launched \href{https://satispie.com}{satispie.com}, a marketing website showcasing artisan pie products and distribution partnerships
+    \item Created internal communication tools for customer outreach and built accessible customer contact records system using Google Sheets API, leveraging familiar technology instead of complex database infrastructure
     \item Developed internal automation tools using Python, Node.js, and Electron, reducing data processing time by 15+ hours per week and eliminating manual email workflows
     \item Collaborated cross-functionally with sales, maintenance, and accounting teams in a 2-person development team, delivering features aligned with business objectives
-    \item Tech Stack: React, Next.js, Python, Node.js, Electron, Google Sheets API
 \end{itemize}
 
-\vspace{2pt}
+\vspace{0.5pt}
 
-% Projects Section
+% Projects Section - condensed descriptions
 \section*{PROJECTS}
-\textbf{wheredoieat} -- \textit{Python, FastAPI, Next.js, PostgreSQL, Machine Learning} \hfill 2025
+\textbf{MetaManager} -- \textit{Electron, TypeScript, Node.js, React} \hfill 2025
 \begin{itemize}
-    \item Built a full-stack restaurant recommendation application with ML-based user profiling to deliver personalized dining suggestions
-    \item Implemented recommendation algorithm using Python and FastAPI backend with Next.js frontend
-    \item Deployed on Vercel with PostgreSQL database for user data and restaurant information management
+    \item Built cross-platform desktop application for audio metadata and cover art management with resilient batch processing that handles partial failures gracefully
+    \item Created unified interface supporting multiple audio formats (MP3, FLAC, WAV) with IPC communication bridge between React frontend and Node.js backend
 \end{itemize}
 
-\vspace{2pt}
+\vspace{0.5pt}
 
-\textbf{Portfolio Site} -- \textit{Next.js 16, TypeScript, Tailwind CSS, D3, Framer Motion} \hfill 2025
+\textbf{wheredoieat} -- \textit{Python, FastAPI, Next.js, PostgreSQL, PostGIS, Machine Learning} \hfill 2025
 \begin{itemize}
-    \item Designed and developed a modern portfolio website with custom neumorphic design system and dark green aesthetic
-    \item Created interactive project graph visualization using D3 for dynamic project exploration
-    \item Implemented responsive design with Tailwind CSS and smooth animations using Framer Motion
+    \item Built full-stack restaurant recommendation application with Content-Based Filtering and Multi-Dimensional Weighted Scoring algorithm combining six weighted features (cuisine 40\%, dietary 25\%, price 15\%, location 10\%, rating 5\%, features 5\%)
+    \item Developed Exponential Moving Average (EMA) algorithm for preference learning and context-aware scoring with multipliers for different occasions
+    \item Designed scalable architecture processing up to 500 candidate restaurants per request using PostGIS geospatial queries, deployed as microservices on Vercel and Railway
 \end{itemize}
 
-\vspace{2pt}
+\vspace{0.5pt}
+
+\textbf{Portfolio Site} -- \textit{Next.js 16, TypeScript, Tailwind CSS, D3.js, Framer Motion} \hfill 2025
+\begin{itemize}
+    \item Designed modern portfolio website with custom neumorphic design system, interactive D3.js project graph visualization, and secure contact form with Cloudflare Turnstile CAPTCHA and formula injection protection
+    \item Built Google Sheets integration for form archiving with input sanitization, developed "Now" page with live data integration (weather, music), and optimized for performance with Lighthouse CI and SEO
+\end{itemize}
+
+\vspace{0.5pt}
 
 \textbf{PDF-y \& PDF-y Lite} -- \textit{Python, FastAPI, Docker, OCR, MCP, Claude AI} \hfill 2025
 \begin{itemize}
-    \item Developed MCP server and FastAPI backend for PDF analysis with OCR capabilities
-    \item Integrated Claude AI for intelligent document processing and content extraction
-    \item Containerized application using Docker for consistent deployment across environments
+    \item Developed Model Context Protocol (MCP) server enabling LLMs to analyze PDFs via JSON-RPC 2.0, with hybrid text extraction pipeline (pdfplumber, PyMuPDF, Tesseract OCR) achieving 99.5\% accuracy in ~2 seconds
+    \item Built advanced table detection system and dual-personality architecture serving both MCP interface and RESTful HTTP API, containerized with Docker, Redis caching, and Nginx load balancing
 \end{itemize}
 
 \end{document}

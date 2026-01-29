@@ -116,7 +116,7 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
             {/* Clickable Preview Image */}
             <button
               onClick={handleOpenPDF}
-              className="w-full max-w-[50%] cursor-pointer hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-neu-accent focus:ring-offset-2 focus:ring-offset-neu-bg-base rounded-neu-lg overflow-hidden group mb-4"
+              className="w-full cursor-pointer hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-neu-accent focus:ring-offset-2 focus:ring-offset-neu-bg-base rounded-neu-lg overflow-hidden group mb-4"
               aria-label="Open resume PDF in new tab"
             >
               <div className="relative w-full aspect-[8.5/11] bg-white flex items-center justify-center">
@@ -130,7 +130,7 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
             </button>
 
             {/* Open PDF Button - Now below the preview, same width as preview */}
-            <div className="w-full max-w-[50%]">
+            <div className="w-full">
               <button
                 onClick={handleOpenPDF}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 neu-surface shadow-neu-outset hover:shadow-neu-pressed rounded-neu-md transition-all duration-200 text-neu-text-primary font-medium group"

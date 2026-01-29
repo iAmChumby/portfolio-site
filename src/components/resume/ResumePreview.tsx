@@ -39,8 +39,8 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
         // Get first page
         const page = await pdf.getPage(1);
 
-        // Set scale for high-quality rendering (2x for retina displays)
-        const scale = 2.0;
+        // Set scale for rendering (reduced to 50% of original size)
+        const scale = 1.0;
         const viewport = page.getViewport({ scale });
 
         // Create canvas element for rendering

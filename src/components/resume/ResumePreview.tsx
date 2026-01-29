@@ -2,15 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import * as pdfjsLib from 'pdfjs-dist';
 
 interface ResumePreviewProps {
   pdfUrl: string;
-}
-
-// Configure PDF.js worker for browser environment
-if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 }
 
 export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
@@ -21,9 +15,20 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
   useEffect(() => {
     // Render PDF preview client-side
     const renderPDFPreview = async () => {
+      // Only run in browser
+      if (typeof window === 'undefined') {
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
+
+        // Dynamically import pdfjs-dist only in browser
+        const pdfjsLib = await import('pdfjs-dist');
+        
+        // Configure PDF.js worker for browser environment
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
         // Load PDF document from public URL
         const loadingTask = pdfjsLib.getDocument(pdfUrl);

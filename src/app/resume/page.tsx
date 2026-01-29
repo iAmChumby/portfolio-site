@@ -3,6 +3,10 @@ import DownloadButton from '@/components/resume/DownloadButton';
 import ProximityCard from '@/components/ui/ProximityCard';
 import { Metadata } from 'next';
 
+// Mark this page as dynamic to prevent static generation
+// This is necessary because ResumePreview uses pdfjs-dist which requires browser APIs
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Resume',
   description: 'View and download Luke Edwards\' resume - Full-Stack Developer with expertise in React, Next.js, Python, and modern web technologies.',

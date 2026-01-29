@@ -119,7 +119,7 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
               className="w-full max-w-[50%] cursor-pointer hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-neu-accent focus:ring-offset-2 focus:ring-offset-neu-bg-base rounded-t-neu-lg overflow-hidden group"
               aria-label="Open resume PDF in new tab"
             >
-              <div className="relative w-full max-w-[50%] mx-auto aspect-[8.5/11] bg-white flex items-center justify-center">
+              <div className="relative w-full aspect-[8.5/11] bg-white flex items-center justify-center">
                 <img
                   src={previewUrl}
                   alt="Preview of Luke Edwards' resume"
@@ -130,7 +130,7 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
             </button>
 
             {/* Open PDF Button */}
-            <div className="p-4 bg-neu-bg-base border-t border-neu-bg-lighter">
+            <div className="w-full max-w-[50%] p-4 bg-neu-bg-base border-t border-neu-bg-lighter">
               <button
                 onClick={handleOpenPDF}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 neu-surface shadow-neu-outset hover:shadow-neu-pressed rounded-neu-md transition-all duration-200 text-neu-text-primary font-medium group"

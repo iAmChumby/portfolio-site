@@ -143,7 +143,7 @@ export default function ContactForm({ onSuccess, onCancel, className = '', autoF
               'expire-callback': () => {
                 turnstileTokenRef.current = '';
               },
-              theme: 'light'
+              theme: 'auto'
             });
             turnstileWidgetIdRef.current = widgetId;
           } catch (error) {

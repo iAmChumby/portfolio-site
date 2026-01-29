@@ -69,6 +69,14 @@ export default function Footer() {
                  <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 mr-0 group-hover:mr-2 h-[2px] bg-neu-accent"></span>
                 LinkedIn
               </a>
+              <a
+                href="/luke-edwards-resume.pdf"
+                download="Luke-Edwards-Resume.pdf"
+                className="text-neu-text-secondary hover:text-neu-accent transition-colors duration-200 flex items-center justify-center md:justify-start group"
+              >
+                <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 mr-0 group-hover:mr-2 h-[2px] bg-neu-accent"></span>
+                Download Resume
+              </a>
             </div>
           </ProximityCard>
         </div>

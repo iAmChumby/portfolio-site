@@ -1,9 +1,0 @@
-{"location":"Contact.tsx:97","message":"callback invoked (new script)","data":{"tokenLength":1029},"timestamp":1769436000677,"sessionId":"debug-session","hypothesisId":"H5"}
-{"location":"Contact.tsx:96","message":"token retrieval start","data":{"hasTurnstile":true,"widgetId":"cf-chl-widget-xif6c","refToken":"0.0TxdTJq0Yz8j6ODLR4"},"timestamp":1769436003434,"sessionId":"debug-session","hypothesisId":"H1"}
-{"location":"Contact.tsx:101","message":"getResponse result","data":{"tokenFromGetResponse":"0.0TxdTJq0Yz8j6ODLR4","tokenLength":1029},"timestamp":1769436003434,"sessionId":"debug-session","hypothesisId":"H1"}
-{"location":"Contact.tsx:113","message":"final token check","data":{"hasToken":true,"tokenLength":1029},"timestamp":1769436003435,"sessionId":"debug-session","hypothesisId":"H1"}
-{"location":"turnstile.ts:17","message":"verify start","data":{"tokenLength":1029,"hasSecret":true,"secretLength":35,"ip":"::1"},"timestamp":1769436003650,"sessionId":"debug-session","hypothesisId":"H6"}
-{"location":"turnstile.ts:37","message":"cloudflare response","data":{"ok":true,"status":200},"timestamp":1769436003769,"sessionId":"debug-session","hypothesisId":"H6"}
-{"location":"turnstile.ts:49","message":"verification result","data":{"success":true,"errorCodes":[],"challengeTs":"2026-01-26T14:00:01.000Z","hostname":"localhost"},"timestamp":1769436003773,"sessionId":"debug-session","hypothesisId":"H6"}
-{"location":"Contact.tsx:131","message":"API response","data":{"ok":true,"status":200},"timestamp":1769436005514,"sessionId":"debug-session","hypothesisId":"H10"}
-{"location":"Contact.tsx:164","message":"reset on success","data":{"hasTurnstile":true,"widgetId":"cf-chl-widget-xif6c"},"timestamp":1769436009229,"sessionId":"debug-session","hypothesisId":"H4"}

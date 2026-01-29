@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,9 @@ interface KnicksGameData {
   isHome: boolean | null;
   gameDetail: string | null;
   teamRecord: string | null;
+  isRecentlyFinished?: boolean;
+  daysUntilGame?: number | null;
+  isOffSeason?: boolean;
 }
 
 const KNICKS_LOGO = 'https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/ny.png';
@@ -31,30 +34,35 @@ export default function KnicksGameIndicator() {
   const [error, setError] = useState<string | null>(null);
   const [isBouncing, setIsBouncing] = useState(false);
 
-  useEffect(() => {
-    const fetchGameData = async () => {
-      try {
-        const response = await fetch('/api/knicks');
-        if (!response.ok) {
-          throw new Error('Failed to fetch game data');
-        }
-        const data = await response.json();
-        setGameData(data);
-        setError(null);
-      } catch {
-        setError('Unable to load game data');
-      } finally {
-        setIsLoading(false);
+  // Memoize the fetch function with useCallback to prevent recreating on each render
+  const fetchGameData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/knicks');
+      if (!response.ok) {
+        throw new Error('Failed to fetch game data');
       }
-    };
+      const data = await response.json();
+      setGameData(data);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load Knicks game data:', err);
+      setError('Unable to load game data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
+  // Calculate refresh interval based on game status
+  const refreshInterval = useMemo(() => {
+    return gameData?.gameStatus === 'in' ? 30000 : 300000;
+  }, [gameData?.gameStatus]);
+
+  useEffect(() => {
     fetchGameData();
 
-    // Refresh every 30 seconds while the game is live, every 5 minutes otherwise
-    const refreshInterval = gameData?.gameStatus === 'in' ? 30000 : 300000;
     const interval = setInterval(fetchGameData, refreshInterval);
     return () => clearInterval(interval);
-  }, [gameData?.gameStatus]);
+  }, [fetchGameData, refreshInterval]);
 
   // Handle bouncing ball easter egg
   const handleBallClick = useCallback((e: React.MouseEvent) => {
@@ -79,9 +87,33 @@ export default function KnicksGameIndicator() {
     );
   }
 
-  // Error state or no data - hide the component
-  if (error || !gameData) {
-    return null;
+  // Error state - show error message
+  if (error) {
+    return (
+      <div className="neu-surface p-6">
+        <div className="flex items-center gap-4">
+          <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+            <span className="text-xl">⚠️</span>
+          </div>
+          <p className="text-sm text-neu-text-secondary">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Component always renders - even during off-season
+  if (!gameData) {
+    return (
+      <div className="neu-surface p-6">
+        <div className="flex items-center gap-4 animate-pulse">
+          <div className="neu-surface-inset w-12 h-12 rounded-lg gap-2" />
+          <div className="flex-1">
+            <div className="h-4 bg-neu-surface-inset rounded w-32 mb-2" />
+            <div className="h-3 bg-neu-surface-inset rounded w-24" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const getStatusDotColor = () => {
@@ -97,21 +129,39 @@ export default function KnicksGameIndicator() {
   };
 
   const getStatusText = () => {
-    // Off-season / No scheduled game found
-    if (gameData.gameStatus === null && !gameData.opponentName) {
-      return gameData.teamRecord || '';
+    // Priority 1: Off-season countdown
+    if (gameData.isOffSeason && gameData.daysUntilGame) {
+      if (gameData.daysUntilGame === 1) return 'First game tomorrow!';
+      if (gameData.daysUntilGame <= 7) return `First game in ${gameData.daysUntilGame} days`;
+      return `Season starts in ${gameData.daysUntilGame} days`;
     }
 
+    // Priority 2: Multi-day upcoming (during season)
+    if (!gameData.isOffSeason && gameData.daysUntilGame && gameData.daysUntilGame > 7) {
+      return `Next: ${formatGameTime()}`;
+    }
+
+    // Priority 3: No game, show record
+    if (gameData.gameStatus === null && !gameData.opponentName) {
+      return gameData.teamRecord || 'Off-season';
+    }
+
+    // Priority 4: Live game
     if (gameData.gameStatus === 'in') {
       const score = `${gameData.knicksScore} - ${gameData.opponentScore}`;
       const timeInfo = `${gameData.period} ${gameData.clock}`;
       return `${score} • ${timeInfo}`;
     }
+
+    // Priority 5: Finished game
     if (gameData.gameStatus === 'post') {
       const score = `${gameData.knicksScore} - ${gameData.opponentScore}`;
       const result = gameData.isWinning ? 'W' : 'L';
-      return `${result} ${score}`;
+      const recentIndicator = gameData.isRecentlyFinished ? ' (Recent)' : '';
+      return `${result} ${score}${recentIndicator}`;
     }
+
+    // Priority 6: Upcoming game (default)
     return formatGameTime();
   };
 
@@ -159,7 +209,7 @@ export default function KnicksGameIndicator() {
 
   const getHeadlineText = () => {
     if (gameData.gameStatus === null && !gameData.opponentName) {
-      return 'Knicks';
+      return gameData.isOffSeason ? 'Knicks Off-Season' : 'New York Knicks';
     }
     const prefix = gameData.isHome ? 'vs' : '@';
     return `Knicks ${prefix} ${gameData.opponentName}`;
@@ -181,44 +231,50 @@ export default function KnicksGameIndicator() {
       className="block h-full"
     >
       <ProximityCard className="neu-surface p-6 h-full transition-all duration-300">
-        <div className="flex items-center gap-4">
-          {/* Status Indicator Circle */}
-          <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
-            <div 
-              className={cn(
-                'w-3 h-3 rounded-full',
-                getStatusDotColor(),
-                gameData.gameStatus === 'in' && 'animate-pulse'
-              )}
-            />
+        <div className="flex items-start gap-2">
+          {/* Left column: dot, logo, and text */}
+          <div className="flex flex-col gap-2 flex-1 min-w-0">
+            {/* Top row: indicator dot + logo */}
+            <div className="flex items-center gap-2">
+              {/* Status Indicator Circle */}
+              <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div
+                  className={cn(
+                    'w-3 h-3 rounded-full',
+                    getStatusDotColor(),
+                    gameData.gameStatus === 'in' && 'animate-pulse'
+                  )}
+                />
+              </div>
+
+              {/* Knicks Logo */}
+              <div className="relative w-12 h-12 flex-shrink-0">
+                <Image
+                  src={KNICKS_LOGO}
+                  alt="New York Knicks"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            </div>
+
+            {/* Bottom row: game info text (aligned with logo) */}
+            <div className="pl-14">
+              <p className="font-medium text-neu-text-primary">
+                {getHeadlineText()}
+              </p>
+              <p className={cn('text-sm', getStatusTextColor())}>
+                {getStatusText()}
+              </p>
+            </div>
           </div>
 
-          {/* Knicks Logo - Directly on card */}
-          <div className="relative w-12 h-12 flex-shrink-0">
-            <Image
-              src={KNICKS_LOGO}
-              alt="New York Knicks"
-              fill
-              className="object-contain"
-              unoptimized
-            />
-          </div>
-          
-          {/* Game Info */}
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-neu-text-primary">
-              {getHeadlineText()}
-            </p>
-            <p className={cn('text-sm', getStatusTextColor())}>
-              {getStatusText()}
-            </p>
-          </div>
-          
-          {/* Mood Emoji - Clickable Easter Egg */}
+          {/* Right column: basketball emoji spanning both rows */}
           <button
             onClick={handleBallClick}
             className={cn(
-              'text-2xl cursor-pointer transition-transform select-none hover:scale-110',
+              'text-2xl cursor-pointer transition-transform select-none hover:scale-110 self-start',
               isBouncing && 'animate-bounce-ball'
             )}
             aria-label="Bounce basketball"

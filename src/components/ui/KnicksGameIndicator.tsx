@@ -22,6 +22,8 @@ interface KnicksGameData {
   gameDetail: string | null;
   teamRecord: string | null;
   isRecentlyFinished?: boolean;
+  daysUntilGame?: number | null;
+  isOffSeason?: boolean;
 }
 
 const KNICKS_LOGO = 'https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/ny.png';
@@ -99,9 +101,19 @@ export default function KnicksGameIndicator() {
     );
   }
 
-  // No data - hide the component (might be off-season)
+  // Component always renders - even during off-season
   if (!gameData) {
-    return null;
+    return (
+      <div className="neu-surface p-6">
+        <div className="flex items-center gap-4 animate-pulse">
+          <div className="neu-surface-inset w-12 h-12 rounded-lg gap-2" />
+          <div className="flex-1">
+            <div className="h-4 bg-neu-surface-inset rounded w-32 mb-2" />
+            <div className="h-3 bg-neu-surface-inset rounded w-24" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const getStatusDotColor = () => {
@@ -117,22 +129,39 @@ export default function KnicksGameIndicator() {
   };
 
   const getStatusText = () => {
-    // Off-season / No scheduled game found
-    if (gameData.gameStatus === null && !gameData.opponentName) {
-      return gameData.teamRecord || '';
+    // Priority 1: Off-season countdown
+    if (gameData.isOffSeason && gameData.daysUntilGame) {
+      if (gameData.daysUntilGame === 1) return 'First game tomorrow!';
+      if (gameData.daysUntilGame <= 7) return `First game in ${gameData.daysUntilGame} days`;
+      return `Season starts in ${gameData.daysUntilGame} days`;
     }
 
+    // Priority 2: Multi-day upcoming (during season)
+    if (!gameData.isOffSeason && gameData.daysUntilGame && gameData.daysUntilGame > 7) {
+      return `Next: ${formatGameTime()}`;
+    }
+
+    // Priority 3: No game, show record
+    if (gameData.gameStatus === null && !gameData.opponentName) {
+      return gameData.teamRecord || 'Off-season';
+    }
+
+    // Priority 4: Live game
     if (gameData.gameStatus === 'in') {
       const score = `${gameData.knicksScore} - ${gameData.opponentScore}`;
       const timeInfo = `${gameData.period} ${gameData.clock}`;
       return `${score} • ${timeInfo}`;
     }
+
+    // Priority 5: Finished game
     if (gameData.gameStatus === 'post') {
       const score = `${gameData.knicksScore} - ${gameData.opponentScore}`;
       const result = gameData.isWinning ? 'W' : 'L';
       const recentIndicator = gameData.isRecentlyFinished ? ' (Recent)' : '';
       return `${result} ${score}${recentIndicator}`;
     }
+
+    // Priority 6: Upcoming game (default)
     return formatGameTime();
   };
 
@@ -180,7 +209,7 @@ export default function KnicksGameIndicator() {
 
   const getHeadlineText = () => {
     if (gameData.gameStatus === null && !gameData.opponentName) {
-      return 'Knicks';
+      return gameData.isOffSeason ? 'Knicks Off-Season' : 'New York Knicks';
     }
     const prefix = gameData.isHome ? 'vs' : '@';
     return `Knicks ${prefix} ${gameData.opponentName}`;

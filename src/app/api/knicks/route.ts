@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const ESPN_SCOREBOARD_URL = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard';
+const ESPN_SCHEDULE_URL = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/18/schedule';
 const KNICKS_TEAM_ID = '18';
 const GAME_DURATION_HOURS = 3; // Conservative estimate for NBA game length
 const POST_GAME_DISPLAY_HOURS = 6; // Display finished games for 6 hours
@@ -69,6 +70,22 @@ interface ESPNScoreboardResponse {
   events: ESPNEvent[];
 }
 
+interface ESPNScheduleEvent {
+  id: string;
+  date: string;
+  name: string;
+  competitions: ESPNCompetition[];
+}
+
+interface ESPNScheduleResponse {
+  events: ESPNScheduleEvent[];
+  team?: {
+    record?: {
+      items?: Array<{ summary?: string; type?: string }>
+    }
+  };
+}
+
 export interface KnicksGameData {
   isPlaying: boolean;
   isWinning: boolean | null;
@@ -85,6 +102,8 @@ export interface KnicksGameData {
   gameDetail: string | null;
   teamRecord: string | null;
   isRecentlyFinished?: boolean; // Flag for games in 6-hour window
+  daysUntilGame?: number | null; // Days until next game (for off-season/multi-day gaps)
+  isOffSeason?: boolean; // Flag for off-season period (July-Sept)
 }
 
 function getScoreboardLogo(team: ESPNTeam): string | null {
@@ -194,6 +213,70 @@ function findRelevantGame(events: ESPNEvent[]): { event: ESPNEvent; type: 'live'
   return null;
 }
 
+/**
+ * Detect if we're in the NBA off-season (July-September)
+ * Simple calendar heuristic: months 6, 7, 8 (July, Aug, Sept)
+ */
+function isOffSeason(): boolean {
+  const month = new Date().getMonth(); // 0-indexed: 6=July, 7=Aug, 8=Sept
+  return month >= 6 && month <= 8;
+}
+
+/**
+ * Fetch the next scheduled game from ESPN Schedule API
+ * Returns the earliest upcoming game with pre-game status
+ * Caches for 1 hour since schedules don't change frequently
+ */
+async function fetchNextScheduledGame(): Promise<{ event: ESPNEvent; teamRecord: string | null } | null> {
+  try {
+    const response = await fetch(ESPN_SCHEDULE_URL, {
+      next: { revalidate: 3600 }, // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      console.error(`ESPN Schedule API responded with status: ${response.status}`);
+      return null;
+    }
+
+    const data: ESPNScheduleResponse = await response.json();
+
+    if (!data.events || data.events.length === 0) {
+      return null;
+    }
+
+    const now = new Date();
+
+    // Find all upcoming games (pre-game status and future date)
+    const upcomingGames = data.events
+      .filter(event => {
+        const competition = event.competitions?.[0];
+        if (!competition) return false;
+
+        const gameDate = new Date(event.date);
+        const status = competition.status;
+
+        return status.type.state === 'pre' && gameDate > now;
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    if (upcomingGames.length === 0) {
+      return null;
+    }
+
+    // Get team record from schedule response
+    const teamRecord = data.team?.record?.items?.find(r => r.type === 'total')?.summary || null;
+
+    // Return earliest upcoming game
+    return {
+      event: upcomingGames[0] as ESPNEvent,
+      teamRecord,
+    };
+  } catch (error) {
+    console.error('Error fetching from Schedule API:', error);
+    return null;
+  }
+}
+
 function parseGame(event: ESPNEvent, teamRecord: string | null): KnicksGameData {
   const competition = event.competitions[0];
   const status = competition.status;
@@ -272,7 +355,24 @@ export async function GET() {
     const relevantGame = findRelevantGame(data.events || []);
 
     if (!relevantGame) {
-      // No upcoming games found - might be off-season
+      // Priority 4: No game found in scoreboard, try schedule API for upcoming games
+      const scheduleResult = await fetchNextScheduledGame();
+
+      if (scheduleResult) {
+        // Found an upcoming game in the schedule
+        const gameData = parseGame(scheduleResult.event, scheduleResult.teamRecord);
+        const now = new Date();
+        const gameDate = new Date(scheduleResult.event.date);
+        const daysUntil = Math.ceil((gameDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+        return NextResponse.json({
+          ...gameData,
+          daysUntilGame: daysUntil,
+          isOffSeason: isOffSeason(),
+        } as KnicksGameData);
+      }
+
+      // No games found in either API - true off-season
       return NextResponse.json({
         isPlaying: false,
         isWinning: null,
@@ -288,6 +388,8 @@ export async function GET() {
         isHome: null,
         gameDetail: null,
         teamRecord: null,
+        daysUntilGame: null,
+        isOffSeason: isOffSeason(),
       } as KnicksGameData);
     }
 

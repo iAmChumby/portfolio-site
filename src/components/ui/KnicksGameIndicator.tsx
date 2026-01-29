@@ -231,44 +231,50 @@ export default function KnicksGameIndicator() {
       className="block h-full"
     >
       <ProximityCard className="neu-surface p-6 h-full transition-all duration-300">
-        <div className="flex items-center gap-4">
-          {/* Status Indicator Circle */}
-          <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
-            <div 
-              className={cn(
-                'w-3 h-3 rounded-full',
-                getStatusDotColor(),
-                gameData.gameStatus === 'in' && 'animate-pulse'
-              )}
-            />
+        <div className="flex items-start gap-2">
+          {/* Left column: dot, logo, and text */}
+          <div className="flex flex-col gap-2 flex-1 min-w-0">
+            {/* Top row: indicator dot + logo */}
+            <div className="flex items-center gap-2">
+              {/* Status Indicator Circle */}
+              <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div
+                  className={cn(
+                    'w-3 h-3 rounded-full',
+                    getStatusDotColor(),
+                    gameData.gameStatus === 'in' && 'animate-pulse'
+                  )}
+                />
+              </div>
+
+              {/* Knicks Logo */}
+              <div className="relative w-12 h-12 flex-shrink-0">
+                <Image
+                  src={KNICKS_LOGO}
+                  alt="New York Knicks"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            </div>
+
+            {/* Bottom row: game info text (aligned with logo) */}
+            <div className="pl-14">
+              <p className="font-medium text-neu-text-primary">
+                {getHeadlineText()}
+              </p>
+              <p className={cn('text-sm', getStatusTextColor())}>
+                {getStatusText()}
+              </p>
+            </div>
           </div>
 
-          {/* Knicks Logo - Directly on card */}
-          <div className="relative w-12 h-12 flex-shrink-0">
-            <Image
-              src={KNICKS_LOGO}
-              alt="New York Knicks"
-              fill
-              className="object-contain"
-              unoptimized
-            />
-          </div>
-          
-          {/* Game Info */}
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-neu-text-primary">
-              {getHeadlineText()}
-            </p>
-            <p className={cn('text-sm', getStatusTextColor())}>
-              {getStatusText()}
-            </p>
-          </div>
-          
-          {/* Mood Emoji - Clickable Easter Egg */}
+          {/* Right column: basketball emoji spanning both rows */}
           <button
             onClick={handleBallClick}
             className={cn(
-              'text-2xl cursor-pointer transition-transform select-none hover:scale-110',
+              'text-2xl cursor-pointer transition-transform select-none hover:scale-110 self-start',
               isBouncing && 'animate-bounce-ball'
             )}
             aria-label="Bounce basketball"

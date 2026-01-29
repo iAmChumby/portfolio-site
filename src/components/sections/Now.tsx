@@ -68,7 +68,7 @@ export default function Now() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Availability Card */}
                 <ProximityCard className="neu-surface p-6 h-full transition-all duration-300">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 h-full">
                     {/* Status Dot Container */}
                     <div className="neu-surface-inset w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
                       <div className={`w-3 h-3 rounded-full ${statusDotColors[data.availability.status]} animate-pulse`}></div>

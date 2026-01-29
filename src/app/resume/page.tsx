@@ -1,5 +1,6 @@
 import PDFViewer from '@/components/resume/PDFViewer';
 import DownloadButton from '@/components/resume/DownloadButton';
+import ProximityCard from '@/components/ui/ProximityCard';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -20,10 +21,16 @@ export default function ResumePage() {
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header Section */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold neu-text-gradient mb-4">Resume</h1>
-          <p className="text-neu-text-secondary text-lg">
-            Full-Stack Developer | Rochester Institute of Technology
-          </p>
+          <div className="relative inline-block">
+            <ProximityCard className="neu-surface p-8">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4">
+                <span className="neu-text-gradient">Resume</span>
+              </h1>
+              <p className="text-lg sm:text-xl md:text-2xl text-center max-w-2xl mx-auto text-neu-text-secondary">
+                Full-Stack Developer | Rochester Institute of Technology
+              </p>
+            </ProximityCard>
+          </div>
         </div>
 
         {/* PDF Viewer Section (Desktop/Tablet) */}

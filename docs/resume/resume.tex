@@ -1,11 +1,12 @@
-\documentclass[11pt,letterpaper]{article}
+\documentclass[10pt,letterpaper]{article}
 
 % Required packages
-\usepackage[margin=0.75in]{geometry}
+\usepackage[margin=0.4in]{geometry}
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{titlesec}
+\usepackage{anyfontsize}
 
 % Hyperlink setup
 \hypersetup{
@@ -18,15 +19,18 @@
 
 % Section formatting
 \titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
-\titlespacing{\section}{0pt}{12pt}{6pt}
+\titlespacing{\section}{0pt}{8pt}{4pt}
 
 % Remove page numbers
 \pagestyle{empty}
 
 % Custom list formatting
-\setlist[itemize]{leftmargin=*, topsep=0pt, itemsep=2pt}
+\setlist[itemize]{leftmargin=*, topsep=0pt, itemsep=1pt, parsep=0pt}
 
 \begin{document}
+
+% Set default font size to 10.5pt for body text
+\fontsize{10.5pt}{12.6pt}\selectfont
 
 % Header
 \begin{center}
@@ -36,7 +40,7 @@
     \href{https://www.linkedin.com/in/LukeEdwards2004}{linkedin.com/in/LukeEdwards2004}
 \end{center}
 
-\vspace{6pt}
+\vspace{3pt}
 
 % Education Section
 \section*{EDUCATION}
@@ -44,7 +48,7 @@
 Bachelor of Science, Software Engineering \hfill Expected Graduation: May 2027 \\
 Dean's List: Spring 2025
 
-\vspace{4pt}
+\vspace{2pt}
 
 % Skills Section
 \section*{SKILLS}
@@ -54,7 +58,7 @@ Dean's List: Spring 2025
 \textbf{Tools \& Technologies:} Docker, PostgreSQL, SQLite, Git, GitHub Actions, Electron, Google Sheets API \\
 \textbf{Design:} Figma, UI/UX Design
 
-\vspace{4pt}
+\vspace{2pt}
 
 % Work Experience Section
 \section*{WORK EXPERIENCE}
@@ -67,14 +71,6 @@ Dean's List: Spring 2025
 \end{itemize}
 
 \vspace{2pt}
-
-\textbf{To-Go Expeditor} $\mid$ \textbf{Hannaford} \hfill May 2023 -- Present
-\begin{itemize}
-    \item Handled curbside transactions with customers ensuring speed and accuracy
-    \item Assured customer satisfaction throughout the entire order process including order accuracy, having a friendly demeanor, as well as being timely when fulfilling their order
-\end{itemize}
-
-\vspace{4pt}
 
 % Projects Section
 \section*{PROJECTS}
@@ -101,24 +97,6 @@ Dean's List: Spring 2025
     \item Developed MCP server and FastAPI backend for PDF analysis with OCR capabilities
     \item Integrated Claude AI for intelligent document processing and content extraction
     \item Containerized application using Docker for consistent deployment across environments
-\end{itemize}
-
-\vspace{2pt}
-
-\textbf{uFund Animal Shelter} -- \textit{Java, Spring Boot, Angular, Mockito} \hfill Spring 2024
-\begin{itemize}
-    \item Collaborated with a team of 4 students to engineer a full-stack website for pet assistance services
-    \item Implemented REST API and controller using Spring framework with Angular frontend following MVC architecture
-    \item Formulated system-wide domain, architecture, and UML class diagrams to encapsulate application requirements
-    \item Built comprehensive test suite covering all cases using the Mockito framework
-\end{itemize}
-
-\vspace{2pt}
-
-\textbf{PokeGames} -- \textit{Python, Flask, React, REST API} \hfill 2024
-\begin{itemize}
-    \item Developed a full-stack Pokémon application integrating external Pokémon API for real-time data
-    \item Engineered Flask backend with RESTful API endpoints and React frontend for interactive user experience
 \end{itemize}
 
 \end{document}

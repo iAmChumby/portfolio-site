@@ -1,14 +1,65 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as pdfjsLib from 'pdfjs-dist';
 import { createCanvas } from 'canvas';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
-// Disable worker for server-side rendering in Node.js
-// We'll use the synchronous API instead
-pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+// Mark this route as dynamic to prevent static generation during build
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  // Polyfill DOMMatrix for Node.js environment (required by pdfjs-dist)
+  // This must be set before importing pdfjs-dist
+  if (typeof globalThis.DOMMatrix === 'undefined') {
+    // Minimal DOMMatrix polyfill for Node.js compatibility
+    // pdfjs-dist uses DOMMatrix internally, so we need to provide a stub
+    globalThis.DOMMatrix = class DOMMatrix {
+      a = 1;
+      b = 0;
+      c = 0;
+      d = 1;
+      e = 0;
+      f = 0;
+      m11 = 1;
+      m12 = 0;
+      m21 = 0;
+      m22 = 1;
+      m41 = 0;
+      m42 = 0;
+      
+      constructor(init?: string | number[]) {
+        if (init) {
+          // Handle initialization if needed
+        }
+      }
+      
+      static fromMatrix(other?: DOMMatrix) {
+        return new DOMMatrix();
+      }
+      
+      multiply(other: DOMMatrix) {
+        return new DOMMatrix();
+      }
+      
+      translate(x: number, y: number) {
+        return new DOMMatrix();
+      }
+      
+      scale(x: number, y?: number) {
+        return new DOMMatrix();
+      }
+      
+      rotate(angle: number) {
+        return new DOMMatrix();
+      }
+    } as any;
+  }
+
+  // Dynamically import pdfjs-dist to avoid build-time evaluation
+  const pdfjsLib = await import('pdfjs-dist');
+  
+  // Disable worker for server-side rendering in Node.js
+  // We'll use the synchronous API instead
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '';
   try {
     // Read PDF file from public directory
     const pdfPath = join(process.cwd(), 'public', 'luke-edwards-resume.pdf');

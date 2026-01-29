@@ -1,0 +1,124 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Required packages
+\usepackage[margin=0.75in]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{titlesec}
+
+% Hyperlink setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdfauthor={Luke Edwards},
+    pdftitle={Luke Edwards - Resume}
+}
+
+% Section formatting
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{12pt}{6pt}
+
+% Remove page numbers
+\pagestyle{empty}
+
+% Custom list formatting
+\setlist[itemize]{leftmargin=*, topsep=0pt, itemsep=2pt}
+
+\begin{document}
+
+% Header
+\begin{center}
+    \textbf{\Large Luke Edwards} \\[4pt]
+    (315) 725-1833 $\mid$
+    \href{mailto:edwards.lukec@gmail.com}{edwards.lukec@gmail.com} $\mid$
+    \href{https://www.linkedin.com/in/LukeEdwards2004}{linkedin.com/in/LukeEdwards2004}
+\end{center}
+
+\vspace{6pt}
+
+% Education Section
+\section*{EDUCATION}
+\textbf{Rochester Institute of Technology (RIT)}, Rochester, NY \\
+Bachelor of Science, Software Engineering \hfill Expected Graduation: May 2027 \\
+Dean's List: Spring 2025
+
+\vspace{4pt}
+
+% Skills Section
+\section*{SKILLS}
+\textbf{Languages:} TypeScript, JavaScript, Python, Java, C, HTML, CSS \\
+\textbf{Frontend:} React, Next.js, Angular, Tailwind CSS, Framer Motion \\
+\textbf{Backend:} Node.js, Express.js, FastAPI, Flask, Spring Boot \\
+\textbf{Tools \& Technologies:} Docker, PostgreSQL, SQLite, Git, GitHub Actions, Electron, Google Sheets API \\
+\textbf{Design:} Figma, UI/UX Design
+
+\vspace{4pt}
+
+% Work Experience Section
+\section*{WORK EXPERIENCE}
+\textbf{Full-Stack Developer Co-op} $\mid$ \textbf{Autocoach LLC} \hfill August 2025 -- December 2025
+\begin{itemize}
+    \item Architected and launched \href{https://satispie.com}{satispie.com}, a B2B e-commerce platform with Clerk authentication, enabling streamlined ordering for distribution partners
+    \item Developed internal automation tools using Python, Node.js, and Electron, reducing data processing time by 15+ hours per week and eliminating manual email workflows
+    \item Collaborated cross-functionally with sales, maintenance, and accounting teams in a 2-person development team, delivering features aligned with business objectives
+    \item Tech Stack: React, Next.js, Python, Node.js, Electron, Google Sheets API
+\end{itemize}
+
+\vspace{2pt}
+
+\textbf{To-Go Expeditor} $\mid$ \textbf{Hannaford} \hfill May 2023 -- Present
+\begin{itemize}
+    \item Handled curbside transactions with customers ensuring speed and accuracy
+    \item Assured customer satisfaction throughout the entire order process including order accuracy, having a friendly demeanor, as well as being timely when fulfilling their order
+\end{itemize}
+
+\vspace{4pt}
+
+% Projects Section
+\section*{PROJECTS}
+\textbf{wheredoieat} -- \textit{Python, FastAPI, Next.js, PostgreSQL, Machine Learning} \hfill 2025
+\begin{itemize}
+    \item Built a full-stack restaurant recommendation application with ML-based user profiling to deliver personalized dining suggestions
+    \item Implemented recommendation algorithm using Python and FastAPI backend with Next.js frontend
+    \item Deployed on Vercel with PostgreSQL database for user data and restaurant information management
+\end{itemize}
+
+\vspace{2pt}
+
+\textbf{Portfolio Site} -- \textit{Next.js 16, TypeScript, Tailwind CSS, D3, Framer Motion} \hfill 2025
+\begin{itemize}
+    \item Designed and developed a modern portfolio website with custom neumorphic design system and dark green aesthetic
+    \item Created interactive project graph visualization using D3 for dynamic project exploration
+    \item Implemented responsive design with Tailwind CSS and smooth animations using Framer Motion
+\end{itemize}
+
+\vspace{2pt}
+
+\textbf{PDF-y \& PDF-y Lite} -- \textit{Python, FastAPI, Docker, OCR, MCP, Claude AI} \hfill 2025
+\begin{itemize}
+    \item Developed MCP server and FastAPI backend for PDF analysis with OCR capabilities
+    \item Integrated Claude AI for intelligent document processing and content extraction
+    \item Containerized application using Docker for consistent deployment across environments
+\end{itemize}
+
+\vspace{2pt}
+
+\textbf{uFund Animal Shelter} -- \textit{Java, Spring Boot, Angular, Mockito} \hfill Spring 2024
+\begin{itemize}
+    \item Collaborated with a team of 4 students to engineer a full-stack website for pet assistance services
+    \item Implemented REST API and controller using Spring framework with Angular frontend following MVC architecture
+    \item Formulated system-wide domain, architecture, and UML class diagrams to encapsulate application requirements
+    \item Built comprehensive test suite covering all cases using the Mockito framework
+\end{itemize}
+
+\vspace{2pt}
+
+\textbf{PokeGames} -- \textit{Python, Flask, React, REST API} \hfill 2024
+\begin{itemize}
+    \item Developed a full-stack Pokémon application integrating external Pokémon API for real-time data
+    \item Engineered Flask backend with RESTful API endpoints and React frontend for interactive user experience
+\end{itemize}
+
+\end{document}

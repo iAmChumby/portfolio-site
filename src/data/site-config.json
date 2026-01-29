@@ -35,6 +35,11 @@
         "external": false
       },
       {
+        "label": "Resume",
+        "href": "/resume",
+        "external": false
+      },
+      {
         "label": "Projects",
         "href": "/projects",
         "external": false

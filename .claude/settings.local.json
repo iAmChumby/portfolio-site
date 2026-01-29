@@ -11,7 +11,8 @@
       "mcp__MCP_DOCKER__browser_network_requests",
       "mcp__MCP_DOCKER__browser_run_code",
       "mcp__MCP_DOCKER__browser_evaluate",
-      "mcp__MCP_DOCKER__browser_close"
+      "mcp__MCP_DOCKER__browser_close",
+      "Bash(chmod:*)"
     ]
   }
 }

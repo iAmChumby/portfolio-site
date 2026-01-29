@@ -10,7 +10,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "resume:compile": "cd docs/resume && bash compile.sh"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

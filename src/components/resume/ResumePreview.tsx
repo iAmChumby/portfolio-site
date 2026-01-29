@@ -112,7 +112,7 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
         )}
 
         {previewUrl && !loading && (
-          <div className="relative w-full flex flex-col items-center">
+          <div className="relative w-full flex flex-col items-center p-4">
             {/* Clickable Preview Image */}
             <button
               onClick={handleOpenPDF}
@@ -129,7 +129,7 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
               </div>
             </button>
 
-            {/* Open PDF Button - Now below the preview */}
+            {/* Open PDF Button - Now below the preview, same width as preview */}
             <div className="w-full max-w-[50%]">
               <button
                 onClick={handleOpenPDF}

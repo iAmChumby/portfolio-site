@@ -1,4 +1,4 @@
-import PDFViewer from '@/components/resume/PDFViewer';
+import ResumePreview from '@/components/resume/ResumePreview';
 import DownloadButton from '@/components/resume/DownloadButton';
 import ProximityCard from '@/components/ui/ProximityCard';
 import { Metadata } from 'next';
@@ -33,16 +33,9 @@ export default function ResumePage() {
           </div>
         </div>
 
-        {/* PDF Viewer Section (Desktop/Tablet) */}
-        <div className="hidden sm:block mb-8">
-          <PDFViewer fileUrl="/luke-edwards-resume.pdf" />
-        </div>
-
-        {/* Mobile Message */}
-        <div className="sm:hidden mb-8 neu-surface p-6 rounded-neu-lg shadow-neu-outset text-center">
-          <p className="text-neu-text-secondary">
-            For the best viewing experience, download the resume or view on a larger screen.
-          </p>
+        {/* Resume Preview Section */}
+        <div className="mb-8">
+          <ResumePreview pdfUrl="/luke-edwards-resume.pdf" />
         </div>
 
         {/* Download Button (All Devices) */}

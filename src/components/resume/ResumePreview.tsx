@@ -27,8 +27,10 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
         // Dynamically import pdfjs-dist only in browser
         const pdfjsLib = await import('pdfjs-dist');
         
-        // Configure PDF.js worker for browser environment
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        // Configure PDF.js worker - use jsdelivr CDN with correct path
+        // For pdfjs-dist 5.x, the worker is at build/pdf.worker.mjs
+        const workerVersion = pdfjsLib.version || '5.4.530';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${workerVersion}/build/pdf.worker.mjs`;
 
         // Load PDF document from public URL
         const loadingTask = pdfjsLib.getDocument(pdfUrl);

@@ -98,7 +98,7 @@ export default function ResumePreview({ pdfUrl }: ResumePreviewProps) {
   }
 
   return (
-    <div className="neu-surface rounded-neu-lg shadow-neu-outset-lg overflow-hidden">
+    <div className="neu-surface rounded-neu-lg shadow-neu-outset-lg overflow-hidden max-w-[50%] mx-auto">
       {/* Preview Image Container */}
       <div className="bg-neu-bg-base overflow-hidden relative">
         {loading && (

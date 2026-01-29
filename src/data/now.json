@@ -25,6 +25,12 @@
   },
   "posts": [
     {
+      "id": "post-002",
+      "date": "2026-01-29",
+      "title": "Resume Refresh for 2026",
+      "body": "Just finished updating my resume with all the latest projects and experiences from the past year. Added some new technical details, reorganized things to better highlight what I've been working on, and made sure everything fits nicely on one page. If you're curious about what I've been up to or want to see the full picture, feel free to [take a look](/resume)—it's over on the resume page."
+    },
+    {
       "id": "post-001",
       "date": "2026-01-26",
       "title": "My New Now Page!",

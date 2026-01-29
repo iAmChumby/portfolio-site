@@ -18,7 +18,7 @@ export default function ResumePage() {
       {/* Background decoration */}
       <div className="absolute inset-0 z-0 pointer-events-none"></div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header Section */}
         <div className="text-center mb-8">
           <div className="relative inline-block">

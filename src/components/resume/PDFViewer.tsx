@@ -37,7 +37,7 @@ export default function PDFViewer({ fileUrl }: PDFViewerProps) {
   return (
     <div className="neu-surface rounded-neu-lg shadow-neu-outset-lg overflow-hidden">
       {/* PDF Document Container */}
-      <div className="bg-neu-bg-base border border-neu-bg-lighter rounded-neu-lg overflow-hidden relative">
+      <div className="bg-neu-bg-base overflow-hidden relative">
         {loading && (
           <div className="flex items-center justify-center p-12 absolute inset-0 bg-neu-bg-base z-10">
             <div className="animate-pulse space-y-4 w-full max-w-2xl">
@@ -50,8 +50,8 @@ export default function PDFViewer({ fileUrl }: PDFViewerProps) {
 
         {/* PDF iframe viewer */}
         <iframe
-          src={`${fileUrl}#view=FitH`}
-          className="w-full h-[800px] border-0"
+          src={`${fileUrl}#zoom=120`}
+          className="w-full h-[calc(100vh-300px)] border-0"
           title="Resume PDF"
           onLoad={handleLoad}
           onError={handleError}
